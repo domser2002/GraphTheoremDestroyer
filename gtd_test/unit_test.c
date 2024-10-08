@@ -3,7 +3,7 @@
 
 int sum(int a,int b)
 {
-    return a-b;
+    return a+b;
 }
 
 void test_sum(void) {

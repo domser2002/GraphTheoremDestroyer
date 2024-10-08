@@ -24,7 +24,7 @@ proof_machine:
 	C_INCLUDE_PATH=${C_INCLUDE_PATH} ${CC} ${CFLAGS} -c gtd_proof_machine/src/machine.c -o build/artifacts/machine.o
 
 test:
-	${CC} ${CFLAGS} -o build/bin/test gtd_fact_tree/src/test.c
+	${CC} ${CFLAGS} -o build/bin/test gtd_test/unit_test.c
 	./build/bin/test
 
 clean:

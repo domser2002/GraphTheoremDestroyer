@@ -20,6 +20,10 @@ common:
 proof_machine:
 	C_INCLUDE_PATH=${C_INCLUDE_PATH} ${CC} ${CFLAGS} -c gtd_proof_machine/src/machine.c -o build/artifacts/machine.o
 
+test:
+	${CC} ${CFLAGS} -o build/bin/test gtd_fact_tree/src/test.c
+	./build/bin/test
+
 clean:
 	rm build/bin/* || true
 	rm build/artifacts/* || true

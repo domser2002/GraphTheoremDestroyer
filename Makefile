@@ -23,9 +23,9 @@ common:
 proof_machine:
 	C_INCLUDE_PATH=${C_INCLUDE_PATH} ${CC} ${CFLAGS} -c gtd_proof_machine/src/machine.c -o build/artifacts/machine.o
 
-test: fact_tree_test
+test: fact_tree_test all
 	C_INCLUDE_PATH=${C_INCLUDE_PATH} ${CC} ${CFLAGS} -c gtd_test/unit_test.c -o build/artifacts/unit_test.o
-	${CC} ${CFLAGS} -o build/bin/test build/artifacts/unit_test.o build/artifacts/test_graph.o build/artifacts/test_fact.o
+	${CC} ${CFLAGS} -o build/bin/test build/artifacts/unit_test.o build/artifacts/test_graph.o build/artifacts/test_fact.o build/artifacts/graph.o build/artifacts/fact.o build/artifacts/log.o build/artifacts/common.o build/artifacts/machine.o ${LFLAGS}
 	./build/bin/test
 
 fact_tree_test:

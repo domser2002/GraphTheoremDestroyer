@@ -1,10 +1,50 @@
 #include "fact.h"
+#define MAX_CONTRADICTING_FACTS 2
+#define KNOWN_CONTRADICTIONS_NUMBER 2
+#define FACT_TYPE_NUM 4
+
+typedef bool (*contradiction_occurs_fun) (int*);
+
+typedef struct Contradiction {
+    bool types[FACT_TYPE_NUM];
+    contradiction_occurs_fun occurs;
+    int n_facts;
+    int n_params;
+    int type_to_param_idx[FACT_TYPE_NUM];
+} Contradiction;
 
 struct Fact 
 {
     FactType type;
     uint32_t *params;
     uint8_t params_count;
+};
+
+static bool contradiction_type_1_occurs(int params[2])
+{
+
+}
+
+static bool contradiction_type_2_occurs(int params[2])
+{
+
+}
+
+const Contradiction knownContradictionsArray[KNOWN_CONTRADICTIONS_NUMBER] = {
+    {
+        .types = {false, true, true, false},
+        .occurs = &contradiction_type_1_occurs,
+        .n_facts = 2,
+        .n_params = 2,
+        .type_to_param_idx = {-1,0,1,-1}
+    },
+    {
+        .types = {false, true, true, false},
+        .occurs = &contradiction_type_1_occurs,
+        .n_facts = 2,
+        .n_params = 2,
+        .type_to_param_idx = {-1,0,1,-1}
+    }
 };
 
 static Fact *create_one_parameter_fact(FactType type, uint32_t param)
@@ -70,29 +110,33 @@ int delete_max_edge_count_fact(Fact *fact)
 
 bool contradict(Fact *fact1, Fact *fact2)
 {
-    switch(fact1->type)
+    for(int i=0; i < KNOWN_CONTRADICTIONS_NUMBER; i++)
     {
-        case MinVertexCountFact:
-            switch(fact2->type)
-            {
-                case MaxVertexCountFact:
-                    return fact2->params[0] > fact1->params[0];
-                default:
-                    return false;
-            }
-        case MinEdgeCountFact:
-            switch(fact2->type)
-            {
-                case MaxVertexCountFact:
-                    return (fact2->params[0]) * (fact2->params[0] - 1) / 2 < fact1->params[0];
-                case MaxEdgeCountFact:
-                    return fact2->params[0] > fact1->params[0];
-                default:
-                    return false;                
-            }
-        default:
-            return false;
+        
     }
+    // switch(fact1->type)
+    // {
+    //     case MinVertexCountFact:
+    //         switch(fact2->type)
+    //         {
+    //             case MaxVertexCountFact:
+    //                 return fact2->params[0] > fact1->params[0];
+    //             default:
+    //                 return false;
+    //         }
+    //     case MinEdgeCountFact:
+    //         switch(fact2->type)
+    //         {
+    //             case MaxVertexCountFact:
+    //                 return (fact2->params[0]) * (fact2->params[0] - 1) / 2 < fact1->params[0];
+    //             case MaxEdgeCountFact:
+    //                 return fact2->params[0] > fact1->params[0];
+    //             default:
+    //                 return false;                
+    //         }
+    //     default:
+    //         return false;
+    // }
 }
 
 Fact *results(Fact *fact)

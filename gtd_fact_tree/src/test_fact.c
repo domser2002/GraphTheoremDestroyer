@@ -6,15 +6,17 @@ typedef int (*delete_fact_func)(Fact *);
 static void single_contradict_test(create_fact_func create_fact1, int fact1_param, create_fact_func create_fact2, int fact2_param, delete_fact_func delete_fact1, delete_fact_func delete_fact2, bool expected)
 {
     // Arrange
-    Fact *fact1 = create_fact1(fact1_param);
-    Fact *fact2 = create_fact2(fact2_param);
+    Fact **factArray = (Fact **)gtd_malloc(2*sizeof(Fact*));
+    factArray[0] = create_fact1(fact1_param);
+    factArray[1] = create_fact2(fact2_param);
     // Act
-    bool result = contradict(fact1, fact2);
+    bool result = contradict(factArray,2);
+    // Clean
+    delete_fact1(factArray[0]);
+    delete_fact2(factArray[1]);
+    gtd_free(factArray);
     // Assert
     assert(result == expected);
-    // Clean
-    delete_fact1(fact1);
-    delete_fact2(fact2);
 }
 
 /**

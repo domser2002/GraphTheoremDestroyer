@@ -26,7 +26,7 @@ int delete_max_vertex_count_fact(Fact *fact);
 int delete_min_edge_count_fact(Fact *fact);
 int delete_max_edge_count_fact(Fact *fact);
 
-bool contradict(Fact *fact1, Fact *fact2);
+bool contradict(Fact **factArray, int n_facts);
 Fact *results(Fact *fact);
 
 char *get_fact_str(Fact *fact);

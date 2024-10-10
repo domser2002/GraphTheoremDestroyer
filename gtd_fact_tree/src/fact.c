@@ -2,6 +2,7 @@
 #define MAX_CONTRADICTING_FACTS 2
 #define KNOWN_CONTRADICTIONS_NUMBER 2
 #define FACT_TYPE_NUM 4
+#define MAX_PARAMS_IN_FACT 1
 
 typedef bool (*contradiction_occurs_fun) (int*);
 
@@ -10,7 +11,7 @@ typedef struct Contradiction {
     contradiction_occurs_fun occurs;
     int n_facts;
     int n_params;
-    int type_to_param_idx[FACT_TYPE_NUM];
+    int type_to_param_idx[FACT_TYPE_NUM][MAX_PARAMS_IN_FACT];
 } Contradiction;
 
 struct Fact 
@@ -20,14 +21,20 @@ struct Fact
     uint8_t params_count;
 };
 
-static bool contradiction_type_1_occurs(int params[2])
+/**
+ * \brief contradiction type 1 - contradiction between max vertex count and min edge count
+ * \param params - array of 2 integers, max vertex count and min edge count
+ * \return true if contradiction occurs, false otherwise
+*/
+static bool contradiction_type_1_occurs(int *params)
 {
-
+    return (params[0] * (params[0] - 1) / 2) > params[1];
 }
 
-static bool contradiction_type_2_occurs(int params[2])
+static bool contradiction_type_2_occurs(int *params)
 {
-
+    GTD_UNUSED(params);
+    return false;
 }
 
 const Contradiction knownContradictionsArray[KNOWN_CONTRADICTIONS_NUMBER] = {
@@ -36,20 +43,20 @@ const Contradiction knownContradictionsArray[KNOWN_CONTRADICTIONS_NUMBER] = {
         .occurs = &contradiction_type_1_occurs,
         .n_facts = 2,
         .n_params = 2,
-        .type_to_param_idx = {-1,0,1,-1}
+        .type_to_param_idx = {{-1}, {0}, {1}, {-1}}
     },
     {
         .types = {false, true, true, false},
-        .occurs = &contradiction_type_1_occurs,
+        .occurs = &contradiction_type_2_occurs,
         .n_facts = 2,
         .n_params = 2,
-        .type_to_param_idx = {-1,0,1,-1}
+        .type_to_param_idx = {{-1}, {0} ,{1} ,{-1}}
     }
 };
 
 static Fact *create_one_parameter_fact(FactType type, uint32_t param)
 {
-    Fact *newFact = gtd_malloc(sizeof(Fact));
+    Fact *newFact = (Fact *)gtd_malloc(sizeof(Fact));
     newFact->type = type;
     newFact->params = gtd_malloc(1*sizeof(uint32_t));
     newFact->params[0] = param;
@@ -108,12 +115,35 @@ int delete_max_edge_count_fact(Fact *fact)
     return delete_one_parameter_fact(fact,MaxEdgeCountFact);
 }
 
-bool contradict(Fact *fact1, Fact *fact2)
+bool contradict(Fact **factArray, int n_facts)
 {
     for(int i=0; i < KNOWN_CONTRADICTIONS_NUMBER; i++)
     {
-        
+        int count = 0;
+        int *params = (int*)gtd_malloc(knownContradictionsArray[i].n_params * sizeof(int));
+        for(int j=0;j<n_facts;j++)
+        {
+            if(knownContradictionsArray[i].types[factArray[j]->type])
+            {
+                count++;
+                int param_idxs[MAX_PARAMS_IN_FACT];
+                for (int k = 0; k < MAX_PARAMS_IN_FACT; k++) {
+                    param_idxs[k] = knownContradictionsArray[i].type_to_param_idx[factArray[j]->type][k];
+                }
+                for(int k=0; k < factArray[j]->params_count; k++)
+                {
+                    params[param_idxs[k]] = factArray[j]->params[k];
+                }
+            }
+        }
+        if(count == knownContradictionsArray[i].n_facts)
+        {
+            if(knownContradictionsArray[i].occurs(params))
+                return true;
+        }
+        gtd_free(params);
     }
+    return false;
     // switch(fact1->type)
     // {
     //     case MinVertexCountFact:

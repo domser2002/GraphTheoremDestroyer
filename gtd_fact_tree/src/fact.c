@@ -28,7 +28,7 @@ struct Fact
 */
 static bool contradiction_type_1_occurs(int *params)
 {
-    return (params[0] * (params[0] - 1) / 2) > params[1];
+    return (params[0] * (params[0] - 1) / 2) < params[1];
 }
 
 static bool contradiction_type_2_occurs(int *params)
@@ -60,6 +60,7 @@ static Fact *create_one_parameter_fact(FactType type, uint32_t param)
     newFact->type = type;
     newFact->params = gtd_malloc(1*sizeof(uint32_t));
     newFact->params[0] = param;
+    newFact->params_count = 1;
     return newFact;
 }
 
@@ -144,29 +145,6 @@ bool contradict(Fact **factArray, int n_facts)
         gtd_free(params);
     }
     return false;
-    // switch(fact1->type)
-    // {
-    //     case MinVertexCountFact:
-    //         switch(fact2->type)
-    //         {
-    //             case MaxVertexCountFact:
-    //                 return fact2->params[0] > fact1->params[0];
-    //             default:
-    //                 return false;
-    //         }
-    //     case MinEdgeCountFact:
-    //         switch(fact2->type)
-    //         {
-    //             case MaxVertexCountFact:
-    //                 return (fact2->params[0]) * (fact2->params[0] - 1) / 2 < fact1->params[0];
-    //             case MaxEdgeCountFact:
-    //                 return fact2->params[0] > fact1->params[0];
-    //             default:
-    //                 return false;                
-    //         }
-    //     default:
-    //         return false;
-    // }
 }
 
 Fact *results(Fact *fact)

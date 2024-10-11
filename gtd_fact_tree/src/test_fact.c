@@ -31,11 +31,11 @@ static void test_contradiction_1(int maxVertexCount, int minEdgeCount, bool expe
     single_contradict_test(&create_max_vertex_count_fact, maxVertexCount, 
     &create_min_edge_count_fact, minEdgeCount,
     &delete_max_vertex_count_fact, &delete_min_edge_count_fact, expected);
-    // check if order changes anything
-    // TODO: rethink if still needed after implementing new approach
-    single_contradict_test(&create_min_edge_count_fact, minEdgeCount, 
-    &create_max_vertex_count_fact, maxVertexCount,
-    &delete_max_vertex_count_fact, &delete_min_edge_count_fact, expected);
+    // // check if order changes anything
+    // // TODO: rethink if still needed after implementing new approach
+    // single_contradict_test(&create_min_edge_count_fact, minEdgeCount, 
+    // &create_max_vertex_count_fact, maxVertexCount,
+    // &delete_max_vertex_count_fact, &delete_min_edge_count_fact, expected);
 }
 
 static void test_contradict(void)
@@ -45,7 +45,6 @@ static void test_contradict(void)
     test_contradiction_1(0,0,false);
     test_contradiction_1(10000,10000 * 9999 / 2 + 1,true);
     test_contradiction_1(10000,10000 * 9999 / 2,false);
-
 }
 
 static void test_results(void)

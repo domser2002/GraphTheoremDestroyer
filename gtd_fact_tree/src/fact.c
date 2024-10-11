@@ -116,17 +116,29 @@ int delete_max_edge_count_fact(Fact *fact)
     return delete_one_parameter_fact(fact,MaxEdgeCountFact);
 }
 
+/**
+ * \brief Function which checks if facts from factArray are in one of the predefined contradictions
+ * \param factArray array of n_facts Fact objects
+ * \param n_facts number of facts in array, should be <= MAX_CONTRADICTING_FACTS
+ * \return true if facts are in one of the predefined contradictions, false otherwise
+*/
 bool contradict(Fact **factArray, int n_facts)
 {
+    if(n_facts > MAX_CONTRADICTING_FACTS) return false;
     for(int i=0; i < KNOWN_CONTRADICTIONS_NUMBER; i++)
     {
-        int count = 0;
+        if(n_facts != knownContradictionsArray[i].n_facts) continue;
         int *params = (int*)gtd_malloc(knownContradictionsArray[i].n_params * sizeof(int));
+        bool fact_types_match = true;
         for(int j=0;j<n_facts;j++)
         {
-            if(knownContradictionsArray[i].types[factArray[j]->type])
+            if(!knownContradictionsArray[i].types[factArray[j]->type])
             {
-                count++;
+                fact_types_match = false;
+                break;
+            }
+            else
+            {
                 int param_idxs[MAX_PARAMS_IN_FACT];
                 for (int k = 0; k < MAX_PARAMS_IN_FACT; k++) {
                     param_idxs[k] = knownContradictionsArray[i].type_to_param_idx[factArray[j]->type][k];
@@ -137,11 +149,8 @@ bool contradict(Fact **factArray, int n_facts)
                 }
             }
         }
-        if(count == knownContradictionsArray[i].n_facts)
-        {
-            if(knownContradictionsArray[i].occurs(params))
-                return true;
-        }
+        if(fact_types_match && knownContradictionsArray[i].occurs(params))
+            return true;
         gtd_free(params);
     }
     return false;

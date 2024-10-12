@@ -64,7 +64,7 @@ void execute(ProofMachine *machine)
     // add facts
     for(uint32_t i = 0; i < n; i++)
     {
-        Fact *newFact = results((Fact *)machine->FactTree->vertexData[i]);
+        Fact *newFact = implies((Fact *)machine->FactTree->vertexData[i]);
         if(newFact != NULL)
         {
             if(add_vertex_with_edge(machine->FactTree,i,(void*)newFact))

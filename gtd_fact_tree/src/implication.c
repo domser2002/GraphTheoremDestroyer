@@ -1,6 +1,6 @@
 #include "implication.h"
 
-Fact *results(Fact *fact)
+Fact *implies(Fact *fact)
 {
     switch (fact->type)
     {

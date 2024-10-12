@@ -4,9 +4,10 @@
 #define FACT_TYPE_NUM 4
 #define MAX_PARAMS_IN_FACT 1
 
-typedef bool (*contradiction_occurs_fun) (int*);
+typedef bool (*contradiction_occurs_fun)(int *);
 
-typedef struct Contradiction {
+typedef struct Contradiction
+{
     bool types[FACT_TYPE_NUM];
     contradiction_occurs_fun occurs;
     int n_facts;
@@ -14,7 +15,7 @@ typedef struct Contradiction {
     int type_to_param_idx[FACT_TYPE_NUM][MAX_PARAMS_IN_FACT];
 } Contradiction;
 
-struct Fact 
+struct Fact
 {
     FactType type;
     uint32_t *params;
@@ -25,7 +26,7 @@ struct Fact
  * \brief contradiction type 1 - contradiction between max vertex count and min edge count
  * \param params - array of 2 integers, max vertex count and min edge count
  * \return true if contradiction occurs, false otherwise
-*/
+ */
 static bool contradiction_type_1_occurs(int *params)
 {
     return (params[0] * (params[0] - 1) / 2) < params[1];
@@ -38,27 +39,22 @@ static bool contradiction_type_2_occurs(int *params)
 }
 
 const Contradiction knownContradictionsArray[KNOWN_CONTRADICTIONS_NUMBER] = {
-    {
-        .types = {false, true, true, false},
-        .occurs = &contradiction_type_1_occurs,
-        .n_facts = 2,
-        .n_params = 2,
-        .type_to_param_idx = {{-1}, {0}, {1}, {-1}}
-    },
-    {
-        .types = {false, true, true, false},
-        .occurs = &contradiction_type_2_occurs,
-        .n_facts = 2,
-        .n_params = 2,
-        .type_to_param_idx = {{-1}, {0} ,{1} ,{-1}}
-    }
-};
+    {.types = {false, true, true, false},
+     .occurs = &contradiction_type_1_occurs,
+     .n_facts = 2,
+     .n_params = 2,
+     .type_to_param_idx = {{-1}, {0}, {1}, {-1}}},
+    {.types = {false, true, true, false},
+     .occurs = &contradiction_type_2_occurs,
+     .n_facts = 2,
+     .n_params = 2,
+     .type_to_param_idx = {{-1}, {0}, {1}, {-1}}}};
 
 static Fact *create_one_parameter_fact(FactType type, uint32_t param)
 {
     Fact *newFact = (Fact *)gtd_malloc(sizeof(Fact));
     newFact->type = type;
-    newFact->params = gtd_malloc(1*sizeof(uint32_t));
+    newFact->params = gtd_malloc(1 * sizeof(uint32_t));
     newFact->params[0] = param;
     newFact->params_count = 1;
     return newFact;
@@ -66,27 +62,27 @@ static Fact *create_one_parameter_fact(FactType type, uint32_t param)
 
 Fact *create_min_vertex_count_fact(int minVertexCount)
 {
-    return create_one_parameter_fact(MinVertexCountFact,minVertexCount);
+    return create_one_parameter_fact(MinVertexCountFact, minVertexCount);
 }
 
 Fact *create_max_vertex_count_fact(int maxVertexCount)
 {
-    return create_one_parameter_fact(MaxVertexCountFact,maxVertexCount);
+    return create_one_parameter_fact(MaxVertexCountFact, maxVertexCount);
 }
 
 Fact *create_min_edge_count_fact(int minEdgeCount)
 {
-    return create_one_parameter_fact(MinEdgeCountFact,minEdgeCount);
+    return create_one_parameter_fact(MinEdgeCountFact, minEdgeCount);
 }
 
 Fact *create_max_edge_count_fact(int maxEdgeCount)
 {
-    return create_one_parameter_fact(MaxEdgeCountFact,maxEdgeCount);
+    return create_one_parameter_fact(MaxEdgeCountFact, maxEdgeCount);
 }
 
 static int delete_one_parameter_fact(Fact *fact, FactType type)
 {
-    if(fact->type != type)
+    if (fact->type != type)
     {
         GTD_LOG("[ERROR] Wrong fact type!");
         return 1;
@@ -98,22 +94,22 @@ static int delete_one_parameter_fact(Fact *fact, FactType type)
 
 int delete_min_vertex_count_fact(Fact *fact)
 {
-    return delete_one_parameter_fact(fact,MinVertexCountFact);
+    return delete_one_parameter_fact(fact, MinVertexCountFact);
 }
 
 int delete_max_vertex_count_fact(Fact *fact)
 {
-    return delete_one_parameter_fact(fact,MaxVertexCountFact);
+    return delete_one_parameter_fact(fact, MaxVertexCountFact);
 }
 
 int delete_min_edge_count_fact(Fact *fact)
 {
-    return delete_one_parameter_fact(fact,MinEdgeCountFact);
+    return delete_one_parameter_fact(fact, MinEdgeCountFact);
 }
 
 int delete_max_edge_count_fact(Fact *fact)
 {
-    return delete_one_parameter_fact(fact,MaxEdgeCountFact);
+    return delete_one_parameter_fact(fact, MaxEdgeCountFact);
 }
 
 /**
@@ -121,18 +117,20 @@ int delete_max_edge_count_fact(Fact *fact)
  * \param factArray array of n_facts Fact objects
  * \param n_facts number of facts in array, should be <= MAX_CONTRADICTING_FACTS
  * \return true if facts are in one of the predefined contradictions, false otherwise
-*/
+ */
 bool contradict(Fact **factArray, int n_facts)
 {
-    if(n_facts > MAX_CONTRADICTING_FACTS) return false;
-    for(int i=0; i < KNOWN_CONTRADICTIONS_NUMBER; i++)
+    if (n_facts > MAX_CONTRADICTING_FACTS)
+        return false;
+    for (int i = 0; i < KNOWN_CONTRADICTIONS_NUMBER; i++)
     {
-        if(n_facts != knownContradictionsArray[i].n_facts) continue;
-        int *params = (int*)gtd_malloc(knownContradictionsArray[i].n_params * sizeof(int));
+        if (n_facts != knownContradictionsArray[i].n_facts)
+            continue;
+        int *params = (int *)gtd_malloc(knownContradictionsArray[i].n_params * sizeof(int));
         bool fact_types_match = true;
-        for(int j=0;j<n_facts;j++)
+        for (int j = 0; j < n_facts; j++)
         {
-            if(!knownContradictionsArray[i].types[factArray[j]->type])
+            if (!knownContradictionsArray[i].types[factArray[j]->type])
             {
                 fact_types_match = false;
                 break;
@@ -140,16 +138,17 @@ bool contradict(Fact **factArray, int n_facts)
             else
             {
                 int param_idxs[MAX_PARAMS_IN_FACT];
-                for (int k = 0; k < MAX_PARAMS_IN_FACT; k++) {
+                for (int k = 0; k < MAX_PARAMS_IN_FACT; k++)
+                {
                     param_idxs[k] = knownContradictionsArray[i].type_to_param_idx[factArray[j]->type][k];
                 }
-                for(int k=0; k < factArray[j]->params_count; k++)
+                for (int k = 0; k < factArray[j]->params_count; k++)
                 {
                     params[param_idxs[k]] = factArray[j]->params[k];
                 }
             }
         }
-        if(fact_types_match && knownContradictionsArray[i].occurs(params))
+        if (fact_types_match && knownContradictionsArray[i].occurs(params))
             return true;
         gtd_free(params);
     }
@@ -158,35 +157,35 @@ bool contradict(Fact **factArray, int n_facts)
 
 Fact *results(Fact *fact)
 {
-    switch(fact->type)
+    switch (fact->type)
     {
-        case MinEdgeCountFact:
-            return create_max_vertex_count_fact(ceil( (1 + sqrt(1+8*fact->params[0])) / 2) );
-        case MaxVertexCountFact:
-            return create_max_edge_count_fact((fact->params[0]) * (fact->params[0] - 1) / 2);
-        default:
-            return NULL;
+    case MinEdgeCountFact:
+        return create_max_vertex_count_fact(ceil((1 + sqrt(1 + 8 * fact->params[0])) / 2));
+    case MaxVertexCountFact:
+        return create_max_edge_count_fact((fact->params[0]) * (fact->params[0] - 1) / 2);
+    default:
+        return NULL;
     }
 }
 
 char *get_fact_str(Fact *fact)
 {
-    char *result = (char*)gtd_malloc(128*sizeof(char));
+    char *result = (char *)gtd_malloc(128 * sizeof(char));
     switch (fact->type)
     {
-        case MinEdgeCountFact:
-            sprintf(result,"Graph has at least %d edges", fact->params[0]);
-            return result;
-        case MaxEdgeCountFact:
-            sprintf(result,"Graph has at most %d edges", fact->params[0]);
-            return result;
-        case MinVertexCountFact:
-            sprintf(result,"Graph has at least %d vertices", fact->params[0]);
-            return result;
-        case MaxVertexCountFact:
-            sprintf(result,"Graph has at most %d vertices", fact->params[0]);
-            return result;
-        default:
-            return "";
+    case MinEdgeCountFact:
+        sprintf(result, "Graph has at least %d edges", fact->params[0]);
+        return result;
+    case MaxEdgeCountFact:
+        sprintf(result, "Graph has at most %d edges", fact->params[0]);
+        return result;
+    case MinVertexCountFact:
+        sprintf(result, "Graph has at least %d vertices", fact->params[0]);
+        return result;
+    case MaxVertexCountFact:
+        sprintf(result, "Graph has at most %d vertices", fact->params[0]);
+        return result;
+    default:
+        return "";
     }
 }

@@ -17,7 +17,7 @@
 // }
 
 int main(void) {
-    test_fact();
+    test_fact_tree();
     printf("All tests passed!\n");
     return 0;
 }

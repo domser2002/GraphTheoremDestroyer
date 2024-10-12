@@ -4,5 +4,5 @@
 #include "fact.h"
 #include "contradiction.h"
 #include "implication.h"
-void test_fact(void);
+void test_fact_tree(void);
 #endif

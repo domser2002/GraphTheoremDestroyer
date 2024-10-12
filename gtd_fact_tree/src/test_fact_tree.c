@@ -38,7 +38,7 @@ contradiction between max vertex count and min edge count
 * \param minEdgeCount min edge count
 * \param expected expected test result, true if facts contradict
 */
-static void test_contradiction_1(int maxVertexCount, int minEdgeCount, bool expected)
+static void test_contradiction_type_1(int maxVertexCount, int minEdgeCount, bool expected)
 {
     int n_facts = 2;
     create_fact_func *create_fact_functions = (create_fact_func*)gtd_malloc(n_facts*sizeof(create_fact_func));
@@ -63,7 +63,7 @@ contradiction between min vertex count and max vertex count
 * \param maxVertexCount max vertex count
 * \param expected expected test result, true if facts contradict
 */
-static void test_contradiction_2(int minVertexCount, int maxVertexCount, bool expected)
+static void test_contradiction_type_2(int minVertexCount, int maxVertexCount, bool expected)
 {
     int n_facts = 2;
     create_fact_func *create_fact_functions = (create_fact_func*)gtd_malloc(n_facts*sizeof(create_fact_func));
@@ -88,7 +88,7 @@ contradiction between min edge count and max edge count
 * \param maxEdgeCount max edge count
 * \param expected expected test result, true if facts contradict
 */
-static void test_contradiction_3(int minEdgeCount, int maxEdgeCount, bool expected)
+static void test_contradiction_type_3(int minEdgeCount, int maxEdgeCount, bool expected)
 {
     int n_facts = 2;
     create_fact_func *create_fact_functions = (create_fact_func*)gtd_malloc(n_facts*sizeof(create_fact_func));
@@ -107,34 +107,42 @@ static void test_contradiction_3(int minEdgeCount, int maxEdgeCount, bool expect
 }
 
 /**
- * \brief function to run all tests for the contradict method
+ * \brief function to run all tests for contradict method
 */
 static void test_contradict(void)
 {
-    test_contradiction_1(1,1,true);
-    test_contradiction_1(1,0,false);
-    test_contradiction_1(0,0,false);
-    test_contradiction_1(10000,10000 * 9999 / 2 + 1,true);
-    test_contradiction_1(10000,10000 * 9999 / 2,false);
-    test_contradiction_2(0,0,false);
-    test_contradiction_2(1,0,true);
-    test_contradiction_2(0,1,false);
-    test_contradiction_2(1234567,1234566,true);
-    test_contradiction_3(0,0,false);
-    test_contradiction_3(1,0,true);
-    test_contradiction_3(0,1,false);
-    test_contradiction_3(1234567,1234566,true);
+    test_contradiction_type_1(1,1,true);
+    test_contradiction_type_1(1,0,false);
+    test_contradiction_type_1(0,0,false);
+    test_contradiction_type_1(10000,10000 * 9999 / 2 + 1,true);
+    test_contradiction_type_1(10000,10000 * 9999 / 2,false);
+    test_contradiction_type_2(0,0,false);
+    test_contradiction_type_2(1,0,true);
+    test_contradiction_type_2(0,1,false);
+    test_contradiction_type_2(1234567,1234566,true);
+    test_contradiction_type_3(0,0,false);
+    test_contradiction_type_3(1,0,true);
+    test_contradiction_type_3(0,1,false);
+    test_contradiction_type_3(1234567,1234566,true);
 }
 
-static void test_results(void)
+/**
+ * \brief function to run all tests for functions from the contradiction.h file
+*/
+static void test_contradiction(void)
+{
+    test_contradict();
+}
+
+static void test_implication(void)
 {
 }
 
 /**
- * \brief function to run all required tests for functions from fact.h
+ * \brief function to run all required tests for files from gtd_fact_tree
 */
-void test_fact(void)
+void test_fact_tree(void)
 {
-    test_contradict();
-    test_results();
+    test_contradiction();
+    test_implication();
 }

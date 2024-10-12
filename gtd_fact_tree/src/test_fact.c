@@ -5,8 +5,11 @@ typedef int (*delete_fact_func)(Fact *);
 
 /**
  * \brief helper function to perform a single test on a contradict method
- * \param create_fact1 pointer to function used to create first fact
- * 
+ * \param n_facts number of facts
+ * \param create_facts array of pointers to functions used to create facts
+ * \param delete_facts array of pointers to functions used to delete facts
+ * \param fact_params array of parameters used to create facts
+ * \param expected expected contradict return value
 */
 static void single_contradict_test(int n_facts, create_fact_func *create_facts, delete_fact_func *delete_facts, int *fact_params, bool expected)
 {
@@ -127,6 +130,9 @@ static void test_results(void)
 {
 }
 
+/**
+ * \brief function to run all required tests for functions from fact.h
+*/
 void test_fact(void)
 {
     test_contradict();

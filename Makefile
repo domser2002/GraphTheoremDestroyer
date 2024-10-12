@@ -6,13 +6,15 @@ C_INCLUDE_PATH = gtd_fact_tree/inc:gtd_log/inc:gtd_common/inc:gtd_proof_machine/
 all: fact_tree log common proof_machine
 	mkdir build/bin || true
 	C_INCLUDE_PATH=${C_INCLUDE_PATH} ${CC} ${CFLAGS} -c main.c -o build/artifacts/main.o
-	${CC} ${CFLAGS} -o build/bin/main build/artifacts/main.o build/artifacts/graph.o build/artifacts/fact.o build/artifacts/log.o build/artifacts/common.o build/artifacts/machine.o ${LFLAGS}
+	${CC} ${CFLAGS} -o build/bin/main build/artifacts/main.o build/artifacts/graph.o build/artifacts/fact.o build/artifacts/contradiction.o build/artifacts/implication.o build/artifacts/log.o build/artifacts/common.o build/artifacts/machine.o ${LFLAGS}
 
 fact_tree:
 	mkdir build || true
 	mkdir build/artifacts || true
 	C_INCLUDE_PATH=${C_INCLUDE_PATH} ${CC} ${CFLAGS} -c gtd_fact_tree/src/graph.c -o build/artifacts/graph.o
 	C_INCLUDE_PATH=${C_INCLUDE_PATH} ${CC} ${CFLAGS} -c gtd_fact_tree/src/fact.c -o build/artifacts/fact.o
+	C_INCLUDE_PATH=${C_INCLUDE_PATH} ${CC} ${CFLAGS} -c gtd_fact_tree/src/contradiction.c -o build/artifacts/contradiction.o
+	C_INCLUDE_PATH=${C_INCLUDE_PATH} ${CC} ${CFLAGS} -c gtd_fact_tree/src/implication.c -o build/artifacts/implication.o
 
 log:
 	C_INCLUDE_PATH=${C_INCLUDE_PATH} ${CC} ${CFLAGS} -c gtd_log/src/log.c -o build/artifacts/log.o
@@ -25,7 +27,7 @@ proof_machine:
 
 test: fact_tree_test all
 	C_INCLUDE_PATH=${C_INCLUDE_PATH} ${CC} ${CFLAGS} -c gtd_test/unit_test.c -o build/artifacts/unit_test.o
-	${CC} ${CFLAGS} -o build/bin/test build/artifacts/unit_test.o build/artifacts/test_graph.o build/artifacts/test_fact.o build/artifacts/graph.o build/artifacts/fact.o build/artifacts/log.o build/artifacts/common.o build/artifacts/machine.o ${LFLAGS}
+	${CC} ${CFLAGS} -o build/bin/test build/artifacts/unit_test.o build/artifacts/test_graph.o build/artifacts/test_fact.o build/artifacts/graph.o build/artifacts/fact.o build/artifacts/contradiction.o build/artifacts/implication.o build/artifacts/log.o build/artifacts/common.o build/artifacts/machine.o ${LFLAGS}
 	./build/bin/test
 
 fact_tree_test:

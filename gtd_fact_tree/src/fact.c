@@ -1,6 +1,6 @@
 #include "fact.h"
 #define MAX_CONTRADICTING_FACTS 2
-#define KNOWN_CONTRADICTIONS_NUMBER 2
+#define KNOWN_CONTRADICTIONS_NUMBER 3
 #define FACT_TYPE_NUM 4
 #define MAX_PARAMS_IN_FACT 1
 
@@ -32,10 +32,24 @@ static bool contradiction_type_1_occurs(int *params)
     return (params[0] * (params[0] - 1) / 2) < params[1];
 }
 
+/**
+ * \brief contradiction type 2 - contradiction between min vertex count and max vertex count
+ * \param params - array of 2 integers, min vertex count and max vertex count
+ * \return true if contradiction occurs, false otherwise
+ */
 static bool contradiction_type_2_occurs(int *params)
 {
-    GTD_UNUSED(params);
-    return false;
+    return params[1] > params[0];
+}
+
+/**
+ * \brief contradiction type 3 - contradiction between min edge count and max edge count
+ * \param params - array of 2 integers, min edge count and max edge count
+ * \return true if contradiction occurs, false otherwise
+ */
+static bool contradiction_type_3_occurs(int *params)
+{
+    return params[1] > params[0];
 }
 
 const Contradiction knownContradictionsArray[KNOWN_CONTRADICTIONS_NUMBER] = {
@@ -44,11 +58,16 @@ const Contradiction knownContradictionsArray[KNOWN_CONTRADICTIONS_NUMBER] = {
      .n_facts = 2,
      .n_params = 2,
      .type_to_param_idx = {{-1}, {0}, {1}, {-1}}},
-    {.types = {false, true, true, false},
+    {.types = {true, true, false, false},
      .occurs = &contradiction_type_2_occurs,
      .n_facts = 2,
      .n_params = 2,
-     .type_to_param_idx = {{-1}, {0}, {1}, {-1}}}};
+     .type_to_param_idx = {{0}, {1}, {-1}, {-1}}},
+    {.types = {false, false, true, true},
+     .occurs = &contradiction_type_3_occurs,
+     .n_facts = 2,
+     .n_params = 2,
+     .type_to_param_idx = {{-1}, {-1}, {0}, {1}}}};
 
 static Fact *create_one_parameter_fact(FactType type, uint32_t param)
 {
@@ -137,6 +156,7 @@ bool contradict(Fact **factArray, int n_facts)
             }
             else
             {
+                // fill params array at the correct positions
                 int param_idxs[MAX_PARAMS_IN_FACT];
                 for (int k = 0; k < MAX_PARAMS_IN_FACT; k++)
                 {

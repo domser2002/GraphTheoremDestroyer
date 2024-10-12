@@ -1,6 +1,6 @@
 #include <assert.h>
 #include <stdio.h>
-#include "test_fact.h"
+#include "test_fact_tree.h"
 
 // int sum(int a,int b)
 // {

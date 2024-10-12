@@ -5,7 +5,7 @@ C_INCLUDE_PATH = gtd_fact_tree/inc:gtd_log/inc:gtd_common/inc:gtd_proof_machine/
 BIN_PATH = build/bin
 OBJ_PATH = build/obj
 MAIN_OBJ_FILES = main.o graph.o fact.o contradiction.o implication.o log.o common.o machine.o
-TEST_OBJ_FILES = unit_test.o test_fact.o fact.o contradiction.o implication.o common.o log.o 
+TEST_OBJ_FILES = unit_test.o test_fact_tree.o fact.o contradiction.o implication.o common.o log.o 
 MAIN_OBJ_FILES_WITH_PATH = $(addprefix ${OBJ_PATH}/, ${MAIN_OBJ_FILES})
 TEST_OBJ_FILES_WITH_PATH = $(addprefix ${OBJ_PATH}/, ${TEST_OBJ_FILES})
 
@@ -37,7 +37,7 @@ test: fact_tree_test all
 	./${BIN_PATH}/test
 
 fact_tree_test:
-	C_INCLUDE_PATH=${C_INCLUDE_PATH} ${CC} ${CFLAGS} -c gtd_fact_tree/src/test_fact.c -o ${OBJ_PATH}/test_fact.o
+	C_INCLUDE_PATH=${C_INCLUDE_PATH} ${CC} ${CFLAGS} -c gtd_fact_tree/src/test_fact_tree.c -o ${OBJ_PATH}/test_fact_tree.o
 
 clean:
 	rm ${BIN_PATH}/* || true

@@ -1,0 +1,4 @@
+#ifndef CONTRADICTION_H
+#define CONTRADICTION_H
+
+#endif

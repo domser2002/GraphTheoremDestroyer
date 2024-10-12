@@ -3,6 +3,8 @@
 #include "graph.h"
 #include "common.h"
 #include "fact.h"
+#include "contradiction.h"
+#include "implication.h"
 #include <stdbool.h>
 #include <stdint.h>
 

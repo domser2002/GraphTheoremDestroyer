@@ -44,9 +44,10 @@ void execute(ProofMachine *machine)
     {
         for (uint32_t j = i; j < n; j++)
         {
-            Fact *fact1 = (Fact *)machine->FactTree->vertexData[i];
-            Fact *fact2 = (Fact *)machine->FactTree->vertexData[j];
-            if(contradict(fact1,fact2))
+            Fact **factArray = (Fact**)gtd_malloc(2*sizeof(Fact*));
+            factArray[0] = (Fact *)machine->FactTree->vertexData[i];
+            factArray[1] = (Fact *)machine->FactTree->vertexData[j];
+            if(contradict(factArray,2))
             {
                 machine->contradictionFound = true;
                 machine->contradiciting_idxs = (uint32_t*)gtd_malloc(2 * sizeof(uint32_t));
@@ -54,8 +55,10 @@ void execute(ProofMachine *machine)
                 machine->contradiciting_idxs[1] = j;
                 machine->contradicting_count = 2;
                 machine->state = EXECUTED;
+                gtd_free(factArray);
                 return;
             }
+            gtd_free(factArray);
         }
     }
     // add facts

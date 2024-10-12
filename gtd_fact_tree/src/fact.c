@@ -39,7 +39,7 @@ static bool contradiction_type_1_occurs(int *params)
  */
 static bool contradiction_type_2_occurs(int *params)
 {
-    return params[1] > params[0];
+    return params[0] > params[1];
 }
 
 /**
@@ -49,7 +49,7 @@ static bool contradiction_type_2_occurs(int *params)
  */
 static bool contradiction_type_3_occurs(int *params)
 {
-    return params[1] > params[0];
+    return params[0] > params[1];
 }
 
 const Contradiction knownContradictionsArray[KNOWN_CONTRADICTIONS_NUMBER] = {

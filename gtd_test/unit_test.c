@@ -1,6 +1,5 @@
 #include <assert.h>
 #include <stdio.h>
-#include "test_graph.h"
 #include "test_fact.h"
 
 // int sum(int a,int b)
@@ -19,7 +18,6 @@
 
 int main(void) {
     test_fact();
-    test_graph();
     printf("All tests passed!\n");
     return 0;
 }

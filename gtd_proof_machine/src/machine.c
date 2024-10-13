@@ -64,14 +64,25 @@ void execute(ProofMachine *machine)
     // add facts
     for(uint32_t i = 0; i < n; i++)
     {
-        Fact *newFact = implies((Fact *)machine->FactTree->vertexData[i]);
-        if(newFact != NULL)
+        Fact **factArray = (Fact **)gtd_malloc(sizeof(Fact*));
+        factArray[0] = (Fact*)machine->FactTree->vertexData[i];
+        int count;
+        Fact **newFacts = implies(factArray, &count);
+        for(int i=0;i<count;i++)
         {
-            if(add_vertex_with_edge(machine->FactTree,i,(void*)newFact))
-                execute(machine);
-            else
-                gtd_free(newFact);
+            if(!add_vertex_with_edge(machine->FactTree,i,(void*)newFacts[i]))
+                break;
         }
+        gtd_free(newFacts);
+        if(count > 0)
+            execute(machine);
+        // if(newFacts != NULL && count != 0)
+        // {
+        //     if(add_vertex_with_edge(machine->FactTree,i,(void*)newFacts[0]))
+        //         execute(machine);
+        //     else
+        //         gtd_free(newFacts);
+        // }
     }
     machine->state = EXECUTED;
     // generate cases

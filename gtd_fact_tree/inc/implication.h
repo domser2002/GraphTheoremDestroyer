@@ -2,5 +2,5 @@
 #define IMPLICATION_H
 #define CAN_ACCESS_FACT
 #include "fact.h"
-Fact *implies(Fact *fact);
+Fact **implies(Fact **factArray, int *count);
 #endif

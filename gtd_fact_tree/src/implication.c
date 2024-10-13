@@ -38,15 +38,19 @@ Implication knownImplicationsArray[KNOWN_IMPLICATIONS_NUMBER] = {
     }
 };
 
-Fact *implies(Fact *fact)
+Fact **implies(Fact **factArray, int *count)
 {
-    switch (fact->type)
-    {
-    case MinEdgeCountFact:
-        return create_max_vertex_count_fact(ceil((1 + sqrt(1 + 8 * fact->params[0])) / 2));
-    case MaxVertexCountFact:
-        return create_max_edge_count_fact((fact->params[0]) * (fact->params[0] - 1) / 2);
-    default:
-        return NULL;
-    }
+    GTD_UNUSED(factArray);
+    count = 0;
+    GTD_UNUSED(count);
+    return NULL;
+    // switch (fact->type)
+    // {
+    // case MinEdgeCountFact:
+    //     return create_max_vertex_count_fact(ceil((1 + sqrt(1 + 8 * fact->params[0])) / 2));
+    // case MaxVertexCountFact:
+    //     return create_max_edge_count_fact((fact->params[0]) * (fact->params[0] - 1) / 2);
+    // default:
+    //     return NULL;
+    // }
 }

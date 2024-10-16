@@ -86,7 +86,7 @@ Implication knownImplicationsArray[KNOWN_IMPLICATIONS_NUMBER] = {
  */
 Fact **implies(Fact **factArray, int n_facts, int *count)
 {
-    count = 0;
+    *count = 0;
     if (n_facts > MAX_LEFT_SIDE_FACTS)
         return NULL;
     for (int i = 0; i < KNOWN_IMPLICATIONS_NUMBER; i++)
@@ -117,7 +117,8 @@ Fact **implies(Fact **factArray, int n_facts, int *count)
         {
             int *right_side_params = (int*)gtd_malloc(knownImplicationsArray[i].right_side.n_params * sizeof(int));
             knownImplicationsArray[i].calculate_params(params,right_side_params);
-            Fact **right_side_facts = (Fact**)gtd_malloc(knownImplicationsArray[i].right_side.n_facts * sizeof(Fact*));
+            *count = knownImplicationsArray[i].right_side.n_facts;
+            Fact **right_side_facts = (Fact**)gtd_malloc(*count * sizeof(Fact*));
             int counter = 0;
             for(int k=0;k<knownImplicationsArray[i].right_side.n_facts;k++)
             {

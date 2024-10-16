@@ -1,21 +1,28 @@
 #include "implication.h"
 #define KNOWN_IMPLICATIONS_NUMBER 2
 #define MAX_LEFT_SIDE_FACTS 1
+#define MAX_RIGHT_SIDE_FACTS 1
 
 typedef bool (*calc_right_side_params_fun)(int *, int *);
 
-typedef struct Implication_Side
+typedef struct Implication_Left_Side
 {
     bool types[FACT_TYPE_NUM];
     int n_facts;
     int n_params;
     int type_to_param_idx[FACT_TYPE_NUM][MAX_PARAMS_IN_FACT];
-} Implication_Side;
+} Implication_Left_Side;
+
+typedef struct Implication_Right_Side
+{
+    int n_facts;
+    FactType types[MAX_RIGHT_SIDE_FACTS];
+} Implication_Right_Side;
 typedef struct Implication
 {
     calc_right_side_params_fun calculate_params;
-    Implication_Side left_side;
-    Implication_Side right_side;
+    Implication_Left_Side left_side;
+    Implication_Right_Side right_side;
 } Implication;
 
 bool implication_type_1_calculate_right_side_params(int *left_side_params, int *right_side_params)
@@ -84,26 +91,23 @@ Fact **implies(Fact **factArray, int n_facts, int *count)
             int *right_side_params = (int*)gtd_malloc(knownImplicationsArray[i].right_side.n_params * sizeof(int));
             knownImplicationsArray[i].calculate_params(params,right_side_params);
             Fact **right_side_facts = (Fact**)gtd_malloc(knownImplicationsArray[i].right_side.n_facts * sizeof(Fact*));
+            int counter = 0;
             for(int k=0;k<knownImplicationsArray[i].right_side.n_facts;k++)
             {
-                int *fact_params = (int*)gtd_malloc(knownImplicationsArray[i].right_side.n_params * sizeof(int));
-                
-                //right_side_facts[k] = 
+                FactType type = knownImplicationsArray[i].right_side.types[k];
+                int n_params = get_param_count(type);
+                int *fact_params = (int*)gtd_malloc(n_params * sizeof(int));
+                for(int s=0;s<n_params;s++)
+                {
+                    fact_params[s] = right_side_params[counter++];
+                }
+                right_side_facts[k] = create_fact(type,fact_params,n_params);
+                gtd_free(fact_params);
+                gtd_free(params);
+                return right_side_facts;
             }
         }
         gtd_free(params);
     }
-    // Fact **rightSideFactArray = (Fact**)gtd_malloc();
-    GTD_UNUSED(factArray);
-    GTD_UNUSED(count);
     return NULL;
-    // switch (fact->type)
-    // {
-    // case MinEdgeCountFact:
-    //     return create_max_vertex_count_fact(ceil((1 + sqrt(1 + 8 * fact->params[0])) / 2));
-    // case MaxVertexCountFact:
-    //     return create_max_edge_count_fact((fact->params[0]) * (fact->params[0] - 1) / 2);
-    // default:
-    //     return NULL;
-    // }
 }

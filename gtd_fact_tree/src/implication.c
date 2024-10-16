@@ -16,6 +16,7 @@ typedef struct Implication_Left_Side
 typedef struct Implication_Right_Side
 {
     int n_facts;
+    int n_params;
     FactType types[MAX_RIGHT_SIDE_FACTS];
 } Implication_Right_Side;
 typedef struct Implication
@@ -40,14 +41,35 @@ bool implication_type_2_calculate_right_side_params(int *left_side_params, int *
 }
 
 Implication knownImplicationsArray[KNOWN_IMPLICATIONS_NUMBER] = {
-    {.left_side = {
-         .types = {false, false, true, false},
-         .n_facts = 1,
-         .n_params = 1,
-         .type_to_param_idx = {{-1}, {-1}, {0}, {-1}}},
-     .right_side = {.types = {false, true, false, false}, .n_facts = 1, .n_params = 1, .type_to_param_idx = {{-1}, {0}, {-1}, {-1}}},
-     .calculate_params = &implication_type_1_calculate_right_side_params},
-    {.left_side = {.types = {false, true, false, false}, .n_facts = 1, .n_params = 1, .type_to_param_idx = {{-1}, {0}, {-1}, {-1}}}, .right_side = {.types = {false, false, false, true}, .n_facts = 1, .n_params = 1, .type_to_param_idx = {{-1}, {-1}, {-1}, {0}}}, .calculate_params = &implication_type_2_calculate_right_side_params}};
+    {
+        .left_side = {
+        .types = {false, false, true, false},
+        .n_facts = 1,
+        .n_params = 1,
+        .type_to_param_idx = {{-1}, {-1}, {0}, {-1}}
+        },
+        .right_side = {
+            .n_facts = 1,
+            .n_params = 1,
+            .types = {MinVertexCountFact}
+        },
+        .calculate_params = &implication_type_1_calculate_right_side_params
+    },
+    {
+        .left_side = {
+            .types = {false, true, false, false},
+            .n_facts = 1, 
+            .n_params = 1, 
+            .type_to_param_idx = {{-1}, {0}, {-1}, {-1}}
+        }, 
+        .right_side = {
+            .types = {MaxEdgeCountFact}, 
+            .n_params = 1,
+            .n_facts = 1
+        }, 
+        .calculate_params = &implication_type_2_calculate_right_side_params
+    }
+};
 
 /**
  * \brief function that checks if array of facts is the left side of a known implication

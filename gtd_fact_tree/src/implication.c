@@ -2,6 +2,7 @@
 #define KNOWN_IMPLICATIONS_NUMBER 2
 #define MAX_LEFT_SIDE_FACTS 1
 #define MAX_RIGHT_SIDE_FACTS 1
+#define EMPTY_TYPE_TO_PARAM {{-1}, {-1}, {-1}, {-1}}
 
 typedef bool (*calc_right_side_params_fun)(int *, int *);
 
@@ -43,10 +44,12 @@ bool implication_type_2_calculate_right_side_params(int *left_side_params, int *
 Implication knownImplicationsArray[KNOWN_IMPLICATIONS_NUMBER] = {
     {
         .left_side = {
-        .types = {false, false, true, false},
+        .types = {0},
+        .types[MinEdgeCountFact] = true,
         .n_facts = 1,
         .n_params = 1,
-        .type_to_param_idx = {{-1}, {-1}, {0}, {-1}}
+        .type_to_param_idx = EMPTY_TYPE_TO_PARAM,
+        .type_to_param_idx[MinEdgeCountFact] = {0}
         },
         .right_side = {
             .n_facts = 1,
@@ -57,10 +60,12 @@ Implication knownImplicationsArray[KNOWN_IMPLICATIONS_NUMBER] = {
     },
     {
         .left_side = {
-            .types = {false, true, false, false},
+            .types = {0},
+            .types[MaxVertexCountFact] = true,
             .n_facts = 1, 
             .n_params = 1, 
-            .type_to_param_idx = {{-1}, {0}, {-1}, {-1}}
+            .type_to_param_idx = EMPTY_TYPE_TO_PARAM,
+            .type_to_param_idx[MaxVertexCountFact] = {0}
         }, 
         .right_side = {
             .types = {MaxEdgeCountFact}, 

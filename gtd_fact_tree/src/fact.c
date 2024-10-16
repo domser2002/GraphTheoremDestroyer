@@ -17,6 +17,11 @@ static Fact *create_one_parameter_fact(FactType type, uint32_t param)
     return newFact;
 }
 
+Fact *create_fact(FactType type, int *params, int params_count)
+{
+
+}
+
 Fact *create_min_vertex_count_fact(int minVertexCount)
 {
     return create_one_parameter_fact(MinVertexCountFact, minVertexCount);
@@ -49,6 +54,11 @@ static int delete_one_parameter_fact(Fact *fact, FactType type)
     return 0;
 }
 
+int delete_fact(Fact *fact)
+{
+    
+}
+
 int delete_min_vertex_count_fact(Fact *fact)
 {
     return delete_one_parameter_fact(fact, MinVertexCountFact);
@@ -67,6 +77,11 @@ int delete_min_edge_count_fact(Fact *fact)
 int delete_max_edge_count_fact(Fact *fact)
 {
     return delete_one_parameter_fact(fact, MaxEdgeCountFact);
+}
+
+int get_param_count(FactType type)
+{
+    return 1;
 }
 
 char *get_fact_str(Fact *fact)

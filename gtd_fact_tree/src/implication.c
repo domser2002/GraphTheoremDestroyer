@@ -1,15 +1,18 @@
 #include "implication.h"
 #define KNOWN_IMPLICATIONS_NUMBER 2
+#define MAX_LEFT_SIDE_FACTS 1
 
-typedef bool (*calc_right_side_params_fun) (int *, int *); 
+typedef bool (*calc_right_side_params_fun)(int *, int *);
 
-typedef struct Implication_Side {
+typedef struct Implication_Side
+{
     bool types[FACT_TYPE_NUM];
     int n_facts;
     int n_params;
     int type_to_param_idx[FACT_TYPE_NUM][MAX_PARAMS_IN_FACT];
 } Implication_Side;
-typedef struct Implication {
+typedef struct Implication
+{
     calc_right_side_params_fun calculate_params;
     Implication_Side left_side;
     Implication_Side right_side;
@@ -30,37 +33,14 @@ bool implication_type_2_calculate_right_side_params(int *left_side_params, int *
 }
 
 Implication knownImplicationsArray[KNOWN_IMPLICATIONS_NUMBER] = {
-    {
-        .left_side = {
-            .types = {false, false, true, false},
-            .n_facts = 1,
-            .n_params = 1,
-            .type_to_param_idx = {{-1},{-1},{0},{-1}}
-        },
-        .right_side = {
-            .types = {false, true, false, false},
-            .n_facts = 1,
-            .n_params = 1,
-            .type_to_param_idx = {{-1},{0},{-1},{-1}}            
-        },
-        .calculate_params = &implication_type_1_calculate_right_side_params
-    },
-    {
-        .left_side = {
-            .types = {false, true, false, false},
-            .n_facts = 1,
-            .n_params = 1,
-            .type_to_param_idx = {{-1},{0},{-1},{-1}}
-        },
-        .right_side = {
-            .types = {false, false, false, true},
-            .n_facts = 1,
-            .n_params = 1,
-            .type_to_param_idx = {{-1},{-1},{-1},{0}}            
-        },
-        .calculate_params = &implication_type_2_calculate_right_side_params
-    }
-};
+    {.left_side = {
+         .types = {false, false, true, false},
+         .n_facts = 1,
+         .n_params = 1,
+         .type_to_param_idx = {{-1}, {-1}, {0}, {-1}}},
+     .right_side = {.types = {false, true, false, false}, .n_facts = 1, .n_params = 1, .type_to_param_idx = {{-1}, {0}, {-1}, {-1}}},
+     .calculate_params = &implication_type_1_calculate_right_side_params},
+    {.left_side = {.types = {false, true, false, false}, .n_facts = 1, .n_params = 1, .type_to_param_idx = {{-1}, {0}, {-1}, {-1}}}, .right_side = {.types = {false, false, false, true}, .n_facts = 1, .n_params = 1, .type_to_param_idx = {{-1}, {-1}, {-1}, {0}}}, .calculate_params = &implication_type_2_calculate_right_side_params}};
 
 /**
  * \brief function that checks if array of facts is the left side of a known implication
@@ -69,11 +49,52 @@ Implication knownImplicationsArray[KNOWN_IMPLICATIONS_NUMBER] = {
  * \param n_facts number of elements in factArray
  * \param count pointer to return number of elements on the right side
  * \return right side of implication or NULL if there is no implication with that left side defined
-*/
+ */
 Fact **implies(Fact **factArray, int n_facts, int *count)
 {
-    GTD_UNUSED(factArray);
     count = 0;
+    if (n_facts > MAX_LEFT_SIDE_FACTS)
+        return NULL;
+    for (int i = 0; i < KNOWN_IMPLICATIONS_NUMBER; i++)
+    {
+        if (knownImplicationsArray[i].left_side.n_facts != n_facts)
+            continue;
+        int *params = (int *)gtd_malloc(knownImplicationsArray[i].left_side.n_params * sizeof(int));
+        bool fact_types_match = true;
+        for (int j = 0; j < n_facts; j++)
+        {
+            if (!knownImplicationsArray[i].left_side.types[factArray[j]->type])
+            {
+                fact_types_match = false;
+                break;
+            }
+            // fill params array at the correct positions
+            int param_idxs[MAX_PARAMS_IN_FACT];
+            for (int k = 0; k < MAX_PARAMS_IN_FACT; k++)
+            {
+                param_idxs[k] = knownImplicationsArray[i].left_side.type_to_param_idx[factArray[j]->type][k];
+            }
+            for (int k = 0; k < factArray[j]->params_count; k++)
+            {
+                params[param_idxs[k]] = factArray[j]->params[k];
+            }
+        }
+        if(fact_types_match)
+        {
+            int *right_side_params = (int*)gtd_malloc(knownImplicationsArray[i].right_side.n_params * sizeof(int));
+            knownImplicationsArray[i].calculate_params(params,right_side_params);
+            Fact **right_side_facts = (Fact**)gtd_malloc(knownImplicationsArray[i].right_side.n_facts * sizeof(Fact*));
+            for(int k=0;k<knownImplicationsArray[i].right_side.n_facts;k++)
+            {
+                int *fact_params = (int*)gtd_malloc(knownImplicationsArray[i].right_side.n_params * sizeof(int));
+                
+                //right_side_facts[k] = 
+            }
+        }
+        gtd_free(params);
+    }
+    // Fact **rightSideFactArray = (Fact**)gtd_malloc();
+    GTD_UNUSED(factArray);
     GTD_UNUSED(count);
     return NULL;
     // switch (fact->type)

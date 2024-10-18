@@ -44,9 +44,10 @@ void execute(ProofMachine *machine)
     {
         for (uint32_t j = i; j < n; j++)
         {
-            Fact *fact1 = (Fact *)machine->FactTree->vertexData[i];
-            Fact *fact2 = (Fact *)machine->FactTree->vertexData[j];
-            if(contradict(fact1,fact2))
+            Fact **factArray = (Fact**)gtd_malloc(2*sizeof(Fact*));
+            factArray[0] = (Fact *)machine->FactTree->vertexData[i];
+            factArray[1] = (Fact *)machine->FactTree->vertexData[j];
+            if(contradict(factArray,2))
             {
                 machine->contradictionFound = true;
                 machine->contradiciting_idxs = (uint32_t*)gtd_malloc(2 * sizeof(uint32_t));
@@ -54,21 +55,34 @@ void execute(ProofMachine *machine)
                 machine->contradiciting_idxs[1] = j;
                 machine->contradicting_count = 2;
                 machine->state = EXECUTED;
+                gtd_free(factArray);
                 return;
             }
+            gtd_free(factArray);
         }
     }
     // add facts
     for(uint32_t i = 0; i < n; i++)
     {
-        Fact *newFact = results((Fact *)machine->FactTree->vertexData[i]);
-        if(newFact != NULL)
+        Fact **factArray = (Fact **)gtd_malloc(sizeof(Fact*));
+        factArray[0] = (Fact*)machine->FactTree->vertexData[i];
+        int count;
+        Fact **newFacts = implies(factArray, 1, &count);
+        for(int i=0;i<count;i++)
         {
-            if(add_vertex_with_edge(machine->FactTree,i,(void*)newFact))
-                execute(machine);
-            else
-                gtd_free(newFact);
+            if(!add_vertex_with_edge(machine->FactTree,i,(void*)newFacts[i]))
+                break;
         }
+        gtd_free(newFacts);
+        if(count > 0)
+            execute(machine);
+        // if(newFacts != NULL && count != 0)
+        // {
+        //     if(add_vertex_with_edge(machine->FactTree,i,(void*)newFacts[0]))
+        //         execute(machine);
+        //     else
+        //         gtd_free(newFacts);
+        // }
     }
     machine->state = EXECUTED;
     // generate cases

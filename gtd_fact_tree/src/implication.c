@@ -4,7 +4,7 @@
 #define MAX_RIGHT_SIDE_FACTS 1
 #define EMPTY_TYPE_TO_PARAM {{-1}, {-1}, {-1}, {-1}}
 
-typedef bool (*calc_right_side_params_fun)(int *, int *);
+typedef void (*calc_right_side_params_fun)(int *, int *);
 
 typedef struct Implication_Left_Side
 {
@@ -26,19 +26,14 @@ typedef struct Implication
     Implication_Left_Side left_side;
     Implication_Right_Side right_side;
 } Implication;
-
-bool implication_type_1_calculate_right_side_params(int *left_side_params, int *right_side_params)
+void implication_type_1_calculate_right_side_params(int *left_side_params, int *right_side_params)
 {
-    GTD_UNUSED(left_side_params);
-    GTD_UNUSED(right_side_params);
-    return false;
+    right_side_params[0] = left_side_params[0];
 }
 
-bool implication_type_2_calculate_right_side_params(int *left_side_params, int *right_side_params)
+void implication_type_2_calculate_right_side_params(int *left_side_params, int *right_side_params)
 {
-    GTD_UNUSED(left_side_params);
-    GTD_UNUSED(right_side_params);
-    return false;
+    right_side_params[0] = left_side_params[0];
 }
 
 Implication knownImplicationsArray[KNOWN_IMPLICATIONS_NUMBER] = {

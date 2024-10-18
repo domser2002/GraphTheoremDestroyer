@@ -67,7 +67,7 @@ void execute(ProofMachine *machine)
         Fact **factArray = (Fact **)gtd_malloc(sizeof(Fact*));
         factArray[0] = (Fact*)machine->FactTree->vertexData[i];
         int count;
-        Fact **newFacts = implies(factArray, &count);
+        Fact **newFacts = implies(factArray, 1, &count);
         for(int i=0;i<count;i++)
         {
             if(!add_vertex_with_edge(machine->FactTree,i,(void*)newFacts[i]))

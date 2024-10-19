@@ -10,15 +10,16 @@ typedef enum MachineState
 } MachineState;
 struct ProofMachine
 {
-    Graph *FactTree;
+    FactTree *FactTree;
     bool contradictionFound;
     uint32_t *contradiciting_idxs;
     uint32_t contradicting_count;
     MachineState state;
 };
 
-ProofMachine *init_machine(Graph *FactTree)
+ProofMachine *init_machine(FactTree *FactTree)
 {
+    GTD_LOG("Initiating proof machine");
     ProofMachine *newMachine = (ProofMachine *)gtd_malloc(sizeof(ProofMachine));
     newMachine->FactTree = FactTree;
     newMachine->contradictionFound = false;
@@ -30,6 +31,7 @@ ProofMachine *init_machine(Graph *FactTree)
 
 void delete_machine(ProofMachine *machine)
 {
+    GTD_LOG("Deleting proof machine");
     if (machine->contradiciting_idxs != NULL)
         gtd_free(machine->contradiciting_idxs);
     gtd_free(machine);
@@ -37,44 +39,63 @@ void delete_machine(ProofMachine *machine)
 
 void execute(ProofMachine *machine)
 {
+    GTD_LOG("Executing proof machine");
     machine->state = EXECUTING;
     uint32_t n = machine->FactTree->vertexCount;
     // find contradiction
     for (uint32_t i = 0; i < n; i++)
     {
-        for (uint32_t j = i; j < n; j++)
+        for (uint32_t j = i+1; j < n; j++)
         {
-            Fact *fact1 = (Fact *)machine->FactTree->vertexData[i];
-            Fact *fact2 = (Fact *)machine->FactTree->vertexData[j];
-            if(contradict(fact1,fact2))
+            Fact **factArray = (Fact**)gtd_malloc(2*sizeof(Fact*));
+            factArray[0] = (Fact *)machine->FactTree->vertexData[i];
+            factArray[1] = (Fact *)machine->FactTree->vertexData[j];
+            if(contradict(factArray,2))
             {
+                GTD_LOG("Contradiction found at indexes: %d %d",i,j);
                 machine->contradictionFound = true;
                 machine->contradiciting_idxs = (uint32_t*)gtd_malloc(2 * sizeof(uint32_t));
                 machine->contradiciting_idxs[0] = i;
                 machine->contradiciting_idxs[1] = j;
                 machine->contradicting_count = 2;
                 machine->state = EXECUTED;
+                gtd_free(factArray);
                 return;
             }
+            GTD_LOG("Contradiction not found at indexes: %d %d",i,j);
+            gtd_free(factArray);
         }
     }
     // add facts
     for(uint32_t i = 0; i < n; i++)
     {
-        Fact *newFact = results((Fact *)machine->FactTree->vertexData[i]);
-        if(newFact != NULL)
+        Fact **factArray = (Fact **)gtd_malloc(sizeof(Fact*));
+        factArray[0] = (Fact*)machine->FactTree->vertexData[i];
+        int count;
+        bool execute_machine = true;
+        Fact **newFacts = implies(factArray, 1, &count);
+        for(int i=0;i<count;i++)
         {
-            if(add_vertex_with_edge(machine->FactTree,i,(void*)newFact))
-                execute(machine);
-            else
-                gtd_free(newFact);
+            GTD_LOG("%s implies %s",get_fact_str(factArray[0]), get_fact_str(newFacts[i]));
+            if(!add_vertex_with_edge(machine->FactTree,i,(void*)newFacts[i]))
+                execute_machine = false;
         }
+        gtd_free(newFacts);
+        if(execute_machine && count > 0)
+            execute(machine);
+        // if(newFacts != NULL && count != 0)
+        // {
+        //     if(add_vertex_with_edge(machine->FactTree,i,(void*)newFacts[0]))
+        //         execute(machine);
+        //     else
+        //         gtd_free(newFacts);
+        // }
     }
     machine->state = EXECUTED;
     // generate cases
 }
 
-static void write_deduction(Graph *FactTree, uint32_t idx, FILE *output)
+static void write_deduction(FactTree *FactTree, uint32_t idx, FILE *output)
 {
     int parent = get_parent(FactTree,idx);
     if(parent != -1)

@@ -3,7 +3,7 @@
 
 void run_all_functions()
 {
-    Graph* g = construct_graph(10);
+    FactTree* g = construct_graph(10);
     destruct_graph(g);
     return;
 }

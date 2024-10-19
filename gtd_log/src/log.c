@@ -8,6 +8,9 @@ static void format_and_write(const char *format, FILE *output, va_list args)
 
 void write_log_to_stdout(const char *format, ...)
 {
+    #ifdef TEST_MODE
+    return;
+    #endif
     va_list args;
     va_start(args, format);
     format_and_write(format, stdout, args);
@@ -16,6 +19,9 @@ void write_log_to_stdout(const char *format, ...)
 
 void write_log_to_file(const char *filepath, const char *format, ...)
 {
+    #ifdef TEST_MODE
+    return;
+    #endif
     FILE *output = fopen(filepath, "a");
     if (output == NULL) return; 
     va_list args;

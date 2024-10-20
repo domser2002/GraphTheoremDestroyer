@@ -1,6 +1,7 @@
 #include <assert.h>
 #include <stdio.h>
 #include "test_fact_tree.h"
+#include "test_physical_graph.h"
 #define TEST_MODE
 
 // int sum(int a,int b)
@@ -19,6 +20,7 @@
 
 int main(void) {
     test_fact_tree();
+    test_physical_graph();
     printf("All tests passed!\n");
     return 0;
 }

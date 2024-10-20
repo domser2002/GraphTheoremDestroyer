@@ -2,9 +2,10 @@
 #include "common.h"
 #include <stdlib.h>
 
-Graph *construct(uint32_t vertexCount)
+FactTree *construct(uint32_t vertexCount)
 {
-    Graph* g = (Graph*)gtd_malloc(sizeof(Graph));
+    GTD_LOG("Constructing FactTree with %d vertices", vertexCount);
+    FactTree* g = (FactTree*)gtd_malloc(sizeof(FactTree));
     g->vertexCount = vertexCount;
     g->edges = (uint32_t**)gtd_malloc(vertexCount*vertexCount*sizeof(uint32_t));
     g->vertexData = NULL;
@@ -17,8 +18,9 @@ Graph *construct(uint32_t vertexCount)
     return g;
 }
 
-void destruct(Graph* g)
+void destruct(FactTree* g)
 {
+    GTD_LOG("Destructing FactTree");
     for(uint32_t i=0;i<g->vertexCount;i++)
     {
         gtd_free(g->edges[i]);
@@ -28,7 +30,7 @@ void destruct(Graph* g)
     gtd_free(g);
 }
 
-static bool exists(Graph *g,uint32_t parent_idx)
+static bool exists(FactTree *g,uint32_t parent_idx)
 {
     for(uint32_t i=0;i<g->vertexCount;i++)
     {
@@ -38,7 +40,7 @@ static bool exists(Graph *g,uint32_t parent_idx)
     return true;
 }
 
-bool add_vertex_with_edge(Graph *g, uint32_t parent_idx, void *newData)
+bool add_vertex_with_edge(FactTree *g, uint32_t parent_idx, void *newData)
 {
     if(exists(g,parent_idx)) return false;
     g->vertexCount++;
@@ -57,7 +59,7 @@ bool add_vertex_with_edge(Graph *g, uint32_t parent_idx, void *newData)
     return true;
 }
 
-uint32_t get_parent(Graph* g, uint32_t idx)
+uint32_t get_parent(FactTree* g, uint32_t idx)
 {
     return g->parents[idx];
 }

@@ -5,14 +5,14 @@ C_INCLUDE_PATH = gtd_fact_tree/inc:gtd_log/inc:gtd_common/inc:gtd_proof_machine/
 BIN_PATH = build/bin
 OBJ_PATH = build/obj
 MAIN_OBJ_FILES = main.o graph.o fact.o contradiction.o implication.o log.o common.o machine.o physical_graph.o generative_proof_machine.o
-TEST_OBJ_FILES = unit_test.o test_fact_tree.o fact.o contradiction.o implication.o common.o log.o test_physical_graph.o physical_graph.o
+TEST_OBJ_FILES = unit_test.o test_fact_tree.o fact.o contradiction.o implication.o common.o log.o test_physical_graph.o physical_graph.o test_generative_proof_machine.o generative_proof_machine.o generative_restriction.o
 MAIN_OBJ_FILES_WITH_PATH = $(addprefix ${OBJ_PATH}/, ${MAIN_OBJ_FILES})
 TEST_OBJ_FILES_WITH_PATH = $(addprefix ${OBJ_PATH}/, ${TEST_OBJ_FILES})
 
 all: fact_tree log common proof_machine physical_graph generative_proof_machine
 	mkdir ${BIN_PATH} || true
 	C_INCLUDE_PATH=${C_INCLUDE_PATH} ${CC} ${CFLAGS} -c main.c -o ${OBJ_PATH}/main.o
-	${CC} ${CFLAGS} -o ${BIN_PATH}/main ${MAIN_OBJ_FILES_WITH_PATH} ${LFLAGS}
+	${CC} ${CFLAGS} -o ${BIN_PATH}/main ${MAIN_OBJ_FILES_WITH_PATH} ${OBJ_PATH}/generative_restriction.o ${LFLAGS}
 
 fact_tree:
 	mkdir build || true
@@ -31,7 +31,7 @@ common:
 proof_machine:
 	C_INCLUDE_PATH=${C_INCLUDE_PATH} ${CC} ${CFLAGS} -c gtd_proof_machine/src/machine.c -o ${OBJ_PATH}/machine.o
 
-test: fact_tree_test physical_graph_test all
+test: fact_tree_test physical_graph_test generative_proof_machine_test all
 	C_INCLUDE_PATH=${C_INCLUDE_PATH} ${CC} ${CFLAGS} -c gtd_test/unit_test.c -o ${OBJ_PATH}/unit_test.o
 	${CC} ${CFLAGS} -o ${BIN_PATH}/test ${TEST_OBJ_FILES_WITH_PATH} ${LFLAGS}
 	./${BIN_PATH}/test
@@ -49,6 +49,8 @@ generative_proof_machine:
 	C_INCLUDE_PATH=${C_INCLUDE_PATH} ${CC} ${CFLAGS} -c gtd_generative_proof_machine/src/generative_proof_machine.c -o ${OBJ_PATH}/generative_proof_machine.o
 	C_INCLUDE_PATH=${C_INCLUDE_PATH} ${CC} ${CFLAGS} -c gtd_generative_proof_machine/src/generative_restriction.c -o ${OBJ_PATH}/generative_restriction.o
 
+generative_proof_machine_test:
+		C_INCLUDE_PATH=${C_INCLUDE_PATH} ${CC} ${CFLAGS} -c gtd_generative_proof_machine/src/test_generative_proof_machine.c -o ${OBJ_PATH}/test_generative_proof_machine.o
 
 clean:
 	rm ${BIN_PATH}/* || true

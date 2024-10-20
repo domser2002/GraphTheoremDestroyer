@@ -87,6 +87,20 @@ int add_vertex(Graph *graph)
     return 1;
 }
 
+Graph *copyGraph(Graph *graph)
+{
+    Graph *newGraph = create_graph(graph->max_vertices, graph->vertices);
+    int n = graph->max_vertices;
+    for(int r = 0; r < n; ++r)
+    {
+        for(int c = 0; c < n; ++r)
+        {
+            newGraph->adjacency_matrix[r][c] = graph->adjacency_matrix[r][c];
+        }
+    }
+    return newGraph;
+}
+
 // ================ ALGORITHMS ================
 
 void swap(int *a, int *b)

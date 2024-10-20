@@ -15,6 +15,7 @@ int **get_graph_adjacency_matrix(Graph *graph);
 int add_edge(Graph *graph, int from, int to);
 int remove_edge(Graph *graph, int from, int to);
 int add_vertex(Graph *graph);
+Graph *copyGraph(Graph *graph);
 
 // create matrix filled with zeros
 int **create_matrix(int rows, int cols);

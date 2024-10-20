@@ -30,8 +30,8 @@ int add_edge(Graph *graph, int from, int to)
         return -1;
     }
 
-    graph->adjacency_matrix[from, to] = 1;
-    graph->adjacency_matrix[to, from] = 1;
+    graph->adjacency_matrix[from][to] = 1;
+    graph->adjacency_matrix[to][from] = 1;
 
     return 1;
 }
@@ -43,8 +43,8 @@ int remove_edge(Graph *graph, int from, int to)
         return -1;
     }
 
-    graph->adjacency_matrix[from, to] = 0;
-    graph->adjacency_matrix[to, from] = 0;
+    graph->adjacency_matrix[from][to] = 0;
+    graph->adjacency_matrix[to][from] = 0;
 
     return 1;
 }

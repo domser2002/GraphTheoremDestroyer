@@ -1,6 +1,8 @@
 #ifndef PHYSICAL_GRAPH_H
 #define PHYSICAL_GRAPH_H
 #include <stdint.h>
+#include "common.h"
+#include <string.h>
 
 typedef struct Graph Graph;
 

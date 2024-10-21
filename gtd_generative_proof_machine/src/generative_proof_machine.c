@@ -18,7 +18,6 @@ struct GenerativeProofMachine
     GraphNode *graphs; //head
     GenerativeRestriction **restrictions;
     int num_restrictions;
-
 };
 
 GenerativeProofMachine *create_generative_proof_machine(GenerativeRestriction **restrictions, int num_restrictions)
@@ -75,6 +74,27 @@ void clear_graphs(GenerativeProofMachine *machine, int delete)
     machine->graphs = NULL;
 }
 
+int can_add_graph(GenerativeProofMachine *machine, Graph *graph)
+{
+    for(int j = 0; j < machine->num_restrictions; ++j)
+    {
+        if(!check_restriction(graph, machine->restrictions[j]))
+        {
+            return 0;
+        }
+    }
+
+    GraphNode *graphNode = machine->graphs;
+    while(graphNode != NULL)
+    {
+        if(check_isomorphic(graphNode->graph, graph))
+        {
+            return 0;
+        }
+        graphNode = graphNode->next;
+    }
+    return 1;
+}
 
 int execute_generative_proof_machine(GenerativeProofMachine *machine)
 {
@@ -83,9 +103,10 @@ int execute_generative_proof_machine(GenerativeProofMachine *machine)
         return 0;
     }
 
+    GraphNode *oldGraphs = NULL;
     while(1)
     {
-        GraphNode *oldGraphs = machine->graphs;
+        oldGraphs = machine->graphs;
         clear_graphs(machine, 0);
 
         GraphNode *node = oldGraphs;
@@ -110,17 +131,7 @@ int execute_generative_proof_machine(GenerativeProofMachine *machine)
                     j = j >> 1;
                 }
 
-                int all_restrictions_passed = 1;
-                for(int j = 0; j < machine->num_restrictions; ++j)
-                {
-                    if(!check_restriction(newGraph, machine->restrictions[j]))
-                    {
-                        all_restrictions_passed = 0;
-                        break;
-                    }
-                }
-
-                if(all_restrictions_passed)
+                if(can_add_graph(machine, newGraph))
                 {
                     add_graph(machine, newGraph);
                 }
@@ -134,6 +145,25 @@ int execute_generative_proof_machine(GenerativeProofMachine *machine)
             break;
         }
     }
+
+    FILE *out_file = fopen("matrices.txt", "w");
+    while(oldGraphs != NULL)
+    {
+        Graph *g = oldGraphs->graph;
+        int n = get_graph_num_vertices(g);
+        int **am = get_graph_adjacency_matrix(g);
+        for(int r = 0; r < n; ++r)
+        {
+            for(int c = 0; c < n; ++c)
+            {
+                fprintf(out_file, "%d ", am[r][c]);
+            }
+            fprintf(out_file, "\n");
+        }
+        fprintf(out_file, "\n");
+        oldGraphs = oldGraphs->next;
+    }
+    fclose(out_file);
 
     return 1;
 }

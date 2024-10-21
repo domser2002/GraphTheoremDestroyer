@@ -10,4 +10,6 @@ void test_generative_proof_machine(void);
 
 void creation_and_deletion(void);
 
+void execute_small_machine(void);
+
 #endif

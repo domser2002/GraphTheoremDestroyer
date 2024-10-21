@@ -13,6 +13,10 @@ int destroy_generative_proof_machine(GenerativeProofMachine *machine);
 void add_graph(GenerativeProofMachine *machine, Graph *graph);
 void clear_graphs(GenerativeProofMachine *machine, int delete);
 
+// check if graph passes all the machine restrictions and is not isomorphic
+// to any graph in machine
+int can_add_graph(GenerativeProofMachine *machine, Graph *graph);
+
 int execute_generative_proof_machine(GenerativeProofMachine *machine);
 
 int int_pow(int base, int exp);

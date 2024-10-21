@@ -93,7 +93,7 @@ Graph *copyGraph(Graph *graph)
     int n = graph->max_vertices;
     for(int r = 0; r < n; ++r)
     {
-        for(int c = 0; c < n; ++r)
+        for(int c = 0; c < n; ++c)
         {
             newGraph->adjacency_matrix[r][c] = graph->adjacency_matrix[r][c];
         }

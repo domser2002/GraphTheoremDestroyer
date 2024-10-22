@@ -1,6 +1,6 @@
 #ifndef MACHINE_H
 #define MACHINE_H
-#include "graph.h"
+#include "fact_tree.h"
 #include "common.h"
 #include "fact.h"
 #include "contradiction.h"

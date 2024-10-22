@@ -41,15 +41,15 @@ void execute(ProofMachine *machine)
 {
     GTD_LOG("Executing proof machine");
     machine->state = EXECUTING;
-    uint32_t n = machine->FactTree->vertexCount;
+    uint32_t n = machine->FactTree->fact_count;
     // find contradiction
     for (uint32_t i = 0; i < n; i++)
     {
         for (uint32_t j = i+1; j < n; j++)
         {
             Fact **factArray = (Fact**)gtd_malloc(2*sizeof(Fact*));
-            factArray[0] = (Fact *)machine->FactTree->vertexData[i];
-            factArray[1] = (Fact *)machine->FactTree->vertexData[j];
+            factArray[0] = (Fact *)machine->FactTree->facts[i];
+            factArray[1] = (Fact *)machine->FactTree->facts[j];
             if(contradict(factArray,2))
             {
                 GTD_LOG("Contradiction found at indexes: %d %d",i,j);
@@ -70,14 +70,16 @@ void execute(ProofMachine *machine)
     for(uint32_t i = 0; i < n; i++)
     {
         Fact **factArray = (Fact **)gtd_malloc(sizeof(Fact*));
-        factArray[0] = (Fact*)machine->FactTree->vertexData[i];
+        factArray[0] = (Fact*)machine->FactTree->facts[i];
         int count;
         bool execute_machine = true;
         Fact **newFacts = implies(factArray, 1, &count);
-        for(int i=0;i<count;i++)
+        for(int j=0;j<count;j++)
         {
-            GTD_LOG("%s implies %s",get_fact_str(factArray[0]), get_fact_str(newFacts[i]));
-            if(!add_vertex_with_edge(machine->FactTree,i,(void*)newFacts[i]))
+            GTD_LOG("%s implies %s",get_fact_str(factArray[0]), get_fact_str(newFacts[j]));
+            uint32_t *parents = (uint32_t*)gtd_malloc(1 * sizeof(uint32_t));
+            parents[0] = i;
+            if(!add_fact(machine->FactTree,parents,1,newFacts[j]))
                 execute_machine = false;
         }
         gtd_free(newFacts);
@@ -97,13 +99,15 @@ void execute(ProofMachine *machine)
 
 static void write_deduction(FactTree *FactTree, uint32_t idx, FILE *output)
 {
-    int parent = get_parent(FactTree,idx);
-    if(parent != -1)
+    uint8_t parent_count = FactTree->parent_count[idx];
+    uint32_t *parents = FactTree->parents[idx];
+    //int parent = get_parent(FactTree,idx);
+    for(uint8_t i=0;i<parent_count;i++)
     {
         fprintf(output," => ");
-        write_deduction(FactTree,idx,output);
+        write_deduction(FactTree,parents[i],output);
     }
-    char *str = get_fact_str((Fact*)FactTree->vertexData[idx]);
+    char *str = get_fact_str((Fact*)FactTree->facts[idx]);
     fprintf(output,"%s",(const char *)str);
     gtd_free((void*)str);
 }

@@ -1,5 +1,5 @@
 CC = gcc
-CFLAGS = -std=c99 -fstrict-aliasing -fstack-protector -ftrack-macro-expansion=0 -Wall -Wextra -Wdouble-promotion -Wformat=2 -Wlogical-op -Wstrict-aliasing -Wstrict-prototypes -Wno-override-init -Werror -Wno-error=cast-function-type -Wno-format-truncation -Wno-error=format-overflow= -D_POSIX_C_SOURCE=20190101L -ggdb3 -DMALLOC_CHECK_=3 -Og
+CFLAGS = -std=c99 -fstrict-aliasing -fstack-protector -ftrack-macro-expansion=0 -Wall -Wextra -Wdouble-promotion -Wformat=2 -Wlogical-op -Wstrict-aliasing -Wstrict-prototypes -Wno-override-init -Werror -Wno-error=cast-function-type -Wno-format-truncation -Wno-error=format-overflow= -D_POSIX_C_SOURCE=20190101L -ggdb3 -DMALLOC_CHECK_=3 -Og -pthread
 LFLAGS = -lm
 C_INCLUDE_PATH = gtd_fact_tree/inc:gtd_log/inc:gtd_common/inc:gtd_proof_machine/inc:gtd_physical_graph/inc:gtd_generative_proof_machine/inc
 BIN_PATH = build/bin

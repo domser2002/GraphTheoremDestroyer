@@ -23,5 +23,9 @@ int **create_matrix(int rows, int cols);
 void swap(int *a, int *b);
 int check_isomorphic(Graph *a, Graph *b);
 int nextPermutation(int *arr, int n);
+int get_graph_hash(Graph *graph);
+int *get_graph_degree(Graph *graph);
+
+int int_pow(int base, int exp);
 
 #endif

@@ -5,17 +5,23 @@ struct Graph
     int max_vertices;
     int vertices;
     int **adjacency_matrix;
+    int *degree;
+    // hash is sum of degree^3 (not sum^3)
+    int hash;
 };
 
 Graph *create_graph(int max_vertices, int vertices)
 {
     Graph *newGraph = (Graph *)gtd_malloc(sizeof(Graph));
+    newGraph->hash = 0;
     newGraph->max_vertices = max_vertices;
     newGraph->vertices = vertices;
+    newGraph->degree = (int *)gtd_malloc(sizeof(int) * max_vertices);
     newGraph->adjacency_matrix = (int **)gtd_malloc(sizeof(int*) * max_vertices);
 
     for(int i = 0; i < max_vertices; ++i)
     {
+        newGraph->degree[i] = 0;
         newGraph->adjacency_matrix[i] = (int *)gtd_malloc(sizeof(int) * max_vertices);
         memset(newGraph->adjacency_matrix[i], 0, sizeof(int) * max_vertices);
     }
@@ -25,6 +31,7 @@ Graph *create_graph(int max_vertices, int vertices)
 
 int destroy_graph(Graph *graph)
 {
+    gtd_free(graph->degree);
     for(int i = 0; i < graph->max_vertices; ++i)
     {
         gtd_free(graph->adjacency_matrix[i]);
@@ -49,11 +56,26 @@ int **get_graph_adjacency_matrix(Graph *graph)
     return graph->adjacency_matrix;
 }
 
+int get_graph_hash(Graph *graph)
+{
+    return graph->hash / 2;
+}
+
 int add_edge(Graph *graph, int from, int to)
 {
     if(from < 0 || from >= graph->vertices || to < 0 || to >= graph->vertices)
     {
         return -1;
+    }
+
+    if(graph->adjacency_matrix[from][to] == 0)
+    {
+        int from_degree = graph->degree[from];
+        int to_degree = graph->degree[to];
+        graph->hash += int_pow(from_degree + 1, 3) + int_pow(to_degree + 1, 3);
+        graph->hash -= int_pow(from_degree, 3) + int_pow(to_degree, 3);
+        graph->degree[from]++;
+        graph->degree[to]++;
     }
 
     graph->adjacency_matrix[from][to] = 1;
@@ -67,6 +89,16 @@ int remove_edge(Graph *graph, int from, int to)
     if(from < 0 || from >= graph->vertices || to < 0 || to >= graph->vertices)
     {
         return -1;
+    }
+
+    if(graph->adjacency_matrix[from][to] == 1)
+    {
+        int from_degree = graph->degree[from];
+        int to_degree = graph->degree[to];
+        graph->hash += int_pow(from_degree - 1, 3) + int_pow(to_degree - 1, 3);
+        graph->hash -= int_pow(from_degree, 3) + int_pow(to_degree, 3);
+        graph->degree[from]--;
+        graph->degree[to]--;
     }
 
     graph->adjacency_matrix[from][to] = 0;
@@ -90,15 +122,22 @@ int add_vertex(Graph *graph)
 Graph *copyGraph(Graph *graph)
 {
     Graph *newGraph = create_graph(graph->max_vertices, graph->vertices);
+    newGraph->hash = graph->hash;
     int n = graph->max_vertices;
     for(int r = 0; r < n; ++r)
     {
+        newGraph->degree[r] = graph->degree[r];
         for(int c = 0; c < n; ++c)
         {
             newGraph->adjacency_matrix[r][c] = graph->adjacency_matrix[r][c];
         }
     }
     return newGraph;
+}
+
+int *get_graph_degree(Graph *graph)
+{
+    return graph->degree;
 }
 
 // ================ ALGORITHMS ================
@@ -125,7 +164,8 @@ int **create_matrix(int rows, int cols)
 int check_isomorphic(Graph *g1, Graph *g2)
 {
     // Step 1: Check if the number of vertices is the same
-    if (g1->vertices != g2->vertices)
+    //if (g1->vertices != g2->vertices || g1->hash != g2->hash)
+    if(g1->vertices != g2->vertices)
     {
         return 0;
     }
@@ -201,4 +241,14 @@ int nextPermutation(int *arr, int n)
     }
 
     return 1;
+}
+
+int int_pow(int base, int exp)
+{
+    int res = 1;
+    for(int i = 0; i < exp; ++i)
+    {
+        res *= base;
+    }
+    return res;
 }

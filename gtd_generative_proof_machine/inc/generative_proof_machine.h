@@ -7,7 +7,8 @@
 typedef struct GraphNode GraphNode;
 typedef struct GenerativeProofMachine GenerativeProofMachine;
 
-GenerativeProofMachine *create_generative_proof_machine(GenerativeRestriction **restrictions, int num_restrictions);
+GenerativeProofMachine *create_generative_proof_machine(GenerativeRestriction **restrictions,
+ int num_restrictions, int num_hash_buckets);
 int destroy_generative_proof_machine(GenerativeProofMachine *machine);
 
 void add_graph(GenerativeProofMachine *machine, Graph *graph);
@@ -19,6 +20,8 @@ int can_add_graph(GenerativeProofMachine *machine, Graph *graph);
 
 int execute_generative_proof_machine(GenerativeProofMachine *machine);
 
-int int_pow(int base, int exp);
+int generate_graphs_from_bucket(
+    GenerativeProofMachine *machine,
+    GraphNode *bucket);
 
 #endif

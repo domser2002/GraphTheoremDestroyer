@@ -1,6 +1,5 @@
 #include "implication.h"
 #define KNOWN_IMPLICATIONS_NUMBER 2
-#define MAX_LEFT_SIDE_FACTS 1
 #define MAX_RIGHT_SIDE_FACTS 1
 #define EMPTY_TYPE_TO_PARAM {{-1}, {-1}, {-1}, {-1}}
 

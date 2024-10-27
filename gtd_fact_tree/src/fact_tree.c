@@ -41,28 +41,16 @@ void destruct(FactTree* ft)
 }
 
 /**
- * \brief function to check if fact with the same set of parents already exists in fact tree 
- * \note used temporary to avoid infinite adding of same implication, machine will handle it in future
+ * \brief function to check if fact with the same type and params already exists in fact tree 
  * \param ft fact tree
- * \param parent_idxs array of parent indexes
- * \param parent_count number of parents
- * \returns true if fact with the same set of parents already exists, false otherwise
+ * \param new_fact fact to be added
+ * \returns true if fact with the same type and params already exists, false otherwise
 */
-static bool exists(FactTree *ft,uint32_t *parent_idxs, uint8_t parent_count)
+static bool exists(FactTree *ft,Fact *new_fact)
 {
     for(uint32_t i=0;i<ft->fact_count;i++)
     {
-        bool all_equal = true;
-        if(ft->parent_count[i] != parent_count) continue; 
-        for(uint8_t j=0;j<ft->parent_count[i];j++)
-        {
-            if(ft->parents[i][j] != parent_idxs[j])
-            {
-                all_equal = false;
-                break;
-            }
-        }
-        if(all_equal)
+        if(equal(ft->facts[i],new_fact))
             return true;
     }
     return false;
@@ -78,7 +66,7 @@ static bool exists(FactTree *ft,uint32_t *parent_idxs, uint8_t parent_count)
 bool add_fact(FactTree *ft, uint32_t *parent_idxs, uint8_t parent_count, Fact *new_fact)
 {
     GTD_LOG("Adding new fact with parent_idx = %d to a FactTree", parent_idxs[0]);
-    if(exists(ft,parent_idxs,parent_count)) 
+    if(exists(ft,new_fact)) 
     {
         GTD_LOG("Fact already exists");
         return false;

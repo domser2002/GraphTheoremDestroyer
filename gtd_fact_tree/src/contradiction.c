@@ -1,5 +1,4 @@
 #include "contradiction.h"
-#define MAX_CONTRADICTING_FACTS 2
 #define KNOWN_CONTRADICTIONS_NUMBER 3
 
 typedef bool (*contradiction_occurs_fun)(int *);

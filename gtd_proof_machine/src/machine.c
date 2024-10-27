@@ -14,9 +14,15 @@ struct ProofMachine
     bool contradictionFound;
     uint32_t *contradiciting_idxs;
     uint32_t contradicting_count;
+    uint64_t checked;
     MachineState state;
 };
 
+/**
+ * \brief initialize new proof machine based on initial fact tree
+ * \param FactTree initial fact tree
+ * \returns newly created machine
+*/
 ProofMachine *init_machine(FactTree *FactTree)
 {
     GTD_LOG("Initiating proof machine");
@@ -25,10 +31,15 @@ ProofMachine *init_machine(FactTree *FactTree)
     newMachine->contradictionFound = false;
     newMachine->contradiciting_idxs = NULL;
     newMachine->contradicting_count = 0;
+    newMachine->checked = 0;
     newMachine->state = INITIATED;
     return newMachine;
 }
 
+/**
+ * \brief delete proof machine
+ * \param machine machine to delete
+*/
 void delete_machine(ProofMachine *machine)
 {
     GTD_LOG("Deleting proof machine");
@@ -37,64 +48,92 @@ void delete_machine(ProofMachine *machine)
     gtd_free(machine);
 }
 
+/**
+ * \brief perform proof machine execution
+ * \details machine tries to find predefined contradiciton in the given tree of facts, 
+ * if it is not found, it looks for one of the predefined implications, adds new facts to a tree
+ * and executes recursively until contradiction is found or no more facts can be added 
+ * \param machine machine to be executed
+ * \note function does not return, it only updates fields in machine class, proof can be written
+ *  using write_proof function
+*/
 void execute(ProofMachine *machine)
 {
     GTD_LOG("Executing proof machine");
     machine->state = EXECUTING;
     uint32_t n = machine->FactTree->fact_count;
     // find contradiction
-    for (uint32_t i = 0; i < n; i++)
+    uint64_t max_number = 1ULL << n;
+    for (uint64_t mask = machine->checked; mask < max_number; mask++)
     {
-        for (uint32_t j = i+1; j < n; j++)
+        Fact **subArray = (Fact **)gtd_malloc(MAX_CONTRADICTING_FACTS * sizeof(Fact *));
+        uint8_t elements[MAX_CONTRADICTING_FACTS];
+        uint8_t number_of_ones = 0;
+        for (uint8_t i = 0; i < n && number_of_ones < MAX_CONTRADICTING_FACTS; i++)
         {
-            Fact **factArray = (Fact**)gtd_malloc(2*sizeof(Fact*));
-            factArray[0] = (Fact *)machine->FactTree->facts[i];
-            factArray[1] = (Fact *)machine->FactTree->facts[j];
-            if(contradict(factArray,2))
+            if (mask & (1ULL << i))
             {
-                GTD_LOG("Contradiction found at indexes: %d %d",i,j);
-                machine->contradictionFound = true;
-                machine->contradiciting_idxs = (uint32_t*)gtd_malloc(2 * sizeof(uint32_t));
-                machine->contradiciting_idxs[0] = i;
-                machine->contradiciting_idxs[1] = j;
-                machine->contradicting_count = 2;
-                machine->state = EXECUTED;
-                gtd_free(factArray);
-                return;
+                elements[number_of_ones] = i;
+                subArray[number_of_ones++] = machine->FactTree->facts[n - i - 1];
             }
-            GTD_LOG("Contradiction not found at indexes: %d %d",i,j);
-            gtd_free(factArray);
         }
+        if (number_of_ones >= MIN_CONTRADICTING_FACTS && number_of_ones <= MAX_CONTRADICTING_FACTS && contradict(subArray, number_of_ones))
+        {
+            GTD_LOG("Contradiction found at subarray (hex format): %x", mask);
+            machine->contradictionFound = true;
+            machine->contradiciting_idxs = (uint32_t *)gtd_malloc(number_of_ones * sizeof(uint32_t));
+            for (uint8_t i = 0; i < number_of_ones; i++)
+                machine->contradiciting_idxs[i] = elements[i];
+            machine->contradicting_count = number_of_ones;
+            machine->state = EXECUTED;
+            gtd_free(subArray);
+            return;
+        }
+        GTD_LOG("Contradiction not found at subarray (hex format): %x", mask);
+        gtd_free(subArray);
     }
     // add facts
-    for(uint32_t i = 0; i < n; i++)
+    bool added_facts = false;
+    for (uint64_t mask = machine->checked; mask < max_number; mask++)
     {
-        Fact **factArray = (Fact **)gtd_malloc(sizeof(Fact*));
-        factArray[0] = (Fact*)machine->FactTree->facts[i];
-        int count;
-        bool execute_machine = true;
-        Fact **newFacts = implies(factArray, 1, &count);
-        for(int j=0;j<count;j++)
+        Fact **subArray = (Fact **)gtd_malloc(MAX_LEFT_SIDE_FACTS * sizeof(Fact *));
+        uint8_t elements[MAX_LEFT_SIDE_FACTS];
+        uint8_t number_of_ones = 0;
+        for (uint8_t i = 0; i < n && number_of_ones < MAX_LEFT_SIDE_FACTS; i++)
         {
-            GTD_LOG("%s implies %s",get_fact_str(factArray[0]), get_fact_str(newFacts[j]));
-            uint32_t *parents = (uint32_t*)gtd_malloc(1 * sizeof(uint32_t));
-            parents[0] = i;
-            if(!add_fact(machine->FactTree,parents,1,newFacts[j]))
-                execute_machine = false;
+            if (mask & (1ULL << i))
+            {
+                elements[number_of_ones] = i;
+                subArray[number_of_ones++] = machine->FactTree->facts[n - i - 1];
+            }
         }
-        gtd_free(newFacts);
-        if(execute_machine && count > 0)
-            execute(machine);
-        // if(newFacts != NULL && count != 0)
-        // {
-        //     if(add_vertex_with_edge(machine->FactTree,i,(void*)newFacts[0]))
-        //         execute(machine);
-        //     else
-        //         gtd_free(newFacts);
-        // }
+        if (number_of_ones >= MIN_LEFT_SIDE_FACTS && number_of_ones <= MAX_LEFT_SIDE_FACTS)
+        {
+            int count;
+            Fact **newFacts = implies(subArray, number_of_ones, &count);
+            for (int i = 0; i < count; i++)
+            {
+                uint32_t *parents = (uint32_t *)gtd_malloc(number_of_ones * sizeof(uint32_t));
+                for (uint8_t j = 0; j < number_of_ones; j++)
+                {
+                    parents[j] = elements[j];
+                }
+                add_fact(machine->FactTree, parents, number_of_ones, newFacts[i]);
+                added_facts = true;
+            }
+            GTD_LOG("Implication found at subarray (hex format): %x", mask);
+            gtd_free(subArray);
+            continue;
+        }
+        GTD_LOG("Implication not found at subarray (hex format): %x", mask);
+        gtd_free(subArray);
+    }
+    if (added_facts)
+    {
+        machine->checked = max_number;
+        execute(machine);
     }
     machine->state = EXECUTED;
-    // generate cases
 }
 
 static void write_deduction(FactTree *FactTree, uint32_t idx, FILE *output)

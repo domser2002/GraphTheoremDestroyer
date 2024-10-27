@@ -9,8 +9,10 @@ Fact **generate_facts(int *count)
 {
     *count = 2;
     Fact **factArray = gtd_malloc(*count * sizeof(Fact*));
-    factArray[0] = create_min_edge_count_fact(9);
-    factArray[1] = create_max_vertex_count_fact(5);
+    int min_edge_count[] = {11};
+    int max_vertex_count[] = {5};
+    factArray[0] = create_fact(MinEdgeCountFact,min_edge_count,1);
+    factArray[1] = create_fact(MaxVertexCountFact,max_vertex_count,1);
     return factArray;
 }
 

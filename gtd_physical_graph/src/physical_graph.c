@@ -8,12 +8,18 @@ struct Graph
     int *degree;
     // hash is sum of degree^3 (not sum^3)
     int hash;
+
+    // do we know for sure that from this graph
+    // we can not generate any other graphs
+    // not colliding with restrictions
+    int is_maximal;
 };
 
 Graph *create_graph(int max_vertices, int vertices)
 {
     Graph *newGraph = (Graph *)gtd_malloc(sizeof(Graph));
     newGraph->hash = 0;
+    newGraph->is_maximal = 0;
     newGraph->max_vertices = max_vertices;
     newGraph->vertices = vertices;
     newGraph->degree = (int *)gtd_malloc(sizeof(int) * max_vertices);
@@ -59,6 +65,17 @@ int **get_graph_adjacency_matrix(Graph *graph)
 int get_graph_hash(Graph *graph)
 {
     return graph->hash / 2;
+}
+
+int set_graph_maximal(Graph *graph)
+{
+    graph->is_maximal = 1;
+    return 1;
+}
+
+int get_graph_is_maximal(Graph *graph)
+{
+    return graph->is_maximal;
 }
 
 int add_edge(Graph *graph, int from, int to)

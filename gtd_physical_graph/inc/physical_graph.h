@@ -25,6 +25,8 @@ int check_isomorphic(Graph *a, Graph *b);
 int nextPermutation(int *arr, int n);
 int get_graph_hash(Graph *graph);
 int *get_graph_degree(Graph *graph);
+int set_graph_maximal(Graph *graph);
+int get_graph_is_maximal(Graph *graph);
 
 int int_pow(int base, int exp);
 

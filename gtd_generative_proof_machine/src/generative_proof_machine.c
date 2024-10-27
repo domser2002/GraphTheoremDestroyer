@@ -123,6 +123,11 @@ int generate_graphs_from_bucket(
         while(node != NULL)
         {
             Graph *graph = node->graph;
+            node = node->next;
+            if(get_graph_is_maximal(graph))
+            {
+                continue;
+            }
             int graph_vertices_num = get_graph_num_vertices(graph);
             int new_graphs_num = int_pow(2, graph_vertices_num);
             for(int i = 0; i < new_graphs_num; ++i)
@@ -148,7 +153,7 @@ int generate_graphs_from_bucket(
                 }
             }
 
-            node = node->next;
+            // node = node->next;
         }
 
         return graphs_added;

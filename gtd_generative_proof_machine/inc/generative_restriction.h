@@ -6,7 +6,8 @@
 typedef struct GenerativeRestriction GenerativeRestriction;
 
 // repair identation
-GenerativeRestriction *create_restriction(int (*restriction)(Graph* graph, int *params), int num_params, int *params);
+GenerativeRestriction *create_restriction(int (*restriction)(Graph* graph, int *params), 
+    int num_params, int *params);
 int destroy_restriction(GenerativeRestriction *genRestriction);
 
 int check_restriction(Graph *graph, GenerativeRestriction *restriction);

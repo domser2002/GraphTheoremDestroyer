@@ -46,5 +46,10 @@ int max_vertices_restriction_condition(Graph* graph, int *params)
     int vertices_num = get_graph_num_vertices(graph);
     int max_vertices = params[0];
 
+    if(vertices_num == max_vertices)
+    {
+        set_graph_maximal(graph);
+    }
+
     return vertices_num <= max_vertices ? 1 : 0;
 }

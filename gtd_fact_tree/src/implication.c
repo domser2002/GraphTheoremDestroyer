@@ -36,6 +36,7 @@ void implication_type_1_calculate_right_side_params(int *left_side_params, int *
 {
     int m = left_side_params[0];
     right_side_params[0] = m == 0 ? 0 : ceil((1+sqrt(1+8*m))/2);
+    GTD_LOG("Calculated that minEdgeCount = %d implies minVertexCount = %d",left_side_params[0],right_side_params[0]);
 }
 
 /**
@@ -47,6 +48,7 @@ void implication_type_2_calculate_right_side_params(int *left_side_params, int *
 {
     int n = left_side_params[0];
     right_side_params[0] = n*(n-1) / 2;
+    GTD_LOG("Calculated that maxVertexCount = %d implies maxEdgeCount = %d",left_side_params[0],right_side_params[0]);
 }
 
 Implication knownImplicationsArray[KNOWN_IMPLICATIONS_NUMBER] = {
@@ -94,19 +96,28 @@ Implication knownImplicationsArray[KNOWN_IMPLICATIONS_NUMBER] = {
  */
 Fact **implies(Fact **factArray, int n_facts, int *count)
 {
+    GTD_LOG("Checking if array of %d facts forms a known implication", n_facts);
     *count = 0;
     if (n_facts > MAX_LEFT_SIDE_FACTS)
+    {
+        GTD_LOG("No implication - too many left side facts");
         return NULL;
+    }
     for (int i = 0; i < KNOWN_IMPLICATIONS_NUMBER; i++)
     {
+        GTD_LOG("Checking implication number %d", i+1);
         if (knownImplicationsArray[i].left_side.n_facts != n_facts)
+        {
+            GTD_LOG("Number of left side facts does not match");
             continue;
+        }
         int *params = (int *)gtd_malloc(knownImplicationsArray[i].left_side.n_params * sizeof(int));
         bool fact_types_match = true;
         for (int j = 0; j < n_facts; j++)
         {
             if (!knownImplicationsArray[i].left_side.types[factArray[j]->type])
             {
+                GTD_LOG("Types of facts do not match");
                 fact_types_match = false;
                 break;
             }
@@ -123,6 +134,7 @@ Fact **implies(Fact **factArray, int n_facts, int *count)
         }
         if(fact_types_match)
         {
+            GTD_LOG("Implication occurs");
             int *right_side_params = (int*)gtd_malloc(knownImplicationsArray[i].right_side.n_params * sizeof(int));
             knownImplicationsArray[i].calculate_params(params,right_side_params);
             *count = knownImplicationsArray[i].right_side.n_facts;

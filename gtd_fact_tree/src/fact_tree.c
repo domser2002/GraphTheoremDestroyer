@@ -30,7 +30,7 @@ FactTree *construct(uint32_t fact_count, Fact **facts)
 */
 void destruct(FactTree* ft)
 {
-    GTD_LOG("Destructing FactTree with fact count = %d", ft->fact_count);
+    GTD_LOG("Destructing FactTree with %d facts", ft->fact_count);
     for(uint32_t i=0;i<ft->fact_count;i++)
     {
         gtd_free(ft->parents[i]);
@@ -40,15 +40,23 @@ void destruct(FactTree* ft)
     gtd_free(ft);
 }
 
-static bool exists(FactTree *g,uint32_t *parent_idxs, uint8_t parent_count)
+/**
+ * \brief function to check if fact with the same set of parents already exists in fact tree 
+ * \note used temporary to avoid infinite adding of same implication, machine will handle it in future
+ * \param ft fact tree
+ * \param parent_idxs array of parent indexes
+ * \param parent_count number of parents
+ * \returns true if fact with the same set of parents already exists, false otherwise
+*/
+static bool exists(FactTree *ft,uint32_t *parent_idxs, uint8_t parent_count)
 {
-    for(uint32_t i=0;i<g->fact_count;i++)
+    for(uint32_t i=0;i<ft->fact_count;i++)
     {
         bool all_equal = true;
-        if(g->parent_count[i] != parent_count) continue; 
-        for(uint8_t j=0;j<g->parent_count[i];j++)
+        if(ft->parent_count[i] != parent_count) continue; 
+        for(uint8_t j=0;j<ft->parent_count[i];j++)
         {
-            if(g->parents[i][j] != parent_idxs[j])
+            if(ft->parents[i][j] != parent_idxs[j])
             {
                 all_equal = false;
                 break;

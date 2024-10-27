@@ -20,6 +20,7 @@ typedef struct Contradiction
  */
 static bool contradiction_type_1_occurs(int *params)
 {
+    GTD_LOG("Checking for contradiction type 1, maxVertexCount = %d, minEdgeCount = %d", params[0],params[1]);
     return (params[0] * (params[0] - 1) / 2) < params[1];
 }
 
@@ -30,6 +31,7 @@ static bool contradiction_type_1_occurs(int *params)
  */
 static bool contradiction_type_2_occurs(int *params)
 {
+    GTD_LOG("Checking for contradiction type 2, minVertexCount = %d, maxVertexCount = %d", params[0],params[1]);
     return params[0] > params[1];
 }
 
@@ -40,6 +42,7 @@ static bool contradiction_type_2_occurs(int *params)
  */
 static bool contradiction_type_3_occurs(int *params)
 {
+    GTD_LOG("Checking for contradiction type 2, minEdgeCount = %d, maxEdgeCount = %d", params[0],params[1]);
     return params[0] > params[1];
 }
 
@@ -74,18 +77,27 @@ const Contradiction knownContradictionsArray[KNOWN_CONTRADICTIONS_NUMBER] = {
  */
 bool contradict(Fact **factArray, int n_facts)
 {
+    GTD_LOG("Checking if array of %d facts forms a known contradiction",n_facts);
     if (n_facts > MAX_CONTRADICTING_FACTS)
+    {
+        GTD_LOG("No contradiction - too many facts");
         return false;
+    }
     for (int i = 0; i < KNOWN_CONTRADICTIONS_NUMBER; i++)
     {
+        GTD_LOG("Checking contradiction number %d", i+1);
         if (n_facts != knownContradictionsArray[i].n_facts)
+        {
+            GTD_LOG("Number of facts does not match");
             continue;
+        }
         int *params = (int *)gtd_malloc(knownContradictionsArray[i].n_params * sizeof(int));
         bool fact_types_match = true;
         for (int j = 0; j < n_facts; j++)
         {
             if (!knownContradictionsArray[i].types[factArray[j]->type])
             {
+                GTD_LOG("Types of facts do not match");
                 fact_types_match = false;
                 break;
             }
@@ -104,7 +116,10 @@ bool contradict(Fact **factArray, int n_facts)
             }
         }
         if (fact_types_match && knownContradictionsArray[i].occurs(params))
+        {
+            GTD_LOG("Contradiction occurs");
             return true;
+        }
         gtd_free(params);
     }
     return false;

@@ -1,5 +1,5 @@
-#ifndef GRAPH_H
-#define GRAPH_H
+#ifndef FACT_TREE_H
+#define FACT_TREE_H
 #include <stdint.h>
 #include <stdbool.h>
 #include "fact.h"

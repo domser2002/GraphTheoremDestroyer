@@ -1,4 +1,4 @@
-#include "machine.h"
+#include "fact_tree_machine.h"
 
 typedef enum MachineState 
 {
@@ -8,7 +8,7 @@ typedef enum MachineState
     WRITING,
     WRITTEN
 } MachineState;
-struct ProofMachine
+struct FactTreeMachine
 {
     FactTree *FactTree;
     bool contradictionFound;
@@ -23,10 +23,10 @@ struct ProofMachine
  * \param FactTree initial fact tree
  * \returns newly created machine
 */
-ProofMachine *init_machine(FactTree *FactTree)
+FactTreeMachine *init_machine(FactTree *FactTree)
 {
     GTD_LOG("Initiating proof machine");
-    ProofMachine *newMachine = (ProofMachine *)gtd_malloc(sizeof(ProofMachine));
+    FactTreeMachine *newMachine = (FactTreeMachine *)gtd_malloc(sizeof(FactTreeMachine));
     newMachine->FactTree = FactTree;
     newMachine->contradictionFound = false;
     newMachine->contradiciting_idxs = NULL;
@@ -40,7 +40,7 @@ ProofMachine *init_machine(FactTree *FactTree)
  * \brief delete proof machine
  * \param machine machine to delete
 */
-void delete_machine(ProofMachine *machine)
+void delete_machine(FactTreeMachine *machine)
 {
     GTD_LOG("Deleting proof machine");
     if (machine->contradiciting_idxs != NULL)
@@ -57,7 +57,7 @@ void delete_machine(ProofMachine *machine)
  * \note function does not return, it only updates fields in machine class, proof can be written
  *  using write_proof function
 */
-void execute(ProofMachine *machine)
+void execute(FactTreeMachine *machine)
 {
     GTD_LOG("Executing proof machine");
     machine->state = EXECUTING;
@@ -151,7 +151,7 @@ static void write_deduction(FactTree *FactTree, uint32_t idx, FILE *output)
     gtd_free((void*)str);
 }
 
-bool write_proof(ProofMachine *machine, FILE *output)
+bool write_proof(FactTreeMachine *machine, FILE *output)
 {
     if(machine->state != EXECUTED)
     {

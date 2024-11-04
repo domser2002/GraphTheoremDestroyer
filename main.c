@@ -3,7 +3,7 @@
 #include "log.h"
 #include "fact_tree.h"
 #include "fact.h"
-#include "machine.h"
+#include "fact_tree_machine.h"
 
 Fact **generate_facts(int *count)
 {
@@ -22,7 +22,7 @@ int main(void)
     int count = 0;
     Fact **factArray = generate_facts(&count);
     FactTree *FactTree = construct(count,factArray);
-    ProofMachine *machine = init_machine(FactTree);
+    FactTreeMachine *machine = init_machine(FactTree);
     execute(machine);
     write_proof(machine,stdout);
     delete_machine(machine);

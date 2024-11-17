@@ -3,16 +3,52 @@
 #include <stdint.h>
 #include <stdbool.h>
 #include <math.h>
+#include <string.h>
 #include "log.h"
 #include "common.h"
-#define FACT_TYPE_NUM 4
-#define MAX_PARAMS_IN_FACT 1
+#define FACT_TYPE_NUM 39
+#define MAX_PARAMS_IN_FACT 3
 typedef enum FactType
 {
-    MinVertexCountFact = 0,
+    IsConnectedFact = 0,
+    IsTreeFact,
+    IstnaryTreeFact,
+    IsPlanarFact,
+    IsPartiteFact,
+    IsCycleFact,
+    IsCycleComplementFact,
+    HasNoCyclesFact,
+    VertexCountFact,
+    MinVertexCountFact,
     MaxVertexCountFact,
+    EdgeCountFact,
     MinEdgeCountFact,
-    MaxEdgeCountFact
+    MaxEdgeCountFact,
+    TreeHeightFact,
+    MinTreeHeightFact,
+    MaxTreeHeightFact,
+    HasCycleFact,
+    HasNoCycleFact,
+    HasInducedCycleFact,
+    HasNoInducedCycleFact,
+    HasMinorCycleFact,
+    HasNoMinorCycleFact,
+    HasPathFact,
+    HasNoPathFact,
+    HasInducedPathFact,
+    HasNoInducedPathFact,
+    HasMinorPathFact,
+    HasNoMinorPathFact,
+    HasCompletePartiteFact,
+    HasNoCompletePartiteFact,
+    HasInducedCompletePartiteFact,
+    HasNoInducedCompletePartiteFact,
+    HasMinorCompletePartiteFact,
+    HasNoMinorCompletePartiteFact,
+    HasCliqueFact,
+    HasNoCliqueFact,
+    HasMinorCliqueFact,
+    HasNoMinorCliqueFact
 } FactType;
 
 typedef struct Fact Fact;

@@ -1,96 +1,20 @@
+#define CAN_ACCESS_FACT
 #include "fact.h"
-
-struct Fact
-{
-    FactType type;
-    uint32_t *params;
-    uint8_t params_count;
-};
-
-static Fact *create_one_parameter_fact(FactType type, uint32_t param)
-{
-    Fact *newFact = (Fact *)gtd_malloc(sizeof(Fact));
-    newFact->type = type;
-    newFact->params = gtd_malloc(1 * sizeof(uint32_t));
-    newFact->params[0] = param;
-    newFact->params_count = 1;
-    return newFact;
-}
-
-static Fact *create_min_vertex_count_fact(int minVertexCount)
-{
-    return create_one_parameter_fact(MinVertexCountFact, minVertexCount);
-}
-
-static Fact *create_max_vertex_count_fact(int maxVertexCount)
-{
-    return create_one_parameter_fact(MaxVertexCountFact, maxVertexCount);
-}
-
-static Fact *create_min_edge_count_fact(int minEdgeCount)
-{
-    return create_one_parameter_fact(MinEdgeCountFact, minEdgeCount);
-}
-
-static Fact *create_max_edge_count_fact(int maxEdgeCount)
-{
-    return create_one_parameter_fact(MaxEdgeCountFact, maxEdgeCount);
-}
 
 /**
  * \brief constructor for Fact class
 */
 Fact *create_fact(FactType type, int *params, int params_count)
 {
-    switch (type)
-    {
-    case MinVertexCountFact:
-        if(params_count != 1) return NULL;
-        return create_min_vertex_count_fact(params[0]);
-    case MaxVertexCountFact:
-        if(params_count != 1) return NULL;
-        return create_max_vertex_count_fact(params[0]);
-    case MinEdgeCountFact:
-        if(params_count != 1) return NULL;
-        return create_min_edge_count_fact(params[0]);
-    case MaxEdgeCountFact:
-        if(params_count != 1) return NULL;
-        return create_max_edge_count_fact(params[0]);
-    default:
+    if(params_count != get_param_count(type)) 
         return NULL;
-    }
-}
-
-static int delete_one_parameter_fact(Fact *fact, FactType type)
-{
-    if (fact->type != type)
-    {
-        GTD_LOG("[ERROR] Wrong fact type!");
-        return 1;
-    }
-    gtd_free(fact->params);
-    gtd_free(fact);
-    return 0;
-}
-
-static int delete_min_vertex_count_fact(Fact *fact)
-{
-    return delete_one_parameter_fact(fact, MinVertexCountFact);
-}
-
-static int delete_max_vertex_count_fact(Fact *fact)
-{
-    return delete_one_parameter_fact(fact, MaxVertexCountFact);
-}
-
-static int delete_min_edge_count_fact(Fact *fact)
-{
-    return delete_one_parameter_fact(fact, MinEdgeCountFact);
-}
-
-static int delete_max_edge_count_fact(Fact *fact)
-{
-    return delete_one_parameter_fact(fact, MaxEdgeCountFact);
+    Fact *newFact = (Fact *)gtd_malloc(sizeof(Fact));
+    newFact->type = type;
+    newFact->params = (params_count == 0)?NULL:gtd_malloc(params_count * sizeof(uint32_t));
+    for(int i=0;i<params_count;i++)
+        newFact->params[i] = params[i];
+    newFact->params_count = params_count;
+    return newFact;
 }
 
 /**
@@ -98,19 +22,9 @@ static int delete_max_edge_count_fact(Fact *fact)
 */
 int delete_fact(Fact *fact)
 {
-    switch (fact->type)
-    {
-    case MinVertexCountFact:
-        return delete_min_vertex_count_fact(fact);
-    case MaxVertexCountFact:
-        return delete_max_vertex_count_fact(fact);
-    case MinEdgeCountFact:
-        return delete_min_edge_count_fact(fact);
-    case MaxEdgeCountFact:
-        return delete_max_edge_count_fact(fact);
-    default:
-        return -1;
-    }
+    gtd_free(fact->params);
+    gtd_free(fact);
+    return 0;
 }
 
 /**
@@ -120,8 +34,54 @@ int delete_fact(Fact *fact)
 */
 int get_param_count(FactType type)
 {
-    GTD_UNUSED(type);
-    return 1;
+    switch (type)
+    {
+    case IstnaryTreeFact:
+    case IsPartiteFact:
+    case VertexCountFact:
+    case MinVertexCountFact:
+    case MaxVertexCountFact:
+    case EdgeCountFact:
+    case MinEdgeCountFact:
+    case MaxEdgeCountFact:
+    case TreeHeightFact:
+    case MinTreeHeightFact:
+    case MaxTreeHeightFact:
+    case HasCycleFact:
+    case HasNoCycleFact:
+    case HasInducedCycleFact:
+    case HasNoInducedCycleFact:
+    case HasMinorCycleFact:
+    case HasNoMinorCycleFact:
+    case HasPathFact:
+    case HasNoPathFact:
+    case HasInducedPathFact:
+    case HasNoInducedPathFact:
+    case HasMinorPathFact:
+    case HasNoMinorPathFact:
+    case HasCliqueFact:
+    case HasNoCliqueFact:
+    case HasMinorCliqueFact:
+    case HasNoMinorCliqueFact:
+        return 1;
+    case IsConnectedFact:
+    case IsTreeFact:
+    case IsPlanarFact:
+    case IsCycleFact:
+    case IsCycleComplementFact:
+    case HasNoCyclesFact:
+        return 0;
+    case HasCompletePartiteFact:
+    case HasNoCompletePartiteFact:
+    case HasInducedCompletePartiteFact:
+    case HasNoInducedCompletePartiteFact:
+    case HasMinorCompletePartiteFact:
+    case HasNoMinorCompletePartiteFact:
+        // handle only bipartite for now
+        return 3;
+    default:
+        return 0;
+    }
 }
 
 /**
@@ -153,11 +113,32 @@ char *get_fact_str(Fact *fact)
     char *result = (char *)gtd_malloc(128 * sizeof(char));
     switch (fact->type)
     {
-    case MinEdgeCountFact:
-        sprintf(result, "Graph has at least %d edges", fact->params[0]);
+    case IsConnectedFact:
+        sprintf(result, "Graph is connected");
         return result;
-    case MaxEdgeCountFact:
-        sprintf(result, "Graph has at most %d edges", fact->params[0]);
+    case IsTreeFact:
+        sprintf(result, "Graph is a tree");
+        return result;
+    case IstnaryTreeFact:
+        sprintf(result, "Graph is a %d-nary tree", fact->params[0]);
+        return result;
+    case IsPlanarFact:
+        sprintf(result, "Graph is planar");
+        return result;
+    case IsPartiteFact:
+        sprintf(result, "Graph is %d-partite", fact->params[0]);
+        return result;
+    case IsCycleFact:
+        sprintf(result, "Graph is a cycle");
+        return result;
+    case IsCycleComplementFact:
+        sprintf(result, "Graph is a complement of a cycle");
+        return result;
+    case HasNoCyclesFact:
+        sprintf(result, "Graph has no cycles");
+        return result;
+    case VertexCountFact:
+        sprintf(result, "Graph has %d vertices", fact->params[0]);
         return result;
     case MinVertexCountFact:
         sprintf(result, "Graph has at least %d vertices", fact->params[0]);
@@ -165,6 +146,132 @@ char *get_fact_str(Fact *fact)
     case MaxVertexCountFact:
         sprintf(result, "Graph has at most %d vertices", fact->params[0]);
         return result;
+    case EdgeCountFact:
+        sprintf(result, "Graph has %d edges", fact->params[0]);
+        return result;
+    case MinEdgeCountFact:
+        sprintf(result, "Graph has at least %d edges", fact->params[0]);
+        return result;
+    case MaxEdgeCountFact:
+        sprintf(result, "Graph has at most %d edges", fact->params[0]);
+        return result;
+    case TreeHeightFact:
+        sprintf(result, "Graph is a tree with height %d", fact->params[0]);
+        return result;
+    case MinTreeHeightFact:
+        sprintf(result, "Graph is a tree with height at least %d", fact->params[0]);
+        return result;
+    case MaxTreeHeightFact:
+        sprintf(result, "Graph is a tree with height at most %d", fact->params[0]);
+        return result;
+    case HasCycleFact:
+        sprintf(result, "Graph contains C_%d as a subgraph", fact->params[0]);
+        return result;   
+    case HasNoCycleFact:
+        sprintf(result, "Graph does not contain C_%d as a subgraph", fact->params[0]);
+        return result;  
+    case HasInducedCycleFact:
+        sprintf(result, "Graph contains C_%d as an induced subgraph", fact->params[0]);
+        return result;   
+    case HasNoInducedCycleFact:
+        sprintf(result, "Graph does not contain C_%d as an induced subgraph", fact->params[0]);
+        return result;  
+    case HasMinorCycleFact:
+        sprintf(result, "Graph contains C_%d as a minor", fact->params[0]);
+        return result;   
+    case HasNoMinorCycleFact:
+        sprintf(result, "Graph does not contain C_%d as a minor", fact->params[0]);
+        return result; 
+    case HasPathFact:
+        sprintf(result, "Graph contains P_%d as a subgraph", fact->params[0]);
+        return result;   
+    case HasNoPathFact:
+        sprintf(result, "Graph does not contain P_%d as a subgraph", fact->params[0]);
+        return result;  
+    case HasInducedPathFact:
+        sprintf(result, "Graph contains P_%d as an induced subgraph", fact->params[0]);
+        return result;   
+    case HasNoInducedPathFact:
+        sprintf(result, "Graph does not contain P_%d as an induced subgraph", fact->params[0]);
+        return result;  
+    case HasMinorPathFact:
+        sprintf(result, "Graph contains P_%d as a minor", fact->params[0]);
+        return result;   
+    case HasNoMinorPathFact:
+        sprintf(result, "Graph does not contain P_%d as a minor", fact->params[0]);
+        return result;
+    case HasCompletePartiteFact:
+        sprintf(result, "Graph contains K_");
+        for(uint32_t i=0;i<fact->params[0];i++)
+        {
+            sprintf(result,"%d", fact->params[i+1]);
+            if(i != fact->params[0] - 1) 
+                sprintf(result,",");
+        }
+        sprintf(result, " as a subgraph");
+        return result;   
+    case HasNoCompletePartiteFact:
+        sprintf(result, "Graph does not contain K_");
+        for(uint32_t i=0;i<fact->params[0];i++)
+        {
+            sprintf(result + strlen(result),"%d", fact->params[i+1]);
+            if(i != fact->params[0] - 1) 
+                sprintf(result + strlen(result),",");
+        }
+        sprintf(result + strlen(result), " as a subgraph");
+        return result;  
+    case HasInducedCompletePartiteFact:
+        sprintf(result + strlen(result), "Graph contains K_");
+        for(uint32_t i=0;i<fact->params[0];i++)
+        {
+            sprintf(result + strlen(result),"%d", fact->params[i+1]);
+            if(i != fact->params[0] - 1) 
+                sprintf(result + strlen(result),",");
+        }
+        sprintf(result + strlen(result), " as a induced subgraph");
+        return result;   
+    case HasNoInducedCompletePartiteFact:
+        sprintf(result, "Graph does not contain K_");
+        for(uint32_t i=0;i<fact->params[0];i++)
+        {
+            sprintf(result + strlen(result),"%d", fact->params[i+1]);
+            if(i != fact->params[0] - 1) 
+                sprintf(result + strlen(result),",");
+        }
+        sprintf(result + strlen(result), " as a induced subgraph");
+        return result;  
+    case HasMinorCompletePartiteFact:
+        sprintf(result, "Graph contains K_");
+        for(uint32_t i=0;i<fact->params[0];i++)
+        {
+            sprintf(result,"%d", fact->params[i+1]);
+            if(i != fact->params[0] - 1) 
+                sprintf(result,",");
+        }
+        sprintf(result, " as a minor");
+        return result;   
+    case HasNoMinorCompletePartiteFact:
+        sprintf(result, "Graph does not contain K_");
+        for(uint32_t i=0;i<fact->params[0];i++)
+        {
+            sprintf(result,"%d", fact->params[i+1]);
+            if(i != fact->params[0] - 1) 
+                sprintf(result,",");
+        }
+        sprintf(result, " as a minor");
+        return result;
+    case HasCliqueFact:
+        sprintf(result, "Graph contains K_%d as a subgraph", fact->params[0]);
+        return result;
+    case HasNoCliqueFact:
+        sprintf(result, "Graph does not contain K_%d as a subgraph", fact->params[0]);
+        return result;
+    case HasMinorCliqueFact:
+        sprintf(result, "Graph contains K_%d as a minor", fact->params[0]);
+        return result;   
+    case HasNoMinorCliqueFact:
+        sprintf(result, "Graph does not contain K_%d as a minor", fact->params[0]);
+        return result;       
     default:
         return "";
     }

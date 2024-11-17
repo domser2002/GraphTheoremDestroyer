@@ -73,7 +73,7 @@ void execute(FactTreeMachine *machine)
         {
             if (mask & (1ULL << i))
             {
-                elements[number_of_ones] = i;
+                elements[number_of_ones] = n - i - 1;
                 subArray[number_of_ones++] = machine->FactTree->facts[n - i - 1];
             }
         }
@@ -103,7 +103,7 @@ void execute(FactTreeMachine *machine)
         {
             if (mask & (1ULL << i))
             {
-                elements[number_of_ones] = i;
+                elements[number_of_ones] = n - i - 1;
                 subArray[number_of_ones++] = machine->FactTree->facts[n - i - 1];
             }
         }
@@ -140,15 +140,20 @@ static void write_deduction(FactTree *FactTree, uint32_t idx, FILE *output)
 {
     uint8_t parent_count = FactTree->parent_count[idx];
     uint32_t *parents = FactTree->parents[idx];
-    //int parent = get_parent(FactTree,idx);
-    for(uint8_t i=0;i<parent_count;i++)
+    for (uint8_t i = 0; i < parent_count; i++)
     {
-        fprintf(output," => ");
-        write_deduction(FactTree,parents[i],output);
+        write_deduction(FactTree, parents[i], output);
+        fprintf(output,"\n");
     }
-    char *str = get_fact_str((Fact*)FactTree->facts[idx]);
-    fprintf(output,"%s",(const char *)str);
-    gtd_free((void*)str);
+    for (uint8_t i = 0; i < parent_count; i++)
+    {
+        fprintf(output, "%s",get_fact_str(FactTree->facts[parents[i]]));
+        if(i != parent_count - 1) fprintf(output,", ");
+    }
+    if(parent_count != 0) fprintf(output, " => ");
+    char *str = get_fact_str((Fact *)FactTree->facts[idx]);
+    fprintf(output, "%s", (const char *)str);
+    gtd_free((void *)str);
 }
 
 bool write_proof(FactTreeMachine *machine, FILE *output)
@@ -170,6 +175,12 @@ bool write_proof(FactTreeMachine *machine, FILE *output)
             write_deduction(machine->FactTree,machine->contradiciting_idxs[i],output);
             fprintf(output,"\n");
         }
+        for(uint32_t i=0;i<machine->contradicting_count;i++)
+        {
+            fprintf(output, "%s",get_fact_str(machine->FactTree->facts[machine->contradiciting_idxs[i]]));
+            if(i != machine->contradicting_count - 1) fprintf(output,", ");
+        }
+        fprintf(output," contradict\n");
     }
     machine->state = WRITTEN;
     return true;

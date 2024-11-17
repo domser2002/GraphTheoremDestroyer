@@ -1,5 +1,5 @@
 #include "test_fact_tree.h"
-
+static uint8_t counter = 1;
 typedef Fact *(*create_fact_func)(int);
 typedef int (*delete_fact_func)(Fact *);
 
@@ -37,6 +37,7 @@ static void delete_fact_array(Fact **factArray,int fact_count)
 
 static void single_contradict_test(Fact **factArray, int fact_count, bool expected)
 {
+    printf("TEST %d\n", counter++);
     // Arrange
     // Act
     bool result = contradict(factArray, fact_count);
@@ -72,34 +73,17 @@ static void test_contradict(void)
 {
     // Case 1 - no facts case
     create_and_run_contradict_test_case(NULL,NULL,NULL,0,false);
-    // Case 2 - only MinVertexCountFact case
-    FactType types2[] = {MinVertexCountFact};
-    int params2_1[] = {1};
-    int *params2[] = {params2_1};
-    int params_count_2[] = {1};
-    int fact_count_2 = 1;
-    create_and_run_contradict_test_case(types2,params2,params_count_2,fact_count_2, false);
-    // Case 3 - only MaxVertexCountFact case
-    FactType types3[] = {MaxVertexCountFact};
-    int params3_1[] = {1};
-    int *params3[] = {params3_1};
-    int params_count_3[] = {1};
-    int fact_count_3 = 1;
-    create_and_run_contradict_test_case(types3,params3,params_count_3,fact_count_3, false);
-    // Case 4 - only MinEdgeCountFact case
-    FactType types4[] = {MinEdgeCountFact};
-    int params4_1[] = {1};
-    int *params4[] = {params4_1};
-    int params_count_4[] = {1};
-    int fact_count_4 = 1;
-    create_and_run_contradict_test_case(types4,params4,params_count_4,fact_count_4, false);
-    // Case 5 - only MaxVertexCountFact case
-    FactType types5[] = {MaxVertexCountFact};
-    int params5_1[] = {1};
-    int *params5[] = {params5_1};
-    int params_count_5[] = {1};
-    int fact_count_5 = 1;
-    create_and_run_contradict_test_case(types5,params5,params_count_5,fact_count_5, false);
+    // Case set 2 - only one fact case
+    for (uint8_t i = 0; i < FACT_TYPE_NUM; i++)
+    {
+        FactType types2[] = {i};
+        int *params2_1 = (int*)gtd_malloc(get_param_count(i)*sizeof(int));
+        memset(params2_1,0x0,get_param_count(i)*sizeof(int));
+        int *params2[] = {params2_1};
+        int params_count_2[] = {get_param_count(i)};
+        int fact_count_2 = 1;
+        create_and_run_contradict_test_case(types2, params2, params_count_2, fact_count_2, false);
+    }
     // Case 6 - contradiction type 1 should not occur
     FactType types6[] = {MaxVertexCountFact, MinEdgeCountFact};
     int params6_1[] = {0};
@@ -202,6 +186,7 @@ static void assert_facts(Fact *fact1, Fact *fact2)
 
 static void single_implies_test(Fact **factArray,int fact_count, Fact **expected, int expected_count)
 {
+    printf("TEST %d\n", counter++);
     // Arrange
     int count;
     // Act

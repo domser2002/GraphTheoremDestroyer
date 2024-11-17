@@ -7,12 +7,16 @@
 
 Fact **generate_facts(int *count)
 {
-    *count = 2;
+    *count = 5;
     Fact **factArray = gtd_malloc(*count * sizeof(Fact*));
-    int min_edge_count[] = {11};
-    int max_vertex_count[] = {5};
-    factArray[0] = create_fact(MinEdgeCountFact,min_edge_count,1);
-    factArray[1] = create_fact(MaxVertexCountFact,max_vertex_count,1);
+    int params_2[] = {2,1,3};
+    int params_3[] = {4};
+    int params_4[] = {8};
+    factArray[0] = create_fact(HasNoCyclesFact,NULL,0);
+    factArray[1] = create_fact(HasNoInducedCompletePartiteFact,params_2,3);
+    factArray[2] = create_fact(HasNoInducedPathFact,params_3,1);
+    factArray[3] = create_fact(MinVertexCountFact,params_4,1);
+    factArray[4] = create_fact(IsConnectedFact,NULL,0);
     return factArray;
 }
 

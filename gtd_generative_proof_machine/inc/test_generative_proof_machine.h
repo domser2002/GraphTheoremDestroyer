@@ -10,6 +10,18 @@ void test_generative_proof_machine(void);
 
 void creation_and_deletion(void);
 
+void test_max_degree(void);
+
 void execute_small_machine(void);
+
+void execute_small_machine2(void);
+
+void test_no_ck_restriction(void);
+
+void test_no_induced_pk_restriction(void);
+
+void test_erdos_gyarfas_subcase(void);
+
+void next_test(void);
 
 #endif

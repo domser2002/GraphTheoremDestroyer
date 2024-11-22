@@ -1,12 +1,14 @@
 #include "physical_graph.h"
+#define HASH_EXP 5
+
 
 struct Graph
 {
     int max_vertices;
     int vertices;
-    int **adjacency_matrix;
+    char **adjacency_matrix;
     int *degree;
-    // hash is sum of degree^3 (not sum^3)
+    // hash is sum of degree^HASH_EXP (not sum^HASH_EXP)
     int hash;
 
     // do we know for sure that from this graph
@@ -23,13 +25,21 @@ Graph *create_graph(int max_vertices, int vertices)
     newGraph->max_vertices = max_vertices;
     newGraph->vertices = vertices;
     newGraph->degree = (int *)gtd_malloc(sizeof(int) * max_vertices);
-    newGraph->adjacency_matrix = (int **)gtd_malloc(sizeof(int*) * max_vertices);
+    newGraph->adjacency_matrix = (char **)gtd_malloc(sizeof(int*) * max_vertices);
 
     for(int i = 0; i < max_vertices; ++i)
     {
         newGraph->degree[i] = 0;
-        newGraph->adjacency_matrix[i] = (int *)gtd_malloc(sizeof(int) * max_vertices);
-        memset(newGraph->adjacency_matrix[i], 0, sizeof(int) * max_vertices);
+        newGraph->adjacency_matrix[i] = (char *)gtd_malloc(sizeof(char) * max_vertices);
+        memset(newGraph->adjacency_matrix[i], 0, sizeof(char) * max_vertices);
+    }
+
+    for(int r = 0; r < max_vertices; ++r)
+    {
+        for(int c = 0; c < max_vertices; ++c)
+        {
+            newGraph->adjacency_matrix[r][c] = UNKNOWN_SYMBOL;
+        }
     }
 
     return newGraph;
@@ -57,7 +67,7 @@ int get_graph_num_vertices(Graph *graph)
     return graph->vertices;
 }
 
-int **get_graph_adjacency_matrix(Graph *graph)
+char **get_graph_adjacency_matrix(Graph *graph)
 {
     return graph->adjacency_matrix;
 }
@@ -78,32 +88,35 @@ int get_graph_is_maximal(Graph *graph)
     return graph->is_maximal;
 }
 
-int add_edge(Graph *graph, int from, int to)
+int set_edge_connected(Graph *graph, int from, int to)
 {
-    if(from < 0 || from >= graph->vertices || to < 0 || to >= graph->vertices)
+    if(from < 0 || from >= graph->vertices || to < 0 || to >= graph->vertices
+        || from == to)
     {
         return -1;
     }
 
-    if(graph->adjacency_matrix[from][to] == 0)
+    // update hash
+    if(graph->adjacency_matrix[from][to] != CONNECTED_SYMBOL)
     {
         int from_degree = graph->degree[from];
         int to_degree = graph->degree[to];
-        graph->hash += int_pow(from_degree + 1, 3) + int_pow(to_degree + 1, 3);
-        graph->hash -= int_pow(from_degree, 3) + int_pow(to_degree, 3);
+        graph->hash += int_pow(from_degree + 1, HASH_EXP) + int_pow(to_degree + 1, HASH_EXP);
+        graph->hash -= int_pow(from_degree, HASH_EXP) + int_pow(to_degree, HASH_EXP);
         graph->degree[from]++;
         graph->degree[to]++;
     }
 
-    graph->adjacency_matrix[from][to] = 1;
-    graph->adjacency_matrix[to][from] = 1;
+    graph->adjacency_matrix[from][to] = CONNECTED_SYMBOL;
+    graph->adjacency_matrix[to][from] = CONNECTED_SYMBOL;
 
     return 1;
 }
 
-int remove_edge(Graph *graph, int from, int to)
+int set_edge_not_connected(Graph *graph, int from, int to)
 {
-    if(from < 0 || from >= graph->vertices || to < 0 || to >= graph->vertices)
+    if(from < 0 || from >= graph->vertices || to < 0 || to >= graph->vertices
+        || from == to)
     {
         return -1;
     }
@@ -112,14 +125,17 @@ int remove_edge(Graph *graph, int from, int to)
     {
         int from_degree = graph->degree[from];
         int to_degree = graph->degree[to];
-        graph->hash += int_pow(from_degree - 1, 3) + int_pow(to_degree - 1, 3);
-        graph->hash -= int_pow(from_degree, 3) + int_pow(to_degree, 3);
-        graph->degree[from]--;
-        graph->degree[to]--;
+        graph->hash += int_pow(from_degree - 1, HASH_EXP) + int_pow(to_degree - 1, HASH_EXP);
+        graph->hash -= int_pow(from_degree, HASH_EXP) + int_pow(to_degree, HASH_EXP);
+        if(graph->adjacency_matrix[from][to] == CONNECTED_SYMBOL)
+        {
+            graph->degree[from]--;
+            graph->degree[to]--;
+        }
     }
 
-    graph->adjacency_matrix[from][to] = 0;
-    graph->adjacency_matrix[to][from] = 0;
+    graph->adjacency_matrix[from][to] = NOT_CONNECTED_SYMBOL;
+    graph->adjacency_matrix[to][from] = NOT_CONNECTED_SYMBOL;
 
     return 1;
 }
@@ -159,105 +175,16 @@ int *get_graph_degree(Graph *graph)
 
 // ================ ALGORITHMS ================
 
-void swap(int *a, int *b)
+char **create_matrix(int rows, int cols)
 {
-    int temp = *a;
-    *a = *b;
-    *b = temp;
-}
-
-int **create_matrix(int rows, int cols)
-{
-    int **matrix = gtd_malloc(rows * sizeof(int*));
+    char **matrix = gtd_malloc(rows * sizeof(int*));
 
     for(int r = 0; r < rows; ++r)
     {
-        matrix[r] = gtd_malloc(cols * sizeof(int));
+        matrix[r] = gtd_malloc(cols * sizeof(char));
     }
 
     return matrix;
-}
-
-int check_isomorphic(Graph *g1, Graph *g2)
-{
-    // Step 1: Check if the number of vertices is the same
-    //if (g1->vertices != g2->vertices || g1->hash != g2->hash)
-    if(g1->vertices != g2->vertices)
-    {
-        return 0;
-    }
-
-    int n = g1->vertices;
-
-    // Step 2: Generate all possible permutations of the vertices
-    int *perm = (int *)malloc(n * sizeof(int));
-    for (int i = 0; i < n; i++)
-    {
-        perm[i] = i; // Initialize permutation as [0, 1, 2, ..., n-1]
-    }
-
-    do
-    {
-        int is_isomorphic = 1;
-
-        for (int i = 0; i < n && is_isomorphic; i++)
-        {
-            for (int j = 0; j < n && is_isomorphic; j++)
-            {
-                // Check if g1[perm[i]][perm[j]] == g2[i][j]
-                if (g1->adjacency_matrix[perm[i]][perm[j]] != g2->adjacency_matrix[i][j])
-                {
-                    is_isomorphic = 0;
-                }
-            }
-        }
-
-        if (is_isomorphic)
-        {
-            free(perm);
-            return 1; // Graphs are isomorphic
-        }
-
-    } while (nextPermutation(perm, n)); // Generate next permutation
-
-    free(perm);
-    return 0;
-
-}
-
-int nextPermutation(int *arr, int n)
-{
-    int i = n - 2;
-    // Find the largest i such that arr[i] < arr[i + 1]
-    while (i >= 0 && arr[i] >= arr[i + 1])
-    {
-        i--;
-    }
-    if (i < 0)
-    {
-        return 0; // No more permutations
-    }
-
-    // Find the largest j such that arr[j] > arr[i]
-    int j = n - 1;
-    while (arr[j] <= arr[i])
-    {
-        j--;
-    }
-
-    // Swap arr[i] and arr[j]
-    swap(&arr[i], &arr[j]);
-
-    // Reverse the elements after i
-    int k = i + 1, l = n - 1;
-    while (k < l)
-    {
-        swap(&arr[k], &arr[l]);
-        k++;
-        l--;
-    }
-
-    return 1;
 }
 
 int int_pow(int base, int exp)

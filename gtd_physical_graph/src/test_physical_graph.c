@@ -34,96 +34,59 @@ void test_adding_vertices(void)
 
 void test_adding_edges(void)
 {
-    Graph *graph = create_graph(10, 4);
-    int n = get_graph_num_vertices(graph);
+    Graph *graph = create_graph(10, 0);
 
-    int correctMatrix[4][4] = 
+    for(int i = 0; i < 8; ++i)
     {
-        {0, 0, 0, 0},
-        {0, 0, 0, 0},
-        {0, 0, 0, 0},
-        {0, 0, 0, 0}
-    };
-
-    int **adjMatrix = get_graph_adjacency_matrix(graph);
-    for(int r = 0; r < n; ++r)
-    {
-        for(int c = 0; c < n; ++c)
-        {
-            assert(adjMatrix[r][c] == correctMatrix[r][c]);
-        }
+        add_vertex(graph);
     }
 
-    add_edge(graph, 0, 2);
-    add_edge(graph, 2, 3);
-    add_edge(graph, 1, 3);
+    int num_vertices = get_graph_num_vertices(graph);
+    char **adjMatrix = get_graph_adjacency_matrix(graph);
+
+    set_edge_connected(graph, 3, 5);
+    set_edge_connected(graph, 4, 6);
+    set_edge_connected(graph, 1, 5);
+    
+    assert(adjMatrix[3][5] == CONNECTED_SYMBOL);
+    assert(adjMatrix[4][6] == CONNECTED_SYMBOL);
+    assert(adjMatrix[1][5] == CONNECTED_SYMBOL);
 
 
-    int correctMatrix2[4][4] = 
+    set_edge_not_connected(graph, 0, 1);
+    set_edge_not_connected(graph, 4, 6);
+
+    assert(adjMatrix[0][1] == NOT_CONNECTED_SYMBOL);
+    assert(adjMatrix[4][6] == NOT_CONNECTED_SYMBOL);
+
+    for(int from = 0; from < num_vertices; ++from)
     {
-        {0, 0, 1, 0},
-        {0, 0, 0, 1},
-        {1, 0, 0, 1},
-        {0, 1, 1, 0}
-    };
-
-    adjMatrix = get_graph_adjacency_matrix(graph);
-    for(int r = 0; r < n; ++r)
-    {
-        for(int c = 0; c < n; ++c)
+        for(int to = 0; to < num_vertices; ++to)
         {
-            assert(adjMatrix[r][c] == correctMatrix2[r][c]);
+            if((from == 3 && to == 5) || (from == 5 && to == 3))
+                continue;
+            if((from == 4 && to == 6) || (from == 6 && to == 4))
+                continue;
+            if((from == 5 && to == 1) || (from == 1 && to == 5))
+                continue;
+            if((from == 0 && to == 1) || (from == 1 && to == 0))
+                continue;
+            
+            assert(adjMatrix[from][to] == UNKNOWN_SYMBOL);
         }
     }
+    
 
     destroy_graph(graph);
 }
 
 void test_isomorpic_pass(void)
 {
-    Graph *g1 = create_graph(5, 5);
-    add_edge(g1, 0, 1);
-    add_edge(g1, 0, 4);
-    add_edge(g1, 1, 2);
-    add_edge(g1, 2, 3);
-    add_edge(g1, 3, 4);
-
-    Graph *g2 = create_graph(5, 5);
-    add_edge(g2, 0, 1);
-    add_edge(g2, 0, 3);
-    add_edge(g2, 1, 4);
-    add_edge(g2, 2, 3);
-    add_edge(g2, 2, 4);
-
-    int res = check_isomorphic(g1, g2);
-
-    assert(res == 1);
-
-    destroy_graph(g1);
-    destroy_graph(g2);
+    
 }
 
 void test_isomorpic_fail(void)
-{Graph *g1 = create_graph(5, 5);
-    add_edge(g1, 0, 1);
-    add_edge(g1, 0, 4);
-    add_edge(g1, 1, 2);
-    add_edge(g1, 1, 3); // adding this one should fail
-    add_edge(g1, 2, 3);
-    add_edge(g1, 3, 4);
-
-    Graph *g2 = create_graph(5, 5);
-    add_edge(g2, 0, 1);
-    add_edge(g2, 0, 3);
-    add_edge(g2, 1, 4);
-    add_edge(g2, 2, 3);
-    add_edge(g2, 2, 4);
-
-    int res = check_isomorphic(g1, g2);
-
-    assert(res == 0);
-
-    destroy_graph(g1);
-    destroy_graph(g2);
+{
+    
 
 }

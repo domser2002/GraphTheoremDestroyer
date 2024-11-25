@@ -9,6 +9,7 @@ struct GenerativeProofMachine
     Graph *graph;
     GenerativeRestriction **restrictions;
     int num_restrictions;
+    int depth;
 };
 
 
@@ -19,6 +20,7 @@ GenerativeProofMachine *create_generative_proof_machine(GenerativeRestriction **
     generativeProofMachine->restrictions = restrictions;
     generativeProofMachine->num_restrictions = num_restrictions;
     generativeProofMachine->graph = startGraph;
+    generativeProofMachine->depth = 0;
 
     return generativeProofMachine;
 }
@@ -57,4 +59,36 @@ int execute_generative_proof_machine(GenerativeProofMachine *machine)
         ++i;
     }
     return 0;
+}
+
+
+void set_machine_depth(GenerativeProofMachine *machine, int depth)
+{
+    machine->depth = depth;
+}
+
+int get_machine_depth(GenerativeProofMachine *machine)
+{
+    int depth = machine->depth;
+    return depth;
+}
+
+
+Graph *get_machine_graph(GenerativeProofMachine *machine)
+{
+    return machine->graph;
+}
+
+
+GenerativeProofMachine *copyMachine(GenerativeProofMachine *machine)
+{
+    GenerativeRestriction **restrictions = machine->restrictions;
+    int num_restrictions = machine->num_restrictions;
+    Graph *startGraph = copyGraph(machine->graph);
+    int depth = machine->depth;
+
+    GenerativeProofMachine *result = create_generative_proof_machine(restrictions, num_restrictions, startGraph);
+    result->depth = depth;
+
+    return result;
 }

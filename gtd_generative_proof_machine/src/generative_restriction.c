@@ -1,11 +1,11 @@
 #include "physical_graph.h"
 #include "generative_restriction.h"
+#include "generative_proof_machine.h"
 
 struct GenerativeRestriction
 {
-    RestrictionResult* (*restriction)(Graph* graph, int *params);
-    int num_params;
-    int *params;
+    RestrictionResult* (*restriction)(Graph* graph, RestrictionParameters *params);
+    RestrictionParameters *params;
 };
 
 typedef struct intNode
@@ -16,11 +16,10 @@ typedef struct intNode
 
 
 
-GenerativeRestriction *create_restriction(RestrictionResult* (*restriction)(Graph* graph, int *params), int num_params, int *params)
+GenerativeRestriction *create_restriction(RestrictionResult* (*restriction)(Graph* graph, RestrictionParameters *params), RestrictionParameters *params)
 {
     GenerativeRestriction *genRestriction = gtd_malloc(sizeof(GenerativeRestriction));
     genRestriction->restriction = restriction;
-    genRestriction->num_params = num_params;
     genRestriction->params = params;
     return genRestriction;
 }
@@ -41,19 +40,39 @@ RestrictionResult* check_restriction(Graph *graph, GenerativeRestriction *restri
     return res;
 }
 
+RestrictionParameters *initRestrictionParameters(void)
+{
+    RestrictionParameters *result = gtd_malloc(sizeof(RestrictionParameters));
+    result->numInt = 0;
+    result->intParams = NULL;
+    result->machine = NULL;
+
+    return result;
+}
+
+void destroyRestrictionParameters(RestrictionParameters *params)
+{
+    gtd_free(params->intParams);
+    destroy_generative_proof_machine(params->machine);
+}
+
 // =============== max degree restriction ===============
 
 GenerativeRestriction *create_max_degree_restriction(int max_degree)
 {
-    int *params = gtd_malloc(sizeof(int));
-    params[0] = max_degree;
-    GenerativeRestriction *restrinction = create_restriction(max_degree_restriction_condition, 1, params);
+    // int *params = gtd_malloc(sizeof(int));
+    // params[0] = max_degree;
+    RestrictionParameters *params = initRestrictionParameters();
+    params->numInt = 1;
+    params->intParams = gtd_malloc(sizeof(int));
+    params->intParams[0] = max_degree;
+    GenerativeRestriction *restrinction = create_restriction(max_degree_restriction_condition, params);
     return restrinction;
 }
 
-RestrictionResult* max_degree_restriction_condition(Graph* graph, int *params)
+RestrictionResult* max_degree_restriction_condition(Graph* graph, RestrictionParameters *params)
 {
-    int maxDegree = params[0];
+    int maxDegree = params->intParams[0];
 
     RestrictionResult *result = gtd_malloc(sizeof(RestrictionResult));
     result->modified = 0;
@@ -96,9 +115,13 @@ RestrictionResult* max_degree_restriction_condition(Graph* graph, int *params)
 
 GenerativeRestriction *create_no_k_cycle_restriction(int k)
 {
-    int *params = gtd_malloc(sizeof(int));
-    params[0] = k;
-    GenerativeRestriction *restriction = create_restriction(no_k_cycle_restrinction_condition, 1, params);
+    // int *params = gtd_malloc(sizeof(int));
+    // params[0] = k;
+    RestrictionParameters *params = initRestrictionParameters();
+    params->numInt = 1;
+    params->intParams = gtd_malloc(sizeof(int));
+    params->intParams[0] = k;
+    GenerativeRestriction *restriction = create_restriction(no_k_cycle_restrinction_condition, params);
     return restriction;
 }
 
@@ -209,8 +232,9 @@ PathNode* find_k_paths(Graph *graph, int k)
 }
 
 // Main function for no-k-cycle restriction condition
-RestrictionResult* no_k_cycle_restrinction_condition(Graph *graph, int *params) {
-    int k = params[0];
+RestrictionResult* no_k_cycle_restrinction_condition(Graph *graph, RestrictionParameters *params) {
+    // int k = params[0];
+    int k = params->intParams[0];
     PathNode *paths = find_k_paths(graph, k);
     RestrictionResult *result = gtd_malloc(sizeof(RestrictionResult));
     result->contradictionFound = 0;
@@ -253,21 +277,21 @@ RestrictionResult* no_k_cycle_restrinction_condition(Graph *graph, int *params) 
 
 GenerativeRestriction *create_no_induced_pk_restriction(int k)
 {
-    int *params = gtd_malloc(sizeof(int));
-    params[0] = k;
-    GenerativeRestriction *restriction = create_restriction(no_induced_pk_restriction_condition, 1, params);
+    // int *params = gtd_malloc(sizeof(int));
+    // params[0] = k;
+    RestrictionParameters *params = initRestrictionParameters();
+    params->numInt = 1;
+    params->intParams = gtd_malloc(sizeof(int));
+    params->intParams[0] = k;
+    GenerativeRestriction *restriction = create_restriction(no_induced_pk_restriction_condition, params);
     return restriction;
 }
 
-// todo
-RestrictionResult* no_induced_pk_restriction_condition(Graph *graph, int *params) {
-    gtd_free(graph);
-    gtd_free(params);
-    return NULL;
-    /*
-    int k = params[0];  // Target path length P_k
-    int n = get_graph_num_vertices(graph);
 
+RestrictionResult* no_induced_pk_restriction_condition(Graph *graph, RestrictionParameters *params) 
+{
+    
+    int k = params->intParams[0];
     RestrictionResult *result = gtd_malloc(sizeof(RestrictionResult));
     result->contradictionFound = 0;
     result->modified = 0;
@@ -279,42 +303,199 @@ RestrictionResult* no_induced_pk_restriction_condition(Graph *graph, int *params
         PathNode *path = paths;
         paths = paths->next;
 
-        // check if path is induced
-        int numUnknown = 1;
-        int unknownStart;
-        int unknownEnd;
-        for(int i = 0; i < path->numElems; ++i)
-        {
-            for(int j = 0; j < path->numElems; ++j)
-            {
-                if((j == i+1 || j == i-1) && adjMatrix[i][j] != CONNECTED_SYMBOL)
-                {
-                    // induced = 0;
-                    break;
-                }
-                else if(adjMatrix[i][j] != NOT_CONNECTED_SYMBOL)
-                {
-                    // induced = 0;
-                    break;
-                }
+        int notConnectedCount = 0;
+        int unknownCount = 0;
+        int lastUnknownStart = -1;
+        int lastUnknownEnd = -1;
 
-            }
-            if(induced == 0)
+        for(int i = 0; i < k; ++i)
+        {
+            for(int j = i+1; j < k; ++j)
             {
-                break;
+                int iver = path->path[i];
+                int jver = path->path[j];
+                if(adjMatrix[iver][jver] == notConnectedCount)
+                {
+                    ++notConnectedCount;
+                }
+                if(adjMatrix[iver][jver] == UNKNOWN_SYMBOL)
+                {
+                    ++unknownCount;
+                    lastUnknownStart = iver;
+                    lastUnknownEnd = jver;
+                }
             }
         }
-        if(!induced)
+
+        if(notConnectedCount == (k-1)*(k-2) / 2)
         {
-            continue;
+            result->contradictionFound = 1;
+            destroyPathNode(path);
+            while(paths != NULL)
+            {
+                path = paths;
+                paths = paths->next;
+                destroyPathNode(path);
+            }
+            return result;
         }
 
+        if(unknownCount == 1)
+        {
+            set_edge_connected(graph, lastUnknownStart, lastUnknownEnd);
+            result->modified = 1;
+        }
 
+        destroyPathNode(path);
     }
     return result;
-    */
 }
 
 
 
 // =============== no induced pk restriction ============
+// =============== min degree restriction ============
+
+GenerativeRestriction *create_min_degree_restriction(int k)
+{
+    // int *params = gtd_malloc(sizeof(int));
+    // params[0] = k;
+    RestrictionParameters *params = initRestrictionParameters();
+    params->numInt = 1;
+    params->intParams = gtd_malloc(sizeof(int));
+    params->intParams[0] = k;
+    GenerativeRestriction *restriction = create_restriction(min_degree_restriction_condition, params);
+    return restriction;
+}
+
+RestrictionResult *min_degree_restriction_condition(Graph *graph, RestrictionParameters *params)
+{
+    RestrictionResult *result = gtd_malloc(sizeof(RestrictionResult));
+    result->contradictionFound = 0;
+    result->modified = 0;
+    int k = params->intParams[0];
+    int n = get_graph_num_vertices(graph);
+    char **adjMatrix = get_graph_adjacency_matrix(graph);
+
+    
+    for(int i = 0; i < n; ++i)
+    {
+        int numUnknown = 0;
+        int numConnected = 0;
+        for(int j = 0; j < n; ++j)
+        {
+            if(i == j)
+            {
+                continue;
+            }
+            if(adjMatrix[i][j] == UNKNOWN_SYMBOL)
+            {
+                ++numUnknown;
+            }
+            if(adjMatrix[i][j] == CONNECTED_SYMBOL)
+            {
+                ++numConnected;
+            }
+        }
+        if(numUnknown + numConnected < k)
+        {
+            if(add_vertex(graph) == 1)
+            {
+                set_edge_connected(graph, i, n);
+                result->modified = 1;
+                return result;
+            }
+        }
+    }
+    return result;
+}
+
+// =============== min degree restriction ============
+// =============== check edge restriction ============
+
+GenerativeRestriction *create_check_edge_restriction(int max_depth, GenerativeProofMachine *machine)
+{
+    // int *params = gtd_malloc(sizeof(int));
+    // params[0] = max_depth;
+    RestrictionParameters *params = initRestrictionParameters();
+    params->numInt = 1;
+    params->intParams = gtd_malloc(sizeof(int));
+    params->intParams[0] = max_depth;
+    params->machine = machine;
+    GenerativeRestriction *restriction = create_restriction(check_edge_restriction_condition, params);
+    return restriction;
+}
+
+RestrictionResult *check_edge_restriction_condition(Graph *graph, RestrictionParameters *params)
+{
+    // int max_depth = params[0];
+    int max_depth = params->intParams[0];
+    int n = get_graph_num_vertices(graph);
+    char **adjMatrix = get_graph_adjacency_matrix(graph);
+    RestrictionResult *result = gtd_malloc(sizeof(RestrictionResult));
+    result->contradictionFound = 0;
+    result->modified = 0;
+
+    if(get_machine_depth(params->machine) == max_depth)
+    {
+        return result;
+    }
+
+    for(int i = n; i > 0; --i)
+    {
+        for(int j = n; j > 0; --j)
+        {
+            if(i == j || adjMatrix[i][j] != UNKNOWN_SYMBOL)
+            {
+                continue;
+            }
+
+            GenerativeProofMachine *originMachine = params->machine;
+
+            GenerativeProofMachine *connMachine = copyMachine(params->machine);
+            Graph *connGraph = get_machine_graph(connMachine);
+            set_edge_connected(connGraph, i, j);
+            set_machine_depth(connMachine, get_machine_depth(connMachine) + 1);
+
+            GenerativeProofMachine *notConnMachine = copyMachine(params->machine);
+            Graph *notConnGraph = get_machine_graph(notConnMachine);
+            set_edge_not_connected(notConnGraph, i, j);
+            set_machine_depth(notConnMachine, get_machine_depth(notConnMachine) + 1);
+            
+            params->machine = connMachine;
+            int contrConn = execute_generative_proof_machine(connMachine);
+
+            params->machine = notConnMachine;
+            int contrNotConn = execute_generative_proof_machine(notConnMachine);
+
+            params->machine = originMachine;
+
+            // todo destroy machines
+
+            if(!contrConn && !contrNotConn)
+            {
+                continue;
+            }
+
+            Graph *graph = get_machine_graph(params->machine);
+            if(contrConn)
+            {
+                set_edge_not_connected(graph, i, j);
+                result->modified = 1;
+            }
+            if(contrNotConn)
+            {
+                set_edge_connected(graph, i, i);
+                result->modified = 1;
+            }
+            if(contrConn && contrNotConn)
+            {
+                result->contradictionFound = 1;
+                return result;
+            }
+        }
+    }
+    return result;
+}
+
+// =============== check edge restriction ============

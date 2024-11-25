@@ -22,6 +22,9 @@ void test_no_induced_pk_restriction(void);
 
 void test_erdos_gyarfas_subcase(void);
 
-void next_test(void);
+void test_min_degree(void);
+
+void test_check_edge(void);
+
 
 #endif

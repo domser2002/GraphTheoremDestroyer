@@ -14,12 +14,16 @@ void test_generative_proof_machine(void)
     test_max_degree();
     printf("No ck restriction\n");
     test_no_ck_restriction();
-    /*
     printf("No induced pk restriction\n");
     test_no_induced_pk_restriction();
+    printf("Min degree\n");
+    test_min_degree();
+    /*
+    printf("Check edge\n");
+    test_check_edge();
+    */
    printf("Erdos gyarfas subcase\n");
    test_erdos_gyarfas_subcase();
-    */
 }
 
 void creation_and_deletion(void)
@@ -223,6 +227,7 @@ void execute_small_machine2(void)
 
 void test_no_induced_pk_restriction(void)
 {
+    // ===== test 1 =====
     GenerativeRestriction *restrictions = create_no_induced_pk_restriction(3);
     Graph *startGraph = create_graph(10, 10);
     char **adjMatrix = get_graph_adjacency_matrix(startGraph);
@@ -235,16 +240,159 @@ void test_no_induced_pk_restriction(void)
     assert(adjMatrix[1][2] == CONNECTED_SYMBOL);
     assert(adjMatrix[0][2] == CONNECTED_SYMBOL);
 
+    // ===== test 2 =====
+
+    Graph *graph2 = create_graph(5, 5);
+    adjMatrix = get_graph_adjacency_matrix(graph2);
+    restrictions = create_no_induced_pk_restriction(5);
+    machine = create_generative_proof_machine(&restrictions, 1, graph2);
+
+    set_edge_connected(graph2, 0, 1);
+    set_edge_connected(graph2, 1, 2);
+    set_edge_connected(graph2, 2, 3);
+    set_edge_connected(graph2, 3, 4);
+
+    int contr2 = execute_generative_proof_machine(machine);
+    assert(contr2 == 0);
+
+    // 02 03 04 13 14 24
+    set_edge_not_connected(graph2, 0, 2);
+    set_edge_not_connected(graph2, 0, 3);
+    set_edge_not_connected(graph2, 0, 4);
+    set_edge_not_connected(graph2, 1, 3);
+    set_edge_not_connected(graph2, 1, 4);
+ 
+    contr2 = execute_generative_proof_machine(machine);
+    assert(contr2 == 0);
+    assert(adjMatrix[2][4] == CONNECTED_SYMBOL);
+
+    // ===== test 3 =====
+
+    // Arrange
+    Graph *graph3 = create_graph(6, 6);
+    GenerativeRestriction *restriction3 = create_no_induced_pk_restriction(2);
+    GenerativeProofMachine *machine3 = create_generative_proof_machine(&restriction3, 1, graph3);
+    char **adjMatrix3 = get_graph_adjacency_matrix(graph3);
+    int contr3;
+    int edgeCount = 0;
+
+    // Act
+    contr3 = execute_generative_proof_machine(machine3);
+    for(int i = 0; i < 6; ++i)
+    {
+        for(int j = i+1; j < 6; ++j)
+        {
+            if(adjMatrix3[i][j] == CONNECTED_SYMBOL)
+            {
+                ++edgeCount;
+            }
+        }
+    }
+
+    // Assert
+    assert(contr3 == 0);
+    assert(edgeCount == 0);
+
+    // ===== test 4 =====
+
+    // Arrange
+    Graph *graph4 = create_graph(6, 6);
+    set_edge_connected(graph4, 2, 4);
+    GenerativeRestriction *restriction4 = create_no_induced_pk_restriction(2);
+    GenerativeProofMachine *machine4 = create_generative_proof_machine(&restriction4, 1, graph4);
+    int contr4;
+
+    // Act
+    contr4 = execute_generative_proof_machine(machine4);
+
+    // Assert
+    assert(contr4 == 1);
+
     // (⊙_☉)
+}
+
+void test_check_edge(void)
+{
+    // ======= test 1 =======
+
+    // Arrange
+
+
+    // Act
+
+    // Assert
 }
 
 void test_erdos_gyarfas_subcase(void)
 {
-    
+    // ======= test 1 =======
+
+    // Arrange
+    // create induced C7
+    Graph *graph1 = create_graph(15, 7);
+    for(int i = 0; i < 7; ++i)
+    {
+        for(int j = 0; j < 7; ++j)
+        {
+            if(i == j)
+            {
+                continue;
+            }
+            if((i+1) % 7 == j || (i-1) % 7 == j)
+            {
+                set_edge_connected(graph1, i, j);
+            }
+            else
+            {
+                set_edge_not_connected(graph1, i, j);
+            }
+        }
+    }
+    GenerativeRestriction **restrictions1 = gtd_malloc(sizeof(GenerativeRestriction*) * 5);
+    restrictions1[0] = create_no_k_cycle_restriction(4);
+    restrictions1[1] = create_no_k_cycle_restriction(8);
+    restrictions1[2] = create_no_induced_pk_restriction(8);
+    restrictions1[3] = create_min_degree_restriction(3);
+    GenerativeProofMachine *machine1 = create_generative_proof_machine(restrictions1, 5, graph1);
+    restrictions1[4] = create_check_edge_restriction(3, machine1);
+
+    // Act
+    int contr1 = execute_generative_proof_machine(machine1);
+
+    // Assert
+    assert(contr1 == 1);
 }
 
-void next_test(void)
+void test_min_degree(void)
 {
+    // ========== test 1 ==========
 
+    // Arrange
+    Graph *graph1 = create_graph(10, 1);
+    GenerativeRestriction *restriction1 = create_min_degree_restriction(7);
+    GenerativeProofMachine *machine1 = create_generative_proof_machine(&restriction1, 1, graph1);
+    int *degree1 = get_graph_degree(graph1);
+
+    // Act
+    int contr1 = execute_generative_proof_machine(machine1);
+
+    // Assert
+    assert(contr1 == 0);
+    assert(degree1[0] == 7);
+
+    // ========== test 2 ==========
+
+    // Arrange
+    Graph *graph2 = create_graph(10, 3);
+    GenerativeRestriction *restriction2 = create_min_degree_restriction(15);
+    GenerativeProofMachine *machine2 = create_generative_proof_machine(&restriction2, 1, graph2);
+    int *degree2 = get_graph_degree(graph2);
+
+    // Act
+    int contr2 = execute_generative_proof_machine(machine2);
+
+    // Assert
+    assert(contr2 == 0);
+    assert(degree2[0] == 7);
 }
 

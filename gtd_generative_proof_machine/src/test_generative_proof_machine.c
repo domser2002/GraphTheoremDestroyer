@@ -18,9 +18,9 @@ void test_generative_proof_machine(void)
     test_no_induced_pk_restriction();
     printf("Min degree\n");
     test_min_degree();
-    /*
     printf("Check edge\n");
     test_check_edge();
+    /*
     */
    printf("Erdos gyarfas subcase\n");
    test_erdos_gyarfas_subcase();

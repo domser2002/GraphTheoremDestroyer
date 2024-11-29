@@ -39,21 +39,27 @@ int destroy_restriction(GenerativeRestriction *genRestriction);
 
 RestrictionResult* check_restriction(Graph *graph, GenerativeRestriction *restriction);
 
-GenerativeRestriction *create_max_degree_restriction(int max_vertices);
+GenerativeRestriction *create_max_degree_restriction(int max_vertices, GenerativeProofMachine *machine);
 RestrictionResult* max_degree_restriction_condition(Graph* graph, RestrictionParameters *params);
 
-GenerativeRestriction *create_no_k_cycle_restriction(int k);
+GenerativeRestriction *create_no_k_cycle_restriction(int k, GenerativeProofMachine *machine);
 RestrictionResult* no_k_cycle_restrinction_condition(Graph *graph, RestrictionParameters *params);
 
-GenerativeRestriction *create_no_induced_pk_restriction(int k);
+GenerativeRestriction *create_no_induced_pk_restriction(int k, GenerativeProofMachine *machine);
 RestrictionResult* no_induced_pk_restriction_condition(Graph *graph, RestrictionParameters *params);
 
-GenerativeRestriction *create_min_degree_restriction(int k);
+GenerativeRestriction *create_min_degree_restriction(int k, GenerativeProofMachine *machine);
 RestrictionResult* min_degree_restriction_condition(Graph *Graph, RestrictionParameters *params);
 
 GenerativeRestriction *create_check_edge_restriction(int max_depth, GenerativeProofMachine *machine);
 RestrictionResult* check_edge_restriction_condition(Graph *graph, RestrictionParameters *params);
 
+// makes deep copy of everything except of the machine
+RestrictionParameters *copy_parameters(RestrictionParameters *params);
 
+// makes deep copy of everything except of the machine
+GenerativeRestriction *copy_restriction(GenerativeRestriction *restriction);
+
+RestrictionParameters *get_restriction_parameters(GenerativeRestriction *restr);
 
 #endif

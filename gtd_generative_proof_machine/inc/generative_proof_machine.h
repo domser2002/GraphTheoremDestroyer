@@ -3,6 +3,7 @@
 
 #include "common.h"
 #include "physical_graph.h"
+#include "proof_tree.h"
 
 // Forward declaration of GenerativeRestriction
 typedef struct GenerativeRestriction GenerativeRestriction;
@@ -22,5 +23,6 @@ void set_machine_depth(GenerativeProofMachine *machine, int depth);
 int get_machine_depth(GenerativeProofMachine *machine);
 Graph *get_machine_graph(GenerativeProofMachine *machine);
 GenerativeProofMachine *copyMachine(GenerativeProofMachine *machine);
+ProofTree *get_machine_proof_tree(GenerativeProofMachine *machine);
 
 #endif

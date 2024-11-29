@@ -2,6 +2,7 @@
 #include "physical_graph.h"
 #include "generative_restriction.h"
 #include "common.h"
+// #include "proof_tree.h"
 
 
 struct GenerativeProofMachine
@@ -10,6 +11,7 @@ struct GenerativeProofMachine
     GenerativeRestriction **restrictions;
     int num_restrictions;
     int depth;
+    ProofTree *proofTree;
 };
 
 
@@ -21,6 +23,7 @@ GenerativeProofMachine *create_generative_proof_machine(GenerativeRestriction **
     generativeProofMachine->num_restrictions = num_restrictions;
     generativeProofMachine->graph = startGraph;
     generativeProofMachine->depth = 0;
+    generativeProofMachine->proofTree = initProofTree();
 
     return generativeProofMachine;
 }
@@ -79,16 +82,32 @@ Graph *get_machine_graph(GenerativeProofMachine *machine)
     return machine->graph;
 }
 
-
+// copies everything excpept of the proof tree
 GenerativeProofMachine *copyMachine(GenerativeProofMachine *machine)
 {
-    GenerativeRestriction **restrictions = machine->restrictions;
+    //GenerativeRestriction **restrictions = machine->restrictions;
     int num_restrictions = machine->num_restrictions;
+    GenerativeRestriction **restrictions = gtd_malloc(sizeof(GenerativeRestriction*) * num_restrictions);
     Graph *startGraph = copyGraph(machine->graph);
     int depth = machine->depth;
 
     GenerativeProofMachine *result = create_generative_proof_machine(restrictions, num_restrictions, startGraph);
+    for(int i = 0; i < num_restrictions; ++i)
+    {
+        GenerativeRestriction *restr = copy_restriction(machine->restrictions[i]);
+        RestrictionParameters *params = get_restriction_parameters(restr);
+        params->machine = result;
+        restrictions[i] = restr;
+    }
     result->depth = depth;
 
+    result->proofTree = initProofTree();
+
     return result;
+}
+
+
+ProofTree *get_machine_proof_tree(GenerativeProofMachine *machine)
+{
+    return machine->proofTree;
 }

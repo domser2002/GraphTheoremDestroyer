@@ -33,6 +33,7 @@ void addProofNode(ProofTree *tree, ProofNode *node)
     else
     {
         tree->nodesTail->next = node;
+        tree->nodesTail = node;
     }
 }
 
@@ -54,6 +55,11 @@ void writeNode(ProofNode *node, FILE *outFile, int depth)
 
 void writeProof(ProofTree *tree, FILE *outFile)
 {
+    if(tree == NULL)
+    {
+        return;
+    }
+
     int depth = tree->depth;
     ProofNode *proofNode = tree->nodes;
     while(proofNode != NULL)

@@ -291,7 +291,13 @@ RestrictionResult* no_k_cycle_restrinction_condition(Graph *graph, RestrictionPa
             // add to proof tree
             char buffer[100];
             snprintf(buffer, sizeof(buffer), 
-                "Sprzecznosc - istnieje cykl C%d", k);
+                "Sprzecznosc - istnieje cykl C%d: [ ", k);
+            for (int i = 0; i < path->numElems; i++) {
+                char temp[20];
+                snprintf(temp, sizeof(temp), "%d ", path->path[i]);
+                strncat(buffer, temp, sizeof(buffer) - strlen(buffer) - 1);
+            }
+            strncat(buffer, "]", 2);
             ProofNode *proofNode = initProofNode();
             proofNode->message = strdup(buffer);
             addProofNode(proofTree, proofNode);
@@ -306,8 +312,14 @@ RestrictionResult* no_k_cycle_restrinction_condition(Graph *graph, RestrictionPa
             // add to proof tree
             char buffer[100];
             snprintf(buffer, sizeof(buffer), 
-                "Nie moze powstac krawedz (%d %d), bo powstalby cykl C%d", 
+                "Nie moze powstac krawedz (%d %d), bo powstalby cykl C%d: [ ", 
                 startVertex, endVertex, k);
+            for (int i = 0; i < path->numElems; i++) {
+                char temp[20];
+                snprintf(temp, sizeof(temp), "%d ", path->path[i]);
+                strncat(buffer, temp, sizeof(buffer) - strlen(buffer) - 1);
+            }
+            strncat(buffer, "]", 2);
             ProofNode *proofNode = initProofNode();
             proofNode->message = strdup(buffer);
             addProofNode(proofTree, proofNode);
@@ -378,6 +390,21 @@ RestrictionResult* no_induced_pk_restriction_condition(Graph *graph, Restriction
 
         if(notConnectedCount == (k-1)*(k-2) / 2)
         {
+
+            // add to proof tree
+            char buffer[100];
+            snprintf(buffer, sizeof(buffer), 
+                "Sprzecznosc - istnieje indukowane P%d: [ ", k);
+            for (int i = 0; i < path->numElems; i++) {
+                char temp[20];
+                snprintf(temp, sizeof(temp), "%d ", path->path[i]);
+                strncat(buffer, temp, sizeof(buffer) - strlen(buffer) - 1);
+            }
+            strncat(buffer, "]", 2);
+            ProofNode *proofNode = initProofNode();
+            proofNode->message = strdup(buffer);
+            addProofNode(proofTree, proofNode);
+
             result->contradictionFound = 1;
             destroyPathNode(path);
             while(paths != NULL)
@@ -386,14 +413,6 @@ RestrictionResult* no_induced_pk_restriction_condition(Graph *graph, Restriction
                 paths = paths->next;
                 destroyPathNode(path);
             }
-
-            // add to proof tree
-            char buffer[100];
-            snprintf(buffer, sizeof(buffer), 
-                "Sprzecznosc - istnieje indukowane P%d", k);
-            ProofNode *proofNode = initProofNode();
-            proofNode->message = strdup(buffer);
-            addProofNode(proofTree, proofNode);
 
             return result;
         }
@@ -405,8 +424,14 @@ RestrictionResult* no_induced_pk_restriction_condition(Graph *graph, Restriction
 
             char buffer[100];
             snprintf(buffer, sizeof(buffer), 
-                "Musi istniec krawedz (%d %d), bo powstalaby indukowana P%d", 
+                "Musi istniec krawedz (%d %d), bo powstalaby indukowana P%d: [ ", 
                 lastUnknownStart, lastUnknownEnd, k);
+            for (int i = 0; i < path->numElems; i++) {
+                char temp[20];
+                snprintf(temp, sizeof(temp), "%d ", path->path[i]);
+                strncat(buffer, temp, sizeof(buffer) - strlen(buffer) - 1);
+            }
+            strncat(buffer, "]", 2);
             ProofNode *proofNode = initProofNode();
             proofNode->message = strdup(buffer);
             addProofNode(proofTree, proofNode);
@@ -518,9 +543,9 @@ RestrictionResult *check_edge_restriction_condition(Graph *graph, RestrictionPar
         return result;
     }
 
-    for(int i = n; i > 0; --i)
+    for(int i = n-1; i > 0; --i)
     {
-        for(int j = n; j > 0; --j)
+        for(int j = n-1; j > 0; --j)
         {
             if(i == j || adjMatrix[i][j] != UNKNOWN_SYMBOL)
             {
@@ -528,21 +553,22 @@ RestrictionResult *check_edge_restriction_condition(Graph *graph, RestrictionPar
             }
 
             GenerativeProofMachine *originMachine = params->machine;
-
             GenerativeProofMachine *connMachine = copyMachine(params->machine);
             Graph *connGraph = get_machine_graph(connMachine);
             set_edge_connected(connGraph, i, j);
             set_machine_depth(connMachine, get_machine_depth(connMachine) + 1);
+            get_machine_proof_tree(connMachine)->depth = get_machine_depth(connMachine);
 
             GenerativeProofMachine *notConnMachine = copyMachine(params->machine);
             Graph *notConnGraph = get_machine_graph(notConnMachine);
+
             set_edge_not_connected(notConnGraph, i, j);
+
             set_machine_depth(notConnMachine, get_machine_depth(notConnMachine) + 1);
-            
-            // params->machine = connMachine;
+            get_machine_proof_tree(notConnMachine)->depth = get_machine_depth(notConnMachine);
+
             int contrConn = execute_generative_proof_machine(connMachine);
 
-            // params->machine = notConnMachine;
             int contrNotConn = execute_generative_proof_machine(notConnMachine);
 
             params->machine = originMachine;
@@ -560,22 +586,36 @@ RestrictionResult *check_edge_restriction_condition(Graph *graph, RestrictionPar
                 set_edge_not_connected(graph, i, j);
                 result->modified = 1;
 
-                ProofNode *proofNode = initProofNode();
-                proofNode->subtree = get_machine_proof_tree(connMachine);
-                addProofNode(get_machine_proof_tree(originMachine), proofNode);
+                char buffer1[100];
+                snprintf(buffer1, sizeof(buffer1), 
+                    "Zalozmy, ze krawedz (%d %d) istnieje:", 
+                    i, j);
+                ProofNode *proofNode1 = initProofNode();
+                proofNode1->message = strdup(buffer1);
+                proofNode1->subtree = get_machine_proof_tree(connMachine);
+                addProofNode(get_machine_proof_tree(originMachine), proofNode1);
             }
             if(contrNotConn)
             {
                 set_edge_connected(graph, i, i);
                 result->modified = 1;
 
-                ProofNode *proofNode = initProofNode();
-                proofNode->subtree = get_machine_proof_tree(notConnMachine);
-                addProofNode(get_machine_proof_tree(originMachine), proofNode);
+                char buffer2[100];
+                snprintf(buffer2, sizeof(buffer2), 
+                    "Zalozmy, ze krawedz (%d %d) nie istnieje:", 
+                    i, j);
+                ProofNode *proofNode2 = initProofNode();
+                proofNode2->message = strdup(buffer2);
+                proofNode2->subtree = get_machine_proof_tree(notConnMachine);
+                addProofNode(get_machine_proof_tree(originMachine), proofNode2);
             }
             if(contrConn && contrNotConn)
             {
                 result->contradictionFound = 1;
+            }
+
+            if(contrConn || contrNotConn)
+            {
                 return result;
             }
         }

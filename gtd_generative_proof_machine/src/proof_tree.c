@@ -44,7 +44,7 @@ void writeNode(ProofNode *node, FILE *outFile, int depth)
     {
         for(int i = 0; i < depth; ++i)
         {
-            fprintf(outFile, " ");
+            fprintf(outFile, "\t");
         }
         fprintf(outFile, "%s\n", node->message);
     }

@@ -1,109 +1,69 @@
 #include "test_fact_tree.h"
-
+static uint8_t counter = 1;
 typedef Fact *(*create_fact_func)(int);
 typedef int (*delete_fact_func)(Fact *);
 
-/**
- * \brief helper function to perform a single test on a contradict method
- * \param n_facts number of facts
- * \param create_facts array of pointers to functions used to create facts
- * \param delete_facts array of pointers to functions used to delete facts
- * \param fact_params array of parameters used to create facts
- * \param expected expected contradict return value
- */
-static void single_contradict_test(int n_facts, create_fact_func *create_facts, delete_fact_func *delete_facts, int *fact_params, bool expected)
+typedef struct Modular_Fact_Array {
+    FactType *types;
+    int **params;
+    int *params_count;
+    int fact_count;
+} Modular_Fact_Array;
+
+typedef struct Implies_Test_Case {
+    Modular_Fact_Array left;
+    Modular_Fact_Array right;
+} Implies_Test_Case;
+
+typedef struct Contradict_Test_Case {
+    Modular_Fact_Array facts;
+    bool expected;
+} Contradict_Test_Case;
+
+static Fact **create_fact_array_from_modular(Modular_Fact_Array mfa)
 {
-    // Arrange
-    Fact **factArray = (Fact **)gtd_malloc(n_facts * sizeof(Fact *));
-    for (int i = 0; i < n_facts; i++)
-    {
-        factArray[i] = create_facts[i](fact_params[i]);
-    }
-    // Act
-    bool result = contradict(factArray, n_facts);
-    // Clean
-    for (int i = 0; i < n_facts; i++)
-    {
-        delete_facts[i](factArray[i]);
-    }
+    Fact **factArray = (Fact**)gtd_malloc(mfa.fact_count * sizeof(Fact*));
+    for(int i=0;i<mfa.fact_count;i++)
+        factArray[i] = create_fact(mfa.types[i],mfa.params[i],mfa.params_count[i]);
+    return factArray;
+}
+
+static void delete_fact_array(Fact **factArray,int fact_count)
+{
+    for(int i=0;i<fact_count;i++)
+        delete_fact(factArray[i]);
     gtd_free(factArray);
+}
+
+static void single_contradict_test(Fact **factArray, int fact_count, bool expected)
+{
+    printf("TEST %d\n", counter++);
+    // Arrange
+    // Act
+    bool result = contradict(factArray, fact_count);
     // Assert
     assert(result == expected);
 }
 
-/**
-* \brief function to check if contradict correctly recognizes contradiction type 1 -
-contradiction between max vertex count and min edge count
-* \param maxVertexCount max vertex count
-* \param minEdgeCount min edge count
-* \param expected expected test result, true if facts contradict
-*/
-static void test_contradiction_type_1(int maxVertexCount, int minEdgeCount, bool expected)
+static void run_contradict_test_case(Contradict_Test_Case test_case)
 {
-    int n_facts = 2;
-    create_fact_func *create_fact_functions = (create_fact_func *)gtd_malloc(n_facts * sizeof(create_fact_func));
-    delete_fact_func *delete_fact_functions = (delete_fact_func *)gtd_malloc(n_facts * sizeof(delete_fact_func));
-    int *fact_params = (int *)gtd_malloc(n_facts * sizeof(int));
-    create_fact_functions[0] = &create_max_vertex_count_fact;
-    delete_fact_functions[0] = &delete_max_vertex_count_fact;
-    fact_params[0] = maxVertexCount;
-    create_fact_functions[1] = &create_min_edge_count_fact;
-    delete_fact_functions[1] = &delete_min_edge_count_fact;
-    fact_params[1] = minEdgeCount;
-    single_contradict_test(n_facts, create_fact_functions, delete_fact_functions, fact_params, expected);
-    gtd_free(create_fact_functions);
-    gtd_free(delete_fact_functions);
-    gtd_free(fact_params);
+    Fact **factArray = create_fact_array_from_modular(test_case.facts);
+    single_contradict_test(factArray,test_case.facts.fact_count,test_case.expected);
+    delete_fact_array(factArray,test_case.facts.fact_count);
 }
 
-/**
-* \brief function to check if contradict correctly recognizes contradiction type 2 -
-contradiction between min vertex count and max vertex count
-* \param minVertexCount min vertex count
-* \param maxVertexCount max vertex count
-* \param expected expected test result, true if facts contradict
-*/
-static void test_contradiction_type_2(int minVertexCount, int maxVertexCount, bool expected)
+static void create_and_run_contradict_test_case(FactType *types, int **params, int *params_count, int fact_count, bool expected)
 {
-    int n_facts = 2;
-    create_fact_func *create_fact_functions = (create_fact_func *)gtd_malloc(n_facts * sizeof(create_fact_func));
-    delete_fact_func *delete_fact_functions = (delete_fact_func *)gtd_malloc(n_facts * sizeof(delete_fact_func));
-    int *fact_params = (int *)gtd_malloc(n_facts * sizeof(int));
-    create_fact_functions[0] = &create_min_vertex_count_fact;
-    delete_fact_functions[0] = &delete_min_vertex_count_fact;
-    fact_params[0] = minVertexCount;
-    create_fact_functions[1] = &create_max_vertex_count_fact;
-    delete_fact_functions[1] = &delete_max_vertex_count_fact;
-    fact_params[1] = maxVertexCount;
-    single_contradict_test(n_facts, create_fact_functions, delete_fact_functions, fact_params, expected);
-    gtd_free(create_fact_functions);
-    gtd_free(delete_fact_functions);
-    gtd_free(fact_params);
-}
-
-/**
-* \brief function to check if contradict correctly recognizes contradiction type 3 -
-contradiction between min edge count and max edge count
-* \param minEdgeCount min edge count
-* \param maxEdgeCount max edge count
-* \param expected expected test result, true if facts contradict
-*/
-static void test_contradiction_type_3(int minEdgeCount, int maxEdgeCount, bool expected)
-{
-    int n_facts = 2;
-    create_fact_func *create_fact_functions = (create_fact_func *)gtd_malloc(n_facts * sizeof(create_fact_func));
-    delete_fact_func *delete_fact_functions = (delete_fact_func *)gtd_malloc(n_facts * sizeof(delete_fact_func));
-    int *fact_params = (int *)gtd_malloc(n_facts * sizeof(int));
-    create_fact_functions[0] = &create_min_edge_count_fact;
-    delete_fact_functions[0] = &delete_min_edge_count_fact;
-    fact_params[0] = minEdgeCount;
-    create_fact_functions[1] = &create_max_edge_count_fact;
-    delete_fact_functions[1] = &delete_max_edge_count_fact;
-    fact_params[1] = maxEdgeCount;
-    single_contradict_test(n_facts, create_fact_functions, delete_fact_functions, fact_params, expected);
-    gtd_free(create_fact_functions);
-    gtd_free(delete_fact_functions);
-    gtd_free(fact_params);
+    Contradict_Test_Case test_case = {
+        .facts = {
+            .types = types,
+            .params = params,
+            .params_count = params_count,
+            .fact_count = fact_count
+        },
+        .expected = expected
+    };
+    run_contradict_test_case(test_case);
 }
 
 /**
@@ -111,19 +71,94 @@ static void test_contradiction_type_3(int minEdgeCount, int maxEdgeCount, bool e
  */
 static void test_contradict(void)
 {
-    test_contradiction_type_1(1, 1, true);
-    test_contradiction_type_1(1, 0, false);
-    test_contradiction_type_1(0, 0, false);
-    test_contradiction_type_1(10000, 10000 * 9999 / 2 + 1, true);
-    test_contradiction_type_1(10000, 10000 * 9999 / 2, false);
-    test_contradiction_type_2(0, 0, false);
-    test_contradiction_type_2(1, 0, true);
-    test_contradiction_type_2(0, 1, false);
-    test_contradiction_type_2(1234567, 1234566, true);
-    test_contradiction_type_3(0, 0, false);
-    test_contradiction_type_3(1, 0, true);
-    test_contradiction_type_3(0, 1, false);
-    test_contradiction_type_3(1234567, 1234566, true);
+    // Case 1 - no facts case
+    create_and_run_contradict_test_case(NULL,NULL,NULL,0,false);
+    // Case set 2 - only one fact case
+    for (uint8_t i = 0; i < FACT_TYPE_NUM; i++)
+    {
+        FactType types2[] = {i};
+        int *params2_1 = (int*)gtd_malloc(get_param_count(i)*sizeof(int));
+        memset(params2_1,0x0,get_param_count(i)*sizeof(int));
+        int *params2[] = {params2_1};
+        int params_count_2[] = {get_param_count(i)};
+        int fact_count_2 = 1;
+        create_and_run_contradict_test_case(types2, params2, params_count_2, fact_count_2, false);
+    }
+    // Case 6 - contradiction type 1 should not occur
+    FactType types6[] = {MaxVertexCountFact, MinEdgeCountFact};
+    int params6_1[] = {0};
+    int params6_2[] = {0};
+    int *params6[] = {params6_1, params6_2};
+    int params_count_6[] = {1,1};
+    int fact_count_6 = 2;
+    create_and_run_contradict_test_case(types6,params6,params_count_6,fact_count_6, false);
+    // Case 7 - contradiction type 1 should occur
+    FactType types7[] = {MaxVertexCountFact, MinEdgeCountFact};
+    int params7_1[] = {1};
+    int params7_2[] = {1};
+    int *params7[] = {params7_1, params7_2};
+    int params_count_7[] = {1,1};
+    int fact_count_7 = 2;
+    create_and_run_contradict_test_case(types7,params7,params_count_7,fact_count_7, true);
+    // Case 8 - contradiction type 2 should not occur
+    FactType types8[] = {MinVertexCountFact, MaxVertexCountFact};
+    int params8_1[] = {1};
+    int params8_2[] = {1};
+    int *params8[] = {params8_1, params8_2};
+    int params_count_8[] = {1,1};
+    int fact_count_8 = 2;
+    create_and_run_contradict_test_case(types8,params8,params_count_8,fact_count_8, false);
+    // Case 9 - contradiction type 2 should occur
+    FactType types9[] = {MinVertexCountFact, MaxVertexCountFact};
+    int params9_1[] = {2};
+    int params9_2[] = {1};
+    int *params9[] = {params9_1, params9_2};
+    int params_count_9[] = {1,1};
+    int fact_count_9 = 2;
+    create_and_run_contradict_test_case(types9,params9,params_count_9,fact_count_9, true);
+    // Case 10 - contradiction type 3 should not occur
+    FactType types10[] = {MinEdgeCountFact, MaxEdgeCountFact};
+    int params10_1[] = {1};
+    int params10_2[] = {1};
+    int *params10[] = {params10_1, params10_2};
+    int params_count_10[] = {1,1};
+    int fact_count_10 = 2;
+    create_and_run_contradict_test_case(types10,params10,params_count_10,fact_count_10, false);
+    // Case 11 - contradiction type 3 should occur
+    FactType types11[] = {MinEdgeCountFact, MaxEdgeCountFact};
+    int params11_1[] = {2};
+    int params11_2[] = {1};
+    int *params11[] = {params11_1, params11_2};
+    int params_count_11[] = {1,1};
+    int fact_count_11 = 2;
+    create_and_run_contradict_test_case(types11,params11,params_count_11,fact_count_11, true);
+    // Case 12 - contradiction type 1 additional fact
+    FactType types12[] = {MaxVertexCountFact, MinEdgeCountFact, MinVertexCountFact};
+    int params12_1[] = {1};
+    int params12_2[] = {1};
+    int params12_3[] = {1};
+    int *params12[] = {params12_1, params12_2, params12_3};
+    int params_count_12[] = {1,1,1};
+    int fact_count_12 = 3;
+    create_and_run_contradict_test_case(types12,params12,params_count_12,fact_count_12, false); 
+    // Case 13 - contradiction type 2 additional fact 
+    FactType types13[] = {MinVertexCountFact, MaxVertexCountFact, MinEdgeCountFact};
+    int params13_1[] = {2};
+    int params13_2[] = {1};
+    int params13_3[] = {1};
+    int *params13[] = {params13_1, params13_2, params13_3};
+    int params_count_13[] = {1,1,1};
+    int fact_count_13 = 3;
+    create_and_run_contradict_test_case(types13,params13,params_count_13,fact_count_13, false);
+    // Case 14 - contradiction type 3 additional fact 
+    FactType types14[] = {MinEdgeCountFact, MaxEdgeCountFact, MinVertexCountFact};
+    int params14_1[] = {2};
+    int params14_2[] = {1};
+    int params14_3[] = {1};
+    int *params14[] = {params14_1, params14_2, params14_3};
+    int params_count_14[] = {1,1,1};
+    int fact_count_14 = 3;
+    create_and_run_contradict_test_case(types14,params14,params_count_14,fact_count_14, false);
 }
 
 /**
@@ -149,104 +184,50 @@ static void assert_facts(Fact *fact1, Fact *fact2)
     }
 }
 
-/**
- * \brief helper function to perform a single test on the implies method
- * \param n_facts_left number of left side facts
- * \param create_facts_left array of pointers to functions used to create left side facts
- * \param delete_facts_left array of pointers to functions used to delete left side facts
- * \param fact_params_left array of parameters used to create left side facts
- * \param n_facts_right expected number of right side facts
- * \param create_facts_right array of pointers to functions used to create expected right side facts
- * \param delete_facts_right array of pointers to functions used to delete expected right side facts
- * \param fact_params_right array of parameters used to create expected right side facts
- */
-static void single_implies_test(int n_facts_left, create_fact_func *create_facts_left,
-                                delete_fact_func *delete_facts_left, int *fact_params_left,
-                                int n_facts_right, create_fact_func *create_facts_right,
-                                delete_fact_func *delete_facts_right, int *fact_params_right)
+static void single_implies_test(Fact **factArray,int fact_count, Fact **expected, int expected_count)
 {
+    printf("TEST %d\n", counter++);
     // Arrange
-    Fact **factArray_left = (Fact **)gtd_malloc(n_facts_left * sizeof(Fact *));
-    for (int i = 0; i < n_facts_left; i++)
-    {
-        factArray_left[i] = create_facts_left[i](fact_params_left[i]);
-    }
-    Fact **factArray_right = (Fact **)gtd_malloc(n_facts_right * sizeof(Fact *));
-    for (int i = 0; i < n_facts_right; i++)
-    {
-        factArray_right[i] = create_facts_right[i](fact_params_right[i]);
-    }
-    int count = 0;
+    int count;
     // Act
-    Fact **result = implies(factArray_left, n_facts_left, &count);
-    // Clean left
-    for (int i = 0; i < n_facts_left; i++)
-    {
-        delete_facts_left[i](factArray_left[i]);
-    }
-    gtd_free(factArray_left);
+    Fact **result = implies(factArray,fact_count,&count);
     // Assert
-    assert(count == n_facts_right);
-    for (int i = 0; i < count; i++)
-    {
-        assert_facts(result[i], factArray_right[i]);
-    }
-    // Clean right
-    for (int i = 0; i < n_facts_right; i++)
-    {
-        delete_facts_right[i](factArray_right[i]);
-        delete_facts_right[i](result[i]);
-    }
-    gtd_free(factArray_right);
-    gtd_free(result);
+    assert(count == expected_count);
+    if(expected == NULL)
+        assert(result == NULL);
+    for(int i=0;i<count;i++)
+        assert_facts(expected[i],result[i]);
+    // Clean
+    delete_fact_array(result,count);
 }
 
-static void test_implication_type_1(int minEdgeCount, int minVertexCount)
+static void run_implies_test_case(Implies_Test_Case test_case)
 {
-    int n_facts_left = 1, n_facts_right = 1;
-    create_fact_func *create_fact_left = (create_fact_func *)gtd_malloc(n_facts_left * sizeof(create_fact_func));
-    create_fact_func *create_fact_right = (create_fact_func *)gtd_malloc(n_facts_right * sizeof(create_fact_func));
-    delete_fact_func *delete_fact_left = (delete_fact_func *)gtd_malloc(n_facts_left * sizeof(delete_fact_func));
-    delete_fact_func *delete_fact_right = (delete_fact_func *)gtd_malloc(n_facts_right * sizeof(delete_fact_func));
-    int *fact_params_left = (int *)gtd_malloc(n_facts_left * sizeof(int));
-    int *fact_params_right = (int *)gtd_malloc(n_facts_right * sizeof(int));
-    create_fact_left[0] = &create_min_edge_count_fact;
-    create_fact_right[0] = &create_min_vertex_count_fact;
-    delete_fact_left[0] = &delete_min_edge_count_fact;
-    delete_fact_right[0] = &delete_min_vertex_count_fact;
-    fact_params_left[0] = minEdgeCount;
-    fact_params_right[0] = minVertexCount;
-    single_implies_test(n_facts_left, create_fact_left, delete_fact_left, fact_params_left, n_facts_right, create_fact_right, delete_fact_right, fact_params_right);
-    gtd_free(create_fact_left);
-    gtd_free(create_fact_right);
-    gtd_free(delete_fact_left);
-    gtd_free(delete_fact_right);
-    gtd_free(fact_params_left);
-    gtd_free(fact_params_right);
+    Fact **factArray = create_fact_array_from_modular(test_case.left);
+    Fact **expected = create_fact_array_from_modular(test_case.right);
+    single_implies_test(factArray,test_case.left.fact_count,expected,test_case.right.fact_count);
+    delete_fact_array(factArray,test_case.left.fact_count);
+    delete_fact_array(expected,test_case.right.fact_count);
 }
 
-static void test_implication_type_2(int maxVertexCount, int maxEdgeCount)
+static void create_and_run_implies_test_case(FactType *left_types, int **left_params, int *left_params_count, int left_fact_count,
+FactType *right_types, int **right_params, int *right_params_count, int right_fact_count)
 {
-    int n_facts_left = 1, n_facts_right = 1;
-    create_fact_func *create_fact_left = (create_fact_func *)gtd_malloc(n_facts_left * sizeof(create_fact_func));
-    create_fact_func *create_fact_right = (create_fact_func *)gtd_malloc(n_facts_right * sizeof(create_fact_func));
-    delete_fact_func *delete_fact_left = (delete_fact_func *)gtd_malloc(n_facts_left * sizeof(delete_fact_func));
-    delete_fact_func *delete_fact_right = (delete_fact_func *)gtd_malloc(n_facts_right * sizeof(delete_fact_func));
-    int *fact_params_left = (int *)gtd_malloc(n_facts_left * sizeof(int));
-    int *fact_params_right = (int *)gtd_malloc(n_facts_right * sizeof(int));
-    create_fact_left[0] = &create_max_vertex_count_fact;
-    create_fact_right[0] = &create_max_edge_count_fact;
-    delete_fact_left[0] = &delete_max_vertex_count_fact;
-    delete_fact_right[0] = &delete_max_edge_count_fact;
-    fact_params_left[0] = maxVertexCount;
-    fact_params_right[0] = maxEdgeCount;
-    single_implies_test(n_facts_left, create_fact_left, delete_fact_left, fact_params_left, n_facts_right, create_fact_right, delete_fact_right, fact_params_right);
-    gtd_free(create_fact_left);
-    gtd_free(create_fact_right);
-    gtd_free(delete_fact_left);
-    gtd_free(delete_fact_right);
-    gtd_free(fact_params_left);
-    gtd_free(fact_params_right);
+    Implies_Test_Case test_case = {
+        .left = {
+            .types = left_types,
+            .params = left_params,
+            .params_count = left_params_count,
+            .fact_count = left_fact_count
+        },
+        .right = {
+            .types = right_types,
+            .params = right_params,
+            .params_count = right_params_count,
+            .fact_count = right_fact_count
+        }
+    };
+    run_implies_test_case(test_case);
 }
 
 /**
@@ -254,14 +235,99 @@ static void test_implication_type_2(int maxVertexCount, int maxEdgeCount)
  */
 static void test_implies(void)
 {
-    test_implication_type_1(0,0);
-    test_implication_type_1(1,2);
-    test_implication_type_1(3,3);
-    test_implication_type_1(1000,46);
-    test_implication_type_2(0,0);
-    test_implication_type_2(1,0);
-    test_implication_type_2(2,1);
-    test_implication_type_2(1000,1000 * 999 / 2);
+    // Case 1 - empty case
+    create_and_run_implies_test_case(NULL,NULL,NULL,0,NULL,NULL,NULL,0);
+    // Case 2 - edge case for implication type 1
+    // left side
+    FactType left2_types[] = {MinEdgeCountFact};
+    int left2_params1[] = {0};
+    int *left2_params[] = {left2_params1};
+    int left2_params_count[] = {1};
+    int left2_fact_count = 1;
+    // expected right side
+    FactType right2_types[] = {MinVertexCountFact};
+    int right2_params1[] = {0};
+    int *right2_params[] = {right2_params1};
+    int right2_params_count[] = {1};
+    int right2_fact_count = 1;
+    create_and_run_implies_test_case(left2_types,left2_params,left2_params_count,left2_fact_count,right2_types,right2_params,right2_params_count,right2_fact_count);
+    // Case 3 - normal case for implication type 1
+    // left side
+    FactType left3_types[] = {MinEdgeCountFact};
+    int left3_params1[] = {1};
+    int *left3_params[] = {left3_params1};
+    int left3_params_count[] = {1};
+    int left3_fact_count = 1;
+    // expected right side
+    FactType right3_types[] = {MinVertexCountFact};
+    int right3_params1[] = {2};
+    int *right3_params[] = {right3_params1};
+    int right3_params_count[] = {1};
+    int right3_fact_count = 1;
+    create_and_run_implies_test_case(left3_types,left3_params,left3_params_count,left3_fact_count,
+    right3_types,right3_params,right3_params_count,right3_fact_count);
+    // Case 4 - edge case for implication type 2
+    // left side
+    FactType left4_types[] = {MaxVertexCountFact};
+    int left4_params1[] = {0};
+    int *left4_params[] = {left4_params1};
+    int left4_params_count[] = {1};
+    int left4_fact_count = 1;
+    // expected right side
+    FactType right4_types[] = {MaxEdgeCountFact};
+    int right4_params1[] = {0};
+    int *right4_params[] = {right4_params1};
+    int right4_params_count[] = {1};
+    int right4_fact_count = 1;
+    create_and_run_implies_test_case(left4_types,left4_params,left4_params_count,left4_fact_count,right4_types,right4_params,right4_params_count,right4_fact_count);
+    // Case 5 - normal case for implication type 2
+    // left side
+    FactType left5_types[] = {MaxVertexCountFact};
+    int left5_params1[] = {2};
+    int *left5_params[] = {left5_params1};
+    int left5_params_count[] = {1};
+    int left5_fact_count = 1;
+    // expected right side
+    FactType right5_types[] = {MaxEdgeCountFact};
+    int right5_params1[] = {1};
+    int *right5_params[] = {right5_params1};
+    int right5_params_count[] = {1};
+    int right5_fact_count = 1;
+    create_and_run_implies_test_case(left5_types,left5_params,left5_params_count,left5_fact_count,right5_types,right5_params,right5_params_count,right5_fact_count);
+    // Case 6 - MaxEdgeCountFact implies nothing
+    // left side
+    FactType left6_types[] = {MaxEdgeCountFact};
+    int left6_params1[] = {1};
+    int *left6_params[] = {left6_params1};
+    int left6_params_count[] = {1};
+    int left6_fact_count = 1;
+    create_and_run_implies_test_case(left6_types,left6_params,left6_params_count,left6_fact_count,NULL,NULL,NULL,0);
+    // Case 7 - MinVertexCountFact implies nothing
+    // left side
+    FactType left7_types[] = {MinVertexCountFact};
+    int left7_params1[] = {1};
+    int *left7_params[] = {left7_params1};
+    int left7_params_count[] = {1};
+    int left7_fact_count = 1;
+    create_and_run_implies_test_case(left7_types,left7_params,left7_params_count,left7_fact_count,NULL,NULL,NULL,0);
+    // Case 8 - additional fact to break implication type 1
+    // left side
+    FactType left8_types[] = {MinEdgeCountFact,MaxVertexCountFact};
+    int left8_params1[] = {1};
+    int left8_params2[] = {1};
+    int *left8_params[] = {left8_params1, left8_params2};
+    int left8_params_count[] = {1,1};
+    int left8_fact_count = 2;
+    create_and_run_implies_test_case(left8_types,left8_params,left8_params_count,left8_fact_count,NULL,NULL,NULL,0);
+    // Case 9 - additional fact to break implication type 2
+    // left side
+    FactType left9_types[] = {MaxVertexCountFact,MaxEdgeCountFact};
+    int left9_params1[] = {1};
+    int left9_params2[] = {1};
+    int *left9_params[] = {left9_params1, left9_params2};
+    int left9_params_count[] = {1,1};
+    int left9_fact_count = 2;
+    create_and_run_implies_test_case(left9_types,left9_params,left9_params_count,left9_fact_count,NULL,NULL,NULL,0);
 }
 
 /**
@@ -273,7 +339,7 @@ static void test_implication(void)
 }
 
 /**
- * \brief function to run all required tests for files from gtd_fact_tree
+ * \brief function to run all required tests for gtd_fact_tree module
  */
 void test_fact_tree(void)
 {

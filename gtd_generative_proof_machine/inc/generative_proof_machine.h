@@ -14,8 +14,7 @@ typedef struct GenerativeProofMachine GenerativeProofMachine;
 Graph *get_node_graph(GraphNode *node);
 GraphNode *get_node_next(GraphNode *node);
 
-GenerativeProofMachine *create_generative_proof_machine(GenerativeRestriction **restrictions,
- int num_restrictions, Graph* startGraph);
+GenerativeProofMachine *create_generative_proof_machine(int num_restrictions, Graph* startGraph);
 
 int destroy_generative_proof_machine(GenerativeProofMachine *machine);
 int execute_generative_proof_machine(GenerativeProofMachine *machine);
@@ -24,5 +23,6 @@ int get_machine_depth(GenerativeProofMachine *machine);
 Graph *get_machine_graph(GenerativeProofMachine *machine);
 GenerativeProofMachine *copyMachine(GenerativeProofMachine *machine);
 ProofTree *get_machine_proof_tree(GenerativeProofMachine *machine);
+GenerativeRestriction **get_machine_restrictions(GenerativeProofMachine *machine);
 
 #endif

@@ -15,11 +15,10 @@ struct GenerativeProofMachine
 };
 
 
-GenerativeProofMachine *create_generative_proof_machine(GenerativeRestriction **restrictions,
- int num_restrictions, Graph* startGraph)
+GenerativeProofMachine *create_generative_proof_machine(int num_restrictions, Graph* startGraph)
 {
     GenerativeProofMachine *generativeProofMachine = gtd_malloc(sizeof(GenerativeProofMachine));
-    generativeProofMachine->restrictions = restrictions;
+    generativeProofMachine->restrictions = gtd_malloc(sizeof(GenerativeRestriction*) * num_restrictions);
     generativeProofMachine->num_restrictions = num_restrictions;
     generativeProofMachine->graph = startGraph;
     generativeProofMachine->depth = 0;
@@ -87,17 +86,17 @@ GenerativeProofMachine *copyMachine(GenerativeProofMachine *machine)
 {
     //GenerativeRestriction **restrictions = machine->restrictions;
     int num_restrictions = machine->num_restrictions;
-    GenerativeRestriction **restrictions = gtd_malloc(sizeof(GenerativeRestriction*) * num_restrictions);
+    // GenerativeRestriction **restrictions = gtd_malloc(sizeof(GenerativeRestriction*) * num_restrictions);
     Graph *startGraph = copyGraph(machine->graph);
     int depth = machine->depth;
 
-    GenerativeProofMachine *result = create_generative_proof_machine(restrictions, num_restrictions, startGraph);
+    GenerativeProofMachine *result = create_generative_proof_machine(num_restrictions, startGraph);
     for(int i = 0; i < num_restrictions; ++i)
     {
         GenerativeRestriction *restr = copy_restriction(machine->restrictions[i]);
         RestrictionParameters *params = get_restriction_parameters(restr);
         params->machine = result;
-        restrictions[i] = restr;
+        get_machine_restrictions(result)[i] = restr;
     }
     result->depth = depth;
 
@@ -110,4 +109,10 @@ GenerativeProofMachine *copyMachine(GenerativeProofMachine *machine)
 ProofTree *get_machine_proof_tree(GenerativeProofMachine *machine)
 {
     return machine->proofTree;
+}
+
+
+GenerativeRestriction **get_machine_restrictions(GenerativeProofMachine *machine)
+{
+    return machine->restrictions;
 }

@@ -4,24 +4,22 @@
 #include "common.h"
 #include "physical_graph.h"
 #include "proof_tree.h"
+#include "generative_proof_machine.h"
 
-// Forward declaration of GenerativeRestriction
-typedef struct GenerativeRestriction GenerativeRestriction;
 
 typedef struct GraphNode GraphNode;
-typedef struct GenerativeProofMachine GenerativeProofMachine;
-
 Graph *get_node_graph(GraphNode *node);
 GraphNode *get_node_next(GraphNode *node);
 
-GenerativeProofMachine *create_generative_proof_machine(int num_restrictions, Graph* startGraph);
-
+typedef struct GenerativeRestriction GenerativeRestriction;
+typedef struct GenerativeProofMachine GenerativeProofMachine;
+GenerativeProofMachine *create_proof_machine(int num_restrictions, Graph *startGraph);
 int destroy_generative_proof_machine(GenerativeProofMachine *machine);
 int execute_generative_proof_machine(GenerativeProofMachine *machine);
 void set_machine_depth(GenerativeProofMachine *machine, int depth);
 int get_machine_depth(GenerativeProofMachine *machine);
 Graph *get_machine_graph(GenerativeProofMachine *machine);
-GenerativeProofMachine *copyMachine(GenerativeProofMachine *machine);
+GenerativeProofMachine *copy_proof_machine(GenerativeProofMachine *machine);
 ProofTree *get_machine_proof_tree(GenerativeProofMachine *machine);
 GenerativeRestriction **get_machine_restrictions(GenerativeProofMachine *machine);
 

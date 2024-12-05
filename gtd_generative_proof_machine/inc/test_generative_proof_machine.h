@@ -7,24 +7,12 @@
 #include <assert.h>
 
 void test_generative_proof_machine(void);
-
-void creation_and_deletion(void);
-
-void test_max_degree(void);
-
-void execute_small_machine(void);
-
-void execute_small_machine2(void);
-
-void test_no_ck_restriction(void);
-
-void test_no_induced_pk_restriction(void);
-
-void test_erdos_gyarfas_subcase(void);
-
-void test_min_degree(void);
-
-void test_check_edge(void);
-
+void run_generative_proof_machine_tests(void);
+void test_machine_creation_and_deletion(void);
+void test_max_degree_restriction(void);
+void test_no_k_cycle_restriction(void);
+void test_no_induced_path_k_restriction(void);
+void test_erdos_gyarfas_case(void);
+void test_minimum_degree_restriction(void);
 
 #endif

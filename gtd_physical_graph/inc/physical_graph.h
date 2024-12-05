@@ -17,7 +17,7 @@ char **get_graph_adjacency_matrix(Graph *graph);
 int set_edge_connected(Graph *graph, int from, int to);
 int set_edge_not_connected(Graph *graph, int from, int to);
 int add_vertex(Graph *graph);
-Graph *copyGraph(Graph *graph);
+Graph *copy_graph(Graph *graph);
 
 // create matrix filled with unknowns
 char **create_matrix(int rows, int cols);

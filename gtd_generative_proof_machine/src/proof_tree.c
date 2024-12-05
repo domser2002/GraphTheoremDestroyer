@@ -3,7 +3,7 @@
 #include "common.h"
 
 
-ProofNode *initProofNode(void)
+ProofNode *create_proof_node(void)
 {
     ProofNode *node = gtd_malloc(sizeof(ProofNode));
     node->message = NULL;
@@ -13,32 +13,32 @@ ProofNode *initProofNode(void)
 }
 
 
-ProofTree *initProofTree(void)
+ProofTree *create_proof_tree(void)
 {
     ProofTree *tree = gtd_malloc(sizeof(ProofTree));
     tree->depth = 0;
-    tree->nodes = NULL;
-    tree->nodesTail = NULL;
+    tree->head = NULL;
+    tree->tail = NULL;
     return tree;
 }
 
 
-void addProofNode(ProofTree *tree, ProofNode *node)
+void append_proof_node(ProofTree *tree, ProofNode *node)
 {
-    if(tree->nodes == NULL)
+    if(tree->head == NULL)
     {
-        tree->nodes = node;
-        tree->nodesTail = node;
+        tree->head = node;
+        tree->tail = node;
     }
     else
     {
-        tree->nodesTail->next = node;
-        tree->nodesTail = node;
+        tree->tail->next = node;
+        tree->tail = node;
     }
 }
 
 
-void writeNode(ProofNode *node, FILE *outFile, int depth)
+void write_proof_node(ProofNode *node, FILE *outFile, int depth)
 {
     if(node->message != NULL)
     {
@@ -49,11 +49,11 @@ void writeNode(ProofNode *node, FILE *outFile, int depth)
         fprintf(outFile, "%s\n", node->message);
     }
 
-    writeProof(node->subtree, outFile);
+    write_proof_tree(node->subtree, outFile);
 }
 
 
-void writeProof(ProofTree *tree, FILE *outFile)
+void write_proof_tree(ProofTree *tree, FILE *outFile)
 {
     if(tree == NULL)
     {
@@ -61,10 +61,10 @@ void writeProof(ProofTree *tree, FILE *outFile)
     }
 
     int depth = tree->depth;
-    ProofNode *proofNode = tree->nodes;
+    ProofNode *proofNode = tree->head;
     while(proofNode != NULL)
     {
-        writeNode(proofNode, outFile, depth);
+        write_proof_node(proofNode, outFile, depth);
         proofNode = proofNode->next;
     }
 }

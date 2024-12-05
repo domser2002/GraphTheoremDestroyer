@@ -1,53 +1,57 @@
 #include "test_generative_proof_machine.h"
-// #include "physical_graph.h"
 #include "generative_restriction.h"
 #include "generative_proof_machine.h"
 #include <assert.h>
 
 void test_generative_proof_machine(void)
 {
-    printf("Small machine\n");
-    execute_small_machine();
     printf("Creation and deletion\n");
-    creation_and_deletion();
+    test_machine_creation_and_deletion();
+
     printf("Max degree restriction\n");
-    test_max_degree();
+    test_max_degree_restriction();
+
     printf("No ck restriction\n");
-    test_no_ck_restriction();
+    test_no_k_cycle_restriction();
+
     printf("No induced pk restriction\n");
-    test_no_induced_pk_restriction();
+    test_no_induced_path_k_restriction();
+
     printf("Min degree\n");
-    test_min_degree();
-    printf("Check edge\n");
-    test_check_edge();
-    /*
-    */
-   printf("Erdos gyarfas subcase\n");
-   test_erdos_gyarfas_subcase();
+    test_minimum_degree_restriction();
+
+    printf("Erdos gyarfas subcase\n");
+    test_erdos_gyarfas_case();
 }
 
-void creation_and_deletion(void)
+void test_machine_creation_and_deletion(void)
 {
-    // GenerativeRestriction **restrictions = gtd_malloc(sizeof(GenerativeRestriction*));
+    // Arrange
     Graph *startGraph = create_graph(3,1);
-    GenerativeProofMachine *machine = create_generative_proof_machine(1, startGraph);
-    get_machine_restrictions(machine)[0] = create_max_degree_restriction(10, machine);
 
+    // Act
+    GenerativeProofMachine *machine = create_proof_machine(1, startGraph);
+    get_machine_restrictions(machine)[0] = create_max_degree_restriction(10, machine);
     destroy_generative_proof_machine(machine);
+
+    // Assert
 }
 
-void test_max_degree(void)
+void test_max_degree_restriction(void)
 {
-    // GenerativeRestriction *restrictions = create_max_degree_restriction(3);
-    // GenerativeRestriction **restrictions = gtd_malloc(sizeof(GenerativeRestriction*));
+    // Arrange
     Graph *startGraph = create_graph(10,10);
     set_edge_connected(startGraph, 0, 1);
     set_edge_connected(startGraph, 0, 2);
     set_edge_connected(startGraph, 0, 3);
-    GenerativeProofMachine *machine = create_generative_proof_machine(1, startGraph);
-    get_machine_restrictions(machine)[0] = create_max_degree_restriction(3, machine);
-    execute_generative_proof_machine(machine);
+    GenerativeProofMachine *machine = create_proof_machine(1, startGraph);
     char **adjMatrix = get_graph_adjacency_matrix(startGraph);
+    get_machine_restrictions(machine)[0] = create_max_degree_restriction(3, machine);
+
+    // Act
+    execute_generative_proof_machine(machine);
+
+    // Assert
     for(int i = 4; i < 10; ++i)
     {
         assert(adjMatrix[0][i] == NOT_CONNECTED_SYMBOL);
@@ -60,22 +64,29 @@ void test_max_degree(void)
         }
     }
 
-    // adding edge should create contradiction
+    // Arrange
     set_edge_connected(startGraph, 0, 4);
-    assert(execute_generative_proof_machine(machine) == 1);
 
+    // Act
+    int contr = execute_generative_proof_machine(machine);
+
+    // Assert
+    assert(contr == 1);
+
+    // Cleanup
     destroy_generative_proof_machine(machine);
 }
 
-void test_no_ck_restriction(void)
+void test_no_k_cycle_restriction(void)
 {
     // ====== test 1 ======
-    // GenerativeRestriction *restrictions = create_no_k_cycle_restriction(4);
-    // GenerativeRestriction **restrictions = gtd_malloc(sizeof(GenerativeRestriction*));
+    // Arrange
     Graph *graph1 = create_graph(4, 4);
     set_edge_connected(graph1, 0, 1);
     set_edge_connected(graph1, 1, 2);
     set_edge_connected(graph1, 2, 3);
+
+    // Act
     PathNode *paths = find_k_paths(graph1, 4);
     int num_paths = 0;
     while(paths != NULL)
@@ -83,20 +94,33 @@ void test_no_ck_restriction(void)
         num_paths++;
         paths = paths->next;
     }
+
+    // Assert
     assert(num_paths == 2);
 
-    GenerativeProofMachine *machine = create_generative_proof_machine(1, graph1);
+    // Arrange
+    GenerativeProofMachine *machine = create_proof_machine(1, graph1);
     get_machine_restrictions(machine)[0] = create_no_k_cycle_restriction(4, machine);
+
+    // Act
     int contr1 = execute_generative_proof_machine(machine);
+
+    // Assert
     assert(contr1 == 0);
     assert(get_graph_adjacency_matrix(graph1)[0][3] == NOT_CONNECTED_SYMBOL);
 
+    // Arrange
     set_edge_connected(graph1, 0, 3);
+
+    // Act
     int contr2 = execute_generative_proof_machine(machine);
+
+    // Assert
     assert(contr2 == 1);
 
     // ====== test 2 ======
 
+    // Arrange
     Graph *graph2 = create_graph(15, 15);
     set_edge_connected(graph2, 0, 1);
     set_edge_connected(graph2, 0, 2);
@@ -112,6 +136,8 @@ void test_no_ck_restriction(void)
     set_edge_connected(graph2, 6, 12);
     set_edge_connected(graph2, 7, 13);
     set_edge_connected(graph2, 8, 14);
+
+    // Act
     paths = find_k_paths(graph2, 2);
     num_paths = 0;
     while(paths != NULL)
@@ -119,10 +145,13 @@ void test_no_ck_restriction(void)
         num_paths++;
         paths = paths->next;
     }
+
+    // Assert
     assert(num_paths == 28);
 
     // ===== test 3 =====
 
+    // Arrange
     Graph *graph3 = create_graph(50, 50);
 
     set_edge_connected(graph3, 0, 1);
@@ -157,14 +186,17 @@ void test_no_ck_restriction(void)
     set_edge_connected(graph3, 20, 9);
     set_edge_connected(graph3, 22, 0);
 
-    // restrictions = create_no_k_cycle_restriction(5);
-    // restrictions = gtd_malloc(sizeof(GenerativeRestriction*));
-    machine = create_generative_proof_machine(1, graph3);
+    // Act
+    machine = create_proof_machine(1, graph3);
     get_machine_restrictions(machine)[0] = create_no_k_cycle_restriction(5, machine);
     int contr3 = execute_generative_proof_machine(machine);
+
+    // Assert
     assert(contr3 == 1);
 
     // ===== test 4 =====
+
+    // Arrange
     Graph *graph4 = create_graph(50, 50);
 
     set_edge_connected(graph4, 0, 1);
@@ -215,37 +247,31 @@ void test_no_ck_restriction(void)
     set_edge_connected(graph4, 31, 9);
     set_edge_connected(graph4, 32, 20);
 
-    // restrictions = create_no_k_cycle_restriction(5);
-    // restrictions = gtd_malloc(sizeof(GenerativeRestriction*));
-    machine = create_generative_proof_machine(1, graph4);
+    // Act
+    machine = create_proof_machine(1, graph4);
     get_machine_restrictions(machine)[0] = create_no_k_cycle_restriction(5, machine);
     int contr4 = execute_generative_proof_machine(machine);
+
+    // Assert
     assert(contr4 == 0);
 
 }
 
-void execute_small_machine(void)
-{
-    
-}
-
-void execute_small_machine2(void)
-{
-
-}
-
-void test_no_induced_pk_restriction(void)
+void test_no_induced_path_k_restriction(void)
 {
     // ===== test 1 =====
-    // GenerativeRestriction *restrictions = create_no_induced_pk_restriction(3);
-    // GenerativeRestriction **restrictions = gtd_malloc(sizeof(GenerativeRestriction*));
+    // Arrange
     Graph *startGraph = create_graph(10, 10);
     char **adjMatrix = get_graph_adjacency_matrix(startGraph);
     set_edge_connected(startGraph, 0, 1);
     set_edge_connected(startGraph, 1, 2);
-    GenerativeProofMachine *machine = create_generative_proof_machine(1, startGraph);
-    get_machine_restrictions(machine)[0] = create_no_induced_pk_restriction(3, machine);
+    GenerativeProofMachine *machine = create_proof_machine(1, startGraph);
+    get_machine_restrictions(machine)[0] = create_no_induced_path_k_restriction(3, machine);
+
+    // Act
     int contr1 = execute_generative_proof_machine(machine);
+
+    // Assert
     assert(contr1 == 0);
     assert(adjMatrix[0][1] == CONNECTED_SYMBOL);
     assert(adjMatrix[1][2] == CONNECTED_SYMBOL);
@@ -253,29 +279,33 @@ void test_no_induced_pk_restriction(void)
 
     // ===== test 2 =====
 
+    // Arrange
     Graph *graph2 = create_graph(5, 5);
     adjMatrix = get_graph_adjacency_matrix(graph2);
-    // restrictions = create_no_induced_pk_restriction(5);
-    // restrictions = gtd_malloc(sizeof(GenerativeRestriction*));
-    machine = create_generative_proof_machine(1, graph2);
-    get_machine_restrictions(machine)[0] = create_no_induced_pk_restriction(5, machine);
-
+    machine = create_proof_machine(1, graph2);
+    get_machine_restrictions(machine)[0] = create_no_induced_path_k_restriction(5, machine);
     set_edge_connected(graph2, 0, 1);
     set_edge_connected(graph2, 1, 2);
     set_edge_connected(graph2, 2, 3);
     set_edge_connected(graph2, 3, 4);
 
+    // Act
     int contr2 = execute_generative_proof_machine(machine);
+
+    // Assert
     assert(contr2 == 0);
 
-    // 02 03 04 13 14 24
+    // Arrange
     set_edge_not_connected(graph2, 0, 2);
     set_edge_not_connected(graph2, 0, 3);
     set_edge_not_connected(graph2, 0, 4);
     set_edge_not_connected(graph2, 1, 3);
     set_edge_not_connected(graph2, 1, 4);
- 
+    
+    // Act
     contr2 = execute_generative_proof_machine(machine);
+
+    // Assert
     assert(contr2 == 0);
     assert(adjMatrix[2][4] == CONNECTED_SYMBOL);
 
@@ -283,10 +313,8 @@ void test_no_induced_pk_restriction(void)
 
     // Arrange
     Graph *graph3 = create_graph(6, 6);
-    // GenerativeRestriction *restriction3 = create_no_induced_pk_restriction(2);
-    // GenerativeRestriction **restriction3 = gtd_malloc(sizeof(GenerativeRestriction*));
-    GenerativeProofMachine *machine3 = create_generative_proof_machine(1, graph3);
-    get_machine_restrictions(machine3)[0] = create_no_induced_pk_restriction(2, machine);
+    GenerativeProofMachine *machine3 = create_proof_machine(1, graph3);
+    get_machine_restrictions(machine3)[0] = create_no_induced_path_k_restriction(2, machine);
     char **adjMatrix3 = get_graph_adjacency_matrix(graph3);
     int contr3;
     int edgeCount = 0;
@@ -313,10 +341,8 @@ void test_no_induced_pk_restriction(void)
     // Arrange
     Graph *graph4 = create_graph(6, 6);
     set_edge_connected(graph4, 2, 4);
-    // GenerativeRestriction *restriction4 = create_no_induced_pk_restriction(2);
-    // GenerativeRestriction **restriction4 = gtd_malloc(sizeof(GenerativeRestriction*));
-    GenerativeProofMachine *machine4 = create_generative_proof_machine(1, graph4);
-    get_machine_restrictions(machine4)[0] = create_no_induced_pk_restriction(2, machine4);
+    GenerativeProofMachine *machine4 = create_proof_machine(1, graph4);
+    get_machine_restrictions(machine4)[0] = create_no_induced_path_k_restriction(2, machine4);
     int contr4;
 
     // Act
@@ -328,19 +354,8 @@ void test_no_induced_pk_restriction(void)
     // (⊙_☉)
 }
 
-void test_check_edge(void)
-{
-    // ======= test 1 =======
 
-    // Arrange
-
-
-    // Act
-
-    // Assert
-}
-
-void test_erdos_gyarfas_subcase(void)
+void test_erdos_gyarfas_case(void)
 {
     // ======= test 1 =======
 
@@ -365,31 +380,28 @@ void test_erdos_gyarfas_subcase(void)
             }
         }
     }
-    // GenerativeRestriction **restrictions1 = gtd_malloc(sizeof(GenerativeRestriction**) * 5);
-    GenerativeProofMachine *machine1 = create_generative_proof_machine(5, graph1);
+    GenerativeProofMachine *machine1 = create_proof_machine(5, graph1);
     get_machine_restrictions(machine1)[0] = create_no_k_cycle_restriction(4, machine1);
     get_machine_restrictions(machine1)[1] = create_no_k_cycle_restriction(8, machine1);
-    get_machine_restrictions(machine1)[2] = create_no_induced_pk_restriction(8, machine1);
+    get_machine_restrictions(machine1)[2] = create_no_induced_path_k_restriction(8, machine1);
     get_machine_restrictions(machine1)[3] = create_min_degree_restriction(3, machine1);
-    get_machine_restrictions(machine1)[4] = create_check_edge_restriction(3, machine1);
+    get_machine_restrictions(machine1)[4] = create_edge_check_restriction(3, machine1);
 
     // Act
     int contr1 = execute_generative_proof_machine(machine1);
-    writeProof(get_machine_proof_tree(machine1), stdout);
+    write_proof_tree(get_machine_proof_tree(machine1), stdout);
 
     // Assert
     assert(contr1 == 1);
 }
 
-void test_min_degree(void)
+void test_minimum_degree_restriction(void)
 {
     // ========== test 1 ==========
 
     // Arrange
     Graph *graph1 = create_graph(10, 1);
-    // GenerativeRestriction *restriction1 = create_min_degree_restriction(7);
-    // GenerativeRestriction **restriction1 = gtd_malloc(sizeof(GenerativeRestriction*));
-    GenerativeProofMachine *machine1 = create_generative_proof_machine(1, graph1);
+    GenerativeProofMachine *machine1 = create_proof_machine(1, graph1);
     get_machine_restrictions(machine1)[0] = create_min_degree_restriction(7, machine1);
     int *degree1 = get_graph_degree(graph1);
 
@@ -404,9 +416,7 @@ void test_min_degree(void)
 
     // Arrange
     Graph *graph2 = create_graph(10, 3);
-    // GenerativeRestriction *restriction2 = create_min_degree_restriction(15);
-    // GenerativeRestriction **restriction2 = gtd_malloc(sizeof(GenerativeRestriction*));
-    GenerativeProofMachine *machine2 = create_generative_proof_machine(1, graph2);
+    GenerativeProofMachine *machine2 = create_proof_machine(1, graph2);
     get_machine_restrictions(machine2)[0] = create_min_degree_restriction(15, machine2);
     int *degree2 = get_graph_degree(graph2);
 

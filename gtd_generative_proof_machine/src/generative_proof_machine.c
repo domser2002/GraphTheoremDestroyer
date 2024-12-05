@@ -2,31 +2,39 @@
 #include "physical_graph.h"
 #include "generative_restriction.h"
 #include "common.h"
-// #include "proof_tree.h"
 
-
-struct GenerativeProofMachine
+typedef struct GenerativeProofMachine
 {
     Graph *graph;
     GenerativeRestriction **restrictions;
-    int num_restrictions;
+    int numRestrictions;
     int depth;
     ProofTree *proofTree;
-};
+} GenerativeProofMachine;
 
-
-GenerativeProofMachine *create_generative_proof_machine(int num_restrictions, Graph* startGraph)
+/**
+ * \brief constructor for GenerativeProofMachine class
+ * \param numRestrictions number of generative restrictions
+ * \param startGraph start graph
+ * \returns pointer to a newly created GenerativeProofMachine
+ */
+GenerativeProofMachine *create_proof_machine(int numRestrictions, Graph *startGraph)
 {
-    GenerativeProofMachine *generativeProofMachine = gtd_malloc(sizeof(GenerativeProofMachine));
-    generativeProofMachine->restrictions = gtd_malloc(sizeof(GenerativeRestriction*) * num_restrictions);
-    generativeProofMachine->num_restrictions = num_restrictions;
-    generativeProofMachine->graph = startGraph;
-    generativeProofMachine->depth = 0;
-    generativeProofMachine->proofTree = initProofTree();
+    GenerativeProofMachine *machine = gtd_malloc(sizeof(GenerativeProofMachine));
+    machine->restrictions = gtd_malloc(sizeof(GenerativeRestriction *) * numRestrictions);
+    machine->numRestrictions = numRestrictions;
+    machine->graph = startGraph;
+    machine->depth = 0;
+    machine->proofTree = create_proof_tree();
 
-    return generativeProofMachine;
+    return machine;
 }
 
+/**
+ * \brief function to destruct GenerativeProofMachine
+ * \param machine pointer to the GenerativeProofMachine to destroy
+ * \returns 1 if suceeded, otherwise raises fault
+ */
 int destroy_generative_proof_machine(GenerativeProofMachine *machine)
 {
     destroy_graph(machine->graph);
@@ -35,26 +43,29 @@ int destroy_generative_proof_machine(GenerativeProofMachine *machine)
     return 1;
 }
 
-
-
-// returns all graphs meeting all restrictions
+/**
+ * \brief function for executing generative proof machine
+ * \param machine pointer to the GenerativeProofMachine to execute
+ * \returns 1 if contradictionw was found, 0 otherwise
+ */
 int execute_generative_proof_machine(GenerativeProofMachine *machine)
 {
     int i = 0;
-    int num_restrictions = machine->num_restrictions;
-    while(i < num_restrictions)
+    while (i < machine->numRestrictions)
     {
         GenerativeRestriction *restriction = machine->restrictions[i];
         Graph *graph = machine->graph;
-        RestrictionResult *result = check_restriction(graph, restriction);
-        if(result->contradictionFound)
+        RestrictionResult *result = validate_restriction(graph, restriction);
+
+        if (result->contradictionFound)
         {
-            // todo memory clear
+            // TODO: Implement proper memory cleanup
             return 1;
         }
-        if(result->modified)
+
+        if (result->modified)
         {
-            // todo memory clear
+            // TODO: Implement proper memory cleanup
             i = 0;
             continue;
         }
@@ -63,55 +74,78 @@ int execute_generative_proof_machine(GenerativeProofMachine *machine)
     return 0;
 }
 
-
+/**
+ * \brief function to set depth parameter of GenerativeProofMachine class
+ * \param machine pointer to the GenerativeProofMachine, which depth will be set
+ * \param depth new depth value
+ */
 void set_machine_depth(GenerativeProofMachine *machine, int depth)
 {
     machine->depth = depth;
 }
 
+/**
+ * \brief function to get machine depth
+ * \param machine pointer to the GenerativeProofMachine for which depth will be returned
+ * \returns depth of a machine
+ */
 int get_machine_depth(GenerativeProofMachine *machine)
 {
-    int depth = machine->depth;
-    return depth;
+    return machine->depth;
 }
 
-
+/**
+ * \brief function to get machine graph
+ * \param machine pointer to the GenerativeProofMachine for which start graph will be returned
+ * \returns start graph of a machine
+ */
 Graph *get_machine_graph(GenerativeProofMachine *machine)
 {
     return machine->graph;
 }
 
-// copies everything excpept of the proof tree
-GenerativeProofMachine *copyMachine(GenerativeProofMachine *machine)
+/**
+ * \brief function to make a deep copy of a machine, except for the proof tree of the machine
+ * \param machine pointer to the GenerativeProofMachine, which will be copied
+ * \returns returns a deep copy of a machine, but proofTree is initialized to new, clean instance
+ */
+GenerativeProofMachine *copy_proof_machine(GenerativeProofMachine *machine)
 {
-    //GenerativeRestriction **restrictions = machine->restrictions;
-    int num_restrictions = machine->num_restrictions;
-    // GenerativeRestriction **restrictions = gtd_malloc(sizeof(GenerativeRestriction*) * num_restrictions);
-    Graph *startGraph = copyGraph(machine->graph);
+    int numRestrictions = machine->numRestrictions;
+    Graph *graphCopy = copy_graph(machine->graph);
     int depth = machine->depth;
 
-    GenerativeProofMachine *result = create_generative_proof_machine(num_restrictions, startGraph);
-    for(int i = 0; i < num_restrictions; ++i)
+    GenerativeProofMachine *copy = create_proof_machine(numRestrictions, graphCopy);
+
+    for (int i = 0; i < numRestrictions; ++i)
     {
-        GenerativeRestriction *restr = copy_restriction(machine->restrictions[i]);
-        RestrictionParameters *params = get_restriction_parameters(restr);
-        params->machine = result;
-        get_machine_restrictions(result)[i] = restr;
+        GenerativeRestriction *restrictionCopy = deep_copy_restriction(machine->restrictions[i]);
+        RestrictionParameters *params = get_parameters_from_restriction(restrictionCopy);
+        params->machine = copy;
+        copy->restrictions[i] = restrictionCopy;
     }
-    result->depth = depth;
 
-    result->proofTree = initProofTree();
+    copy->depth = depth;
+    copy->proofTree = create_proof_tree();
 
-    return result;
+    return copy;
 }
 
-
+/**
+ * \brief function to get proof tree of a graph
+ * \param machine pointer to the GenerativeProofMachine for which proof tree will be returned
+ * \return proof tree of a machine
+ */
 ProofTree *get_machine_proof_tree(GenerativeProofMachine *machine)
 {
     return machine->proofTree;
 }
 
-
+/**
+ * \brief function to get restrictions of a graph
+ * \param machine pointer to the GenerativeProofMachine for which restrictions tree will be returned
+ * \return restrictions of a machine
+ */
 GenerativeRestriction **get_machine_restrictions(GenerativeProofMachine *machine)
 {
     return machine->restrictions;

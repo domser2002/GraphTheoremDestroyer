@@ -15,8 +15,13 @@ typedef struct intNode
 }intNode;
 
 
-
-GenerativeRestriction *create_restriction(RestrictionResult* (*restriction)(Graph* graph, RestrictionParameters *params), RestrictionParameters *params)
+/**
+ * \brief constructor for GenerativeRestriction class
+ * \param restriction function that applies restriction to a graph
+ * \param params pointer to RestrictionParameters that store parameters for restriction
+ * \returns pointer to a newly created GenerativeRestriction
+ */
+GenerativeRestriction *create_restriction_object(RestrictionResult* (*restriction)(Graph* graph, RestrictionParameters *params), RestrictionParameters *params)
 {
     GenerativeRestriction *genRestriction = gtd_malloc(sizeof(GenerativeRestriction));
     genRestriction->restriction = restriction;
@@ -24,7 +29,12 @@ GenerativeRestriction *create_restriction(RestrictionResult* (*restriction)(Grap
     return genRestriction;
 }
 
-int destroy_restriction(GenerativeRestriction *genRestriction)
+/**
+ * \brief function to destruct GenerativeRestriction
+ * \param machine pointer to the GenerativeRestriction to destroy
+ * \returns 1 if suceeded, otherwise raises fault
+ */
+int delete_restriction_object(GenerativeRestriction *genRestriction)
 {
     if(genRestriction != NULL)
     {
@@ -34,34 +44,53 @@ int destroy_restriction(GenerativeRestriction *genRestriction)
     return 1;
 }
 
-RestrictionResult* check_restriction(Graph *graph, GenerativeRestriction *restriction)
+/**
+ * \brief function to validate a restriction on a graph
+ * \param graph pointer to the PhysicalGraph for which restriction will be validated
+ * \param restriction pointer to the GenerativeRestriction that will be validated on a graph
+ * \returns pointer to RestrictionResult specifying the result of a restriction validation
+ */
+RestrictionResult* validate_restriction(Graph *graph, GenerativeRestriction *restriction)
 {
     RestrictionResult* res = restriction->restriction(graph, restriction->params);
     return res;
 }
 
-RestrictionParameters *initRestrictionParameters(void)
+/**
+ * \brief constructor for RestrictionParameters class
+ * \result pointer to the newly created RestrictionParameter
+ */
+RestrictionParameters *initialize_restriction_parameters(void)
 {
     RestrictionParameters *result = gtd_malloc(sizeof(RestrictionParameters));
-    result->numInt = 0;
+    result->numIntParams = 0;
     result->intParams = NULL;
     result->machine = NULL;
 
     return result;
 }
 
-void destroyRestrictionParameters(RestrictionParameters *params)
+/**
+ * \brief function to destruct RestrictionParameters
+ * \param params pointer to the RestrictionParameters to destroy
+ */
+void destroy_restriction_parameters(RestrictionParameters *params)
 {
     gtd_free(params->intParams);
     destroy_generative_proof_machine(params->machine);
 }
 
-RestrictionParameters *copy_parameters(RestrictionParameters *params)
+/**
+ * \brief function to make a deep copy of RestrictionParameters object
+ * \param params pointer to the RestrictionParameters object
+ * \returns deep copy of an object pointed to by params
+ */
+RestrictionParameters *deep_copy_restriction_parameters(RestrictionParameters *params)
 {
-    RestrictionParameters *result = initRestrictionParameters();
-    result->numInt = params->numInt;
-    result->intParams = gtd_malloc(sizeof(int) * params->numInt);
-    for(int i = 0; i < params->numInt; ++i)
+    RestrictionParameters *result = initialize_restriction_parameters();
+    result->numIntParams = params->numIntParams;
+    result->intParams = gtd_malloc(sizeof(int) * params->numIntParams);
+    for(int i = 0; i < params->numIntParams; ++i)
     {
         result->intParams[i] = params->intParams[i];
     }
@@ -69,34 +98,52 @@ RestrictionParameters *copy_parameters(RestrictionParameters *params)
     return result;
 }
 
-// 
-GenerativeRestriction *copy_restriction(GenerativeRestriction *restriction)
+/**
+ * \brief function to make a deep copy of GenerativeRestriction object
+ * \param restriction pointer to the GenerativeRestriction object
+ * \returns deep copy of an object pointed to by restriction
+ */
+GenerativeRestriction *deep_copy_restriction(GenerativeRestriction *restriction)
 {
-    RestrictionParameters *params = copy_parameters(restriction->params);
-    GenerativeRestriction *result = create_restriction(restriction->restriction, params);
+    RestrictionParameters *params = deep_copy_restriction_parameters(restriction->params);
+    GenerativeRestriction *result = create_restriction_object(restriction->restriction, params);
     return result;
 }
 
-RestrictionParameters *get_restriction_parameters(GenerativeRestriction *restr)
+/**
+ * \brief function to get restriction parameters of a restriction
+ * \param restr pointer to the GenerativeRestriction object
+ * \return restriction parameters of restr
+ */
+RestrictionParameters *get_parameters_from_restriction(GenerativeRestriction *restr)
 {
     return restr->params;
 }
 
 // =============== max degree restriction ===============
 
+/**
+ * \brief function to create a restriction for a maximal degree of a vertex
+ * \param max_degree integer specyfing maximal degree of a vertex
+ * \param machine pointer to the GenerativeProofMachine, for which restriction will be validated
+ * \returns pointer to the newly created GenerativeRestriction that will depict maximal degree restriction
+ */
 GenerativeRestriction *create_max_degree_restriction(int max_degree, GenerativeProofMachine *machine)
 {
-    // int *params = gtd_malloc(sizeof(int));
-    // params[0] = max_degree;
-    RestrictionParameters *params = initRestrictionParameters();
-    params->numInt = 1;
+    RestrictionParameters *params = initialize_restriction_parameters();
+    params->numIntParams = 1;
     params->intParams = gtd_malloc(sizeof(int));
     params->intParams[0] = max_degree;
     params->machine = machine;
-    GenerativeRestriction *restrinction = create_restriction(max_degree_restriction_condition, params);
+    GenerativeRestriction *restrinction = create_restriction_object(max_degree_restriction_condition, params);
     return restrinction;
 }
 
+/**
+ * \brief function to validate max degree condition
+ * \param machine pointer to the GenerativeProofMachine, for which restriction will be validated
+ * \returns pointer to the RestrictionResult that will store information about result of restriction validation
+ */
 RestrictionResult* max_degree_restriction_condition(Graph* graph, RestrictionParameters *params)
 {
     int maxDegree = params->intParams[0];
@@ -140,43 +187,49 @@ RestrictionResult* max_degree_restriction_condition(Graph* graph, RestrictionPar
 // =============== max degree restriction ===============
 // =============== no k cycle restriction ===============
 
+/**
+ * \brief function to create a restriction for a cycle of a particular length
+ * \param k integer specyfying forbidden length of a cycle
+ * \param machine pointer to the GenerativeProofMachine, for which restriction will be validated
+ * \returns pointer to the newly created GenerativeRestriction that will depict no k cycle restriction
+ */
 GenerativeRestriction *create_no_k_cycle_restriction(int k, GenerativeProofMachine *machine)
 {
-    // int *params = gtd_malloc(sizeof(int));
-    // params[0] = k;
-    RestrictionParameters *params = initRestrictionParameters();
-    params->numInt = 1;
+    RestrictionParameters *params = initialize_restriction_parameters();
+    params->numIntParams = 1;
     params->intParams = gtd_malloc(sizeof(int));
     params->intParams[0] = k;
     params->machine = machine;
-    GenerativeRestriction *restriction = create_restriction(no_k_cycle_restrinction_condition, params);
+    GenerativeRestriction *restriction = create_restriction_object(no_k_cycle_condition, params);
     return restriction;
 }
 
-
-
+/**
+ * \brief constructor for a helper class that stores information about paths
+ * \param k integer specyfying a length of a path
+ * \param n integer specyfying number of all vertices
+ * \returns pointer to the newly create PathNode
+ */
 PathNode *initPathNode(int k, int n)
 {
     PathNode *node = gtd_malloc(sizeof(PathNode));
     node->path = gtd_malloc(sizeof(int) * k);
-    /*
-    for(int i = 0; i < k; ++i)
-    {
-        node->path[i] = 0;
-    }
-    */
+    
     node->pathBool = gtd_malloc(sizeof(int) * n);
     for(int i = 0; i < n; ++i)
     {
         node->pathBool[i] = 0;
     }
-    /*
-    */
+
     node->next = NULL;
     node->numElems = 0;
     return node;
 }
 
+/**
+ * \brief function to destruct PathNode
+ * \param pointer to the PathNode to destruct
+ */
 void destroyPathNode(PathNode *node)
 {
     gtd_free(node->path);
@@ -184,7 +237,12 @@ void destroyPathNode(PathNode *node)
     gtd_free(node);
 }
 
-// find all k-paths
+/**
+ * \brief function to find all paths with length k in a graph
+ * \param graph pointer to the Graph, for which paths will be searched
+ * \param k integer specyfying length of path
+ * \returns pointer to the PathNode that contains all k-paths
+ */
 PathNode* find_k_paths(Graph *graph, int k)
 {
     PathNode *nodes = NULL;
@@ -259,9 +317,13 @@ PathNode* find_k_paths(Graph *graph, int k)
     return result;
 }
 
-// Main function for no-k-cycle restriction condition
-RestrictionResult* no_k_cycle_restrinction_condition(Graph *graph, RestrictionParameters *params) {
-    // int k = params[0];
+/**
+ * \brief function to validate no k cycle condition
+ * \param machine pointer to the GenerativeProofMachine, for which restriction will be validated
+ * \returns pointer to the RestrictionResult that will store information about result of restriction validation
+ */
+RestrictionResult* no_k_cycle_condition(Graph *graph, RestrictionParameters *params) 
+{
     int k = params->intParams[0];
     PathNode *paths = find_k_paths(graph, k);
     RestrictionResult *result = gtd_malloc(sizeof(RestrictionResult));
@@ -298,9 +360,9 @@ RestrictionResult* no_k_cycle_restrinction_condition(Graph *graph, RestrictionPa
                 strncat(buffer, temp, sizeof(buffer) - strlen(buffer) - 1);
             }
             strncat(buffer, "]", 2);
-            ProofNode *proofNode = initProofNode();
+            ProofNode *proofNode = create_proof_node();
             proofNode->message = strdup(buffer);
-            addProofNode(proofTree, proofNode);
+            append_proof_node(proofTree, proofNode);
 
             return result;
         }
@@ -320,9 +382,9 @@ RestrictionResult* no_k_cycle_restrinction_condition(Graph *graph, RestrictionPa
                 strncat(buffer, temp, sizeof(buffer) - strlen(buffer) - 1);
             }
             strncat(buffer, "]", 2);
-            ProofNode *proofNode = initProofNode();
+            ProofNode *proofNode = create_proof_node();
             proofNode->message = strdup(buffer);
-            addProofNode(proofTree, proofNode);
+            append_proof_node(proofTree, proofNode);
         }
 
         destroyPathNode(path);
@@ -334,21 +396,29 @@ RestrictionResult* no_k_cycle_restrinction_condition(Graph *graph, RestrictionPa
 // =============== no k cycle restriction ===============
 // =============== no induced pk restriction ============
 
-GenerativeRestriction *create_no_induced_pk_restriction(int k, GenerativeProofMachine *machine)
+/**
+ * \brief function to create a restriction for a induced path of a particular length
+ * \param k integer specyfying forbidden length of a path
+ * \param machine pointer to the GenerativeProofMachine, for which restriction will be validated
+ * \returns pointer to the newly created GenerativeRestriction that will depict no induced k path
+ */
+GenerativeRestriction *create_no_induced_path_k_restriction(int k, GenerativeProofMachine *machine)
 {
-    // int *params = gtd_malloc(sizeof(int));
-    // params[0] = k;
-    RestrictionParameters *params = initRestrictionParameters();
-    params->numInt = 1;
+    RestrictionParameters *params = initialize_restriction_parameters();
+    params->numIntParams = 1;
     params->intParams = gtd_malloc(sizeof(int));
     params->intParams[0] = k;
     params->machine = machine;
-    GenerativeRestriction *restriction = create_restriction(no_induced_pk_restriction_condition, params);
+    GenerativeRestriction *restriction = create_restriction_object(no_induced_path_k_condition, params);
     return restriction;
 }
 
-
-RestrictionResult* no_induced_pk_restriction_condition(Graph *graph, RestrictionParameters *params) 
+/**
+ * \brief function to validate no induced k path condition
+ * \param machine pointer to the GenerativeProofMachine, for which restriction will be validated
+ * \returns pointer to the RestrictionResult that will store information about result of restriction validation
+ */
+RestrictionResult* no_induced_path_k_condition(Graph *graph, RestrictionParameters *params) 
 {
     
     int k = params->intParams[0];
@@ -401,9 +471,9 @@ RestrictionResult* no_induced_pk_restriction_condition(Graph *graph, Restriction
                 strncat(buffer, temp, sizeof(buffer) - strlen(buffer) - 1);
             }
             strncat(buffer, "]", 2);
-            ProofNode *proofNode = initProofNode();
+            ProofNode *proofNode = create_proof_node();
             proofNode->message = strdup(buffer);
-            addProofNode(proofTree, proofNode);
+            append_proof_node(proofTree, proofNode);
 
             result->contradictionFound = 1;
             destroyPathNode(path);
@@ -432,9 +502,9 @@ RestrictionResult* no_induced_pk_restriction_condition(Graph *graph, Restriction
                 strncat(buffer, temp, sizeof(buffer) - strlen(buffer) - 1);
             }
             strncat(buffer, "]", 2);
-            ProofNode *proofNode = initProofNode();
+            ProofNode *proofNode = create_proof_node();
             proofNode->message = strdup(buffer);
-            addProofNode(proofTree, proofNode);
+            append_proof_node(proofTree, proofNode);
         }
 
         destroyPathNode(path);
@@ -442,25 +512,32 @@ RestrictionResult* no_induced_pk_restriction_condition(Graph *graph, Restriction
     return result;
 }
 
-
-
 // =============== no induced pk restriction ============
 // =============== min degree restriction ============
 
+/**
+ * \brief function to create a restriction for a minimal degree of a vertex
+ * \param k integer specyfing minimal degree of a vertex
+ * \param machine pointer to the GenerativeProofMachine, for which restriction will be validated
+ * \returns pointer to the newly created GenerativeRestriction that will depict minimal degree restriction
+ */
 GenerativeRestriction *create_min_degree_restriction(int k, GenerativeProofMachine *machine)
 {
-    // int *params = gtd_malloc(sizeof(int));
-    // params[0] = k;
-    RestrictionParameters *params = initRestrictionParameters();
-    params->numInt = 1;
+    RestrictionParameters *params = initialize_restriction_parameters();
+    params->numIntParams = 1;
     params->intParams = gtd_malloc(sizeof(int));
     params->intParams[0] = k;
     params->machine = machine;
-    GenerativeRestriction *restriction = create_restriction(min_degree_restriction_condition, params);
+    GenerativeRestriction *restriction = create_restriction_object(min_degree_condition, params);
     return restriction;
 }
 
-RestrictionResult *min_degree_restriction_condition(Graph *graph, RestrictionParameters *params)
+/**
+ * \brief function to validate min degree condition
+ * \param machine pointer to the GenerativeProofMachine, for which restriction will be validated
+ * \returns pointer to the RestrictionResult that will store information about result of restriction validation
+ */
+RestrictionResult *min_degree_condition(Graph *graph, RestrictionParameters *params)
 {
     RestrictionResult *result = gtd_malloc(sizeof(RestrictionResult));
     result->contradictionFound = 0;
@@ -501,9 +578,9 @@ RestrictionResult *min_degree_restriction_condition(Graph *graph, RestrictionPar
                 snprintf(buffer, sizeof(buffer), 
                     "Wierzcholek %d musi miec nowego sasiada - niech bedzie nim %d", 
                     i, n);
-                ProofNode *proofNode = initProofNode();
+                ProofNode *proofNode = create_proof_node();
                 proofNode->message = strdup(buffer);
-                addProofNode(proofTree, proofNode);
+                append_proof_node(proofTree, proofNode);
 
                 return result;
             }
@@ -515,20 +592,29 @@ RestrictionResult *min_degree_restriction_condition(Graph *graph, RestrictionPar
 // =============== min degree restriction ============
 // =============== check edge restriction ============
 
-GenerativeRestriction *create_check_edge_restriction(int max_depth, GenerativeProofMachine *machine)
+/**
+ * \brief function to apply checking different possibilites logic
+ * \param max_depth integer specyfying how many subcases can be considered
+ * \param machine pointer to the GenerativeProofMachine, for which restriction will be validated
+ * \returns pointer to the newly created GenerativeRestriction that will depict checking edges action
+ */
+GenerativeRestriction *create_edge_check_restriction(int max_depth, GenerativeProofMachine *machine)
 {
-    // int *params = gtd_malloc(sizeof(int));
-    // params[0] = max_depth;
-    RestrictionParameters *params = initRestrictionParameters();
-    params->numInt = 1;
+    RestrictionParameters *params = initialize_restriction_parameters();
+    params->numIntParams = 1;
     params->intParams = gtd_malloc(sizeof(int));
     params->intParams[0] = max_depth;
     params->machine = machine;
-    GenerativeRestriction *restriction = create_restriction(check_edge_restriction_condition, params);
+    GenerativeRestriction *restriction = create_restriction_object(edge_check_condition, params);
     return restriction;
 }
 
-RestrictionResult *check_edge_restriction_condition(Graph *graph, RestrictionParameters *params)
+/**
+ * \brief function to validate edge check condition
+ * \param machine pointer to the GenerativeProofMachine, for which restriction will be validated
+ * \returns pointer to the RestrictionResult that will store information about result of restriction validation
+ */
+RestrictionResult *edge_check_condition(Graph *graph, RestrictionParameters *params)
 {
     // int max_depth = params[0];
     int max_depth = params->intParams[0];
@@ -553,13 +639,14 @@ RestrictionResult *check_edge_restriction_condition(Graph *graph, RestrictionPar
             }
 
             GenerativeProofMachine *originMachine = params->machine;
-            GenerativeProofMachine *connMachine = copyMachine(params->machine);
+
+            GenerativeProofMachine *connMachine = copy_proof_machine(params->machine);
             Graph *connGraph = get_machine_graph(connMachine);
             set_edge_connected(connGraph, i, j);
             set_machine_depth(connMachine, get_machine_depth(connMachine) + 1);
             get_machine_proof_tree(connMachine)->depth = get_machine_depth(connMachine);
 
-            GenerativeProofMachine *notConnMachine = copyMachine(params->machine);
+            GenerativeProofMachine *notConnMachine = copy_proof_machine(params->machine);
             Graph *notConnGraph = get_machine_graph(notConnMachine);
 
             set_edge_not_connected(notConnGraph, i, j);
@@ -590,10 +677,10 @@ RestrictionResult *check_edge_restriction_condition(Graph *graph, RestrictionPar
                 snprintf(buffer1, sizeof(buffer1), 
                     "Zalozmy, ze krawedz (%d %d) istnieje:", 
                     i, j);
-                ProofNode *proofNode1 = initProofNode();
+                ProofNode *proofNode1 = create_proof_node();
                 proofNode1->message = strdup(buffer1);
                 proofNode1->subtree = get_machine_proof_tree(connMachine);
-                addProofNode(get_machine_proof_tree(originMachine), proofNode1);
+                append_proof_node(get_machine_proof_tree(originMachine), proofNode1);
             }
             if(contrNotConn)
             {
@@ -604,10 +691,10 @@ RestrictionResult *check_edge_restriction_condition(Graph *graph, RestrictionPar
                 snprintf(buffer2, sizeof(buffer2), 
                     "Zalozmy, ze krawedz (%d %d) nie istnieje:", 
                     i, j);
-                ProofNode *proofNode2 = initProofNode();
+                ProofNode *proofNode2 = create_proof_node();
                 proofNode2->message = strdup(buffer2);
                 proofNode2->subtree = get_machine_proof_tree(notConnMachine);
-                addProofNode(get_machine_proof_tree(originMachine), proofNode2);
+                append_proof_node(get_machine_proof_tree(originMachine), proofNode2);
             }
             if(contrConn && contrNotConn)
             {

@@ -152,7 +152,7 @@ int add_vertex(Graph *graph)
     return 1;
 }
 
-Graph *copyGraph(Graph *graph)
+Graph *copy_graph(Graph *graph)
 {
     Graph *newGraph = create_graph(graph->max_vertices, graph->vertices);
     newGraph->hash = graph->hash;

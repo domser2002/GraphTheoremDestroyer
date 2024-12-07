@@ -21,7 +21,8 @@ SRC_GTD_FACT_TREE = \
 	gtd_fact_tree/src/fact.c \
 	gtd_fact_tree/src/contradiction.c \
 	gtd_fact_tree/src/implication.c \
-	gtd_fact_tree/src/fact_tree_machine.c
+	gtd_fact_tree/src/fact_tree_machine.c \
+	gtd_fact_tree/src/function.c
 
 SRC_GTD_COMMON = \
 	gtd_common/src/common.c \
@@ -46,7 +47,8 @@ OBJ_GTD_FACT_TREE = $(OBJ_PATH)/fact_tree.o \
                     $(OBJ_PATH)/fact.o \
                     $(OBJ_PATH)/contradiction.o \
                     $(OBJ_PATH)/implication.o \
-                    $(OBJ_PATH)/fact_tree_machine.o
+                    $(OBJ_PATH)/fact_tree_machine.o \
+                    $(OBJ_PATH)/function.o 
 
 OBJ_GTD_COMMON = $(OBJ_PATH)/common.o \
                 $(OBJ_PATH)/log.o
@@ -98,6 +100,9 @@ $(OBJ_PATH)/implication.o: gtd_fact_tree/src/implication.c
 	C_INCLUDE_PATH=$(C_INCLUDE_PATH) $(CC) $(CFLAGS) -c $< -o $@
 
 $(OBJ_PATH)/fact_tree_machine.o: gtd_fact_tree/src/fact_tree_machine.c
+	C_INCLUDE_PATH=$(C_INCLUDE_PATH) $(CC) $(CFLAGS) -c $< -o $@
+
+$(OBJ_PATH)/function.o: gtd_fact_tree/src/function.c
 	C_INCLUDE_PATH=$(C_INCLUDE_PATH) $(CC) $(CFLAGS) -c $< -o $@
 
 # Compile gtd_common sources

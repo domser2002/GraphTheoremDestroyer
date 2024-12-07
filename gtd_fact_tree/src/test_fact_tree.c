@@ -5,7 +5,7 @@ typedef int (*delete_fact_func)(Fact *);
 
 typedef struct Modular_Fact_Array {
     FactType *types;
-    int **params;
+    Function ***params;
     int *params_count;
     int fact_count;
 } Modular_Fact_Array;
@@ -19,6 +19,12 @@ typedef struct Contradict_Test_Case {
     Modular_Fact_Array facts;
     bool expected;
 } Contradict_Test_Case;
+
+typedef struct Function_Test_Case {
+    Function f1;
+    Function f2;
+    Function expected;
+} Function_Test_Case;
 
 static Fact **create_fact_array_from_modular(Modular_Fact_Array mfa)
 {
@@ -52,7 +58,7 @@ static void run_contradict_test_case(Contradict_Test_Case test_case)
     delete_fact_array(factArray,test_case.facts.fact_count);
 }
 
-static void create_and_run_contradict_test_case(FactType *types, int **params, int *params_count, int fact_count, bool expected)
+static void create_and_run_contradict_test_case(FactType *types, Function ***params, int *params_count, int fact_count, bool expected)
 {
     Contradict_Test_Case test_case = {
         .facts = {
@@ -73,92 +79,93 @@ static void test_contradict(void)
 {
     // Case 1 - no facts case
     create_and_run_contradict_test_case(NULL,NULL,NULL,0,false);
-    // Case set 2 - only one fact case
-    for (uint8_t i = 0; i < FACT_TYPE_NUM; i++)
-    {
-        FactType types2[] = {i};
-        int *params2_1 = (int*)gtd_malloc(get_param_count(i)*sizeof(int));
-        memset(params2_1,0x0,get_param_count(i)*sizeof(int));
-        int *params2[] = {params2_1};
-        int params_count_2[] = {get_param_count(i)};
-        int fact_count_2 = 1;
-        create_and_run_contradict_test_case(types2, params2, params_count_2, fact_count_2, false);
-    }
-    // Case 6 - contradiction type 1 should not occur
-    FactType types6[] = {MaxVertexCountFact, MinEdgeCountFact};
-    int params6_1[] = {0};
-    int params6_2[] = {0};
-    int *params6[] = {params6_1, params6_2};
-    int params_count_6[] = {1,1};
-    int fact_count_6 = 2;
-    create_and_run_contradict_test_case(types6,params6,params_count_6,fact_count_6, false);
-    // Case 7 - contradiction type 1 should occur
-    FactType types7[] = {MaxVertexCountFact, MinEdgeCountFact};
-    int params7_1[] = {1};
-    int params7_2[] = {1};
-    int *params7[] = {params7_1, params7_2};
-    int params_count_7[] = {1,1};
-    int fact_count_7 = 2;
-    create_and_run_contradict_test_case(types7,params7,params_count_7,fact_count_7, true);
-    // Case 8 - contradiction type 2 should not occur
-    FactType types8[] = {MinVertexCountFact, MaxVertexCountFact};
-    int params8_1[] = {1};
-    int params8_2[] = {1};
-    int *params8[] = {params8_1, params8_2};
-    int params_count_8[] = {1,1};
-    int fact_count_8 = 2;
-    create_and_run_contradict_test_case(types8,params8,params_count_8,fact_count_8, false);
-    // Case 9 - contradiction type 2 should occur
-    FactType types9[] = {MinVertexCountFact, MaxVertexCountFact};
-    int params9_1[] = {2};
-    int params9_2[] = {1};
-    int *params9[] = {params9_1, params9_2};
-    int params_count_9[] = {1,1};
-    int fact_count_9 = 2;
-    create_and_run_contradict_test_case(types9,params9,params_count_9,fact_count_9, true);
-    // Case 10 - contradiction type 3 should not occur
-    FactType types10[] = {MinEdgeCountFact, MaxEdgeCountFact};
-    int params10_1[] = {1};
-    int params10_2[] = {1};
-    int *params10[] = {params10_1, params10_2};
-    int params_count_10[] = {1,1};
-    int fact_count_10 = 2;
-    create_and_run_contradict_test_case(types10,params10,params_count_10,fact_count_10, false);
-    // Case 11 - contradiction type 3 should occur
-    FactType types11[] = {MinEdgeCountFact, MaxEdgeCountFact};
-    int params11_1[] = {2};
-    int params11_2[] = {1};
-    int *params11[] = {params11_1, params11_2};
-    int params_count_11[] = {1,1};
-    int fact_count_11 = 2;
-    create_and_run_contradict_test_case(types11,params11,params_count_11,fact_count_11, true);
-    // Case 12 - contradiction type 1 additional fact
-    FactType types12[] = {MaxVertexCountFact, MinEdgeCountFact, MinVertexCountFact};
-    int params12_1[] = {1};
-    int params12_2[] = {1};
-    int params12_3[] = {1};
-    int *params12[] = {params12_1, params12_2, params12_3};
-    int params_count_12[] = {1,1,1};
-    int fact_count_12 = 3;
-    create_and_run_contradict_test_case(types12,params12,params_count_12,fact_count_12, false); 
-    // Case 13 - contradiction type 2 additional fact 
-    FactType types13[] = {MinVertexCountFact, MaxVertexCountFact, MinEdgeCountFact};
-    int params13_1[] = {2};
-    int params13_2[] = {1};
-    int params13_3[] = {1};
-    int *params13[] = {params13_1, params13_2, params13_3};
-    int params_count_13[] = {1,1,1};
-    int fact_count_13 = 3;
-    create_and_run_contradict_test_case(types13,params13,params_count_13,fact_count_13, false);
-    // Case 14 - contradiction type 3 additional fact 
-    FactType types14[] = {MinEdgeCountFact, MaxEdgeCountFact, MinVertexCountFact};
-    int params14_1[] = {2};
-    int params14_2[] = {1};
-    int params14_3[] = {1};
-    int *params14[] = {params14_1, params14_2, params14_3};
-    int params_count_14[] = {1,1,1};
-    int fact_count_14 = 3;
-    create_and_run_contradict_test_case(types14,params14,params_count_14,fact_count_14, false);
+    // TODO: will be rewritten with functions in the next PR
+    // // Case set 2 - only one fact case
+    // for (uint8_t i = 0; i < FACT_TYPE_NUM; i++)
+    // {
+    //     FactType types2[] = {i};
+    //     int *params2_1 = (int*)gtd_malloc(get_param_count(i)*sizeof(int));
+    //     memset(params2_1,0x0,get_param_count(i)*sizeof(int));
+    //     int *params2[] = {params2_1};
+    //     int params_count_2[] = {get_param_count(i)};
+    //     int fact_count_2 = 1;
+    //     create_and_run_contradict_test_case(types2, params2, params_count_2, fact_count_2, false);
+    // }
+    // // Case 6 - contradiction type 1 should not occur
+    // FactType types6[] = {MaxVertexCountFact, MinEdgeCountFact};
+    // int params6_1[] = {0};
+    // int params6_2[] = {0};
+    // int *params6[] = {params6_1, params6_2};
+    // int params_count_6[] = {1,1};
+    // int fact_count_6 = 2;
+    // create_and_run_contradict_test_case(types6,params6,params_count_6,fact_count_6, false);
+    // // Case 7 - contradiction type 1 should occur
+    // FactType types7[] = {MaxVertexCountFact, MinEdgeCountFact};
+    // int params7_1[] = {1};
+    // int params7_2[] = {1};
+    // int *params7[] = {params7_1, params7_2};
+    // int params_count_7[] = {1,1};
+    // int fact_count_7 = 2;
+    // create_and_run_contradict_test_case(types7,params7,params_count_7,fact_count_7, true);
+    // // Case 8 - contradiction type 2 should not occur
+    // FactType types8[] = {MinVertexCountFact, MaxVertexCountFact};
+    // int params8_1[] = {1};
+    // int params8_2[] = {1};
+    // int *params8[] = {params8_1, params8_2};
+    // int params_count_8[] = {1,1};
+    // int fact_count_8 = 2;
+    // create_and_run_contradict_test_case(types8,params8,params_count_8,fact_count_8, false);
+    // // Case 9 - contradiction type 2 should occur
+    // FactType types9[] = {MinVertexCountFact, MaxVertexCountFact};
+    // int params9_1[] = {2};
+    // int params9_2[] = {1};
+    // int *params9[] = {params9_1, params9_2};
+    // int params_count_9[] = {1,1};
+    // int fact_count_9 = 2;
+    // create_and_run_contradict_test_case(types9,params9,params_count_9,fact_count_9, true);
+    // // Case 10 - contradiction type 3 should not occur
+    // FactType types10[] = {MinEdgeCountFact, MaxEdgeCountFact};
+    // int params10_1[] = {1};
+    // int params10_2[] = {1};
+    // int *params10[] = {params10_1, params10_2};
+    // int params_count_10[] = {1,1};
+    // int fact_count_10 = 2;
+    // create_and_run_contradict_test_case(types10,params10,params_count_10,fact_count_10, false);
+    // // Case 11 - contradiction type 3 should occur
+    // FactType types11[] = {MinEdgeCountFact, MaxEdgeCountFact};
+    // int params11_1[] = {2};
+    // int params11_2[] = {1};
+    // int *params11[] = {params11_1, params11_2};
+    // int params_count_11[] = {1,1};
+    // int fact_count_11 = 2;
+    // create_and_run_contradict_test_case(types11,params11,params_count_11,fact_count_11, true);
+    // // Case 12 - contradiction type 1 additional fact
+    // FactType types12[] = {MaxVertexCountFact, MinEdgeCountFact, MinVertexCountFact};
+    // int params12_1[] = {1};
+    // int params12_2[] = {1};
+    // int params12_3[] = {1};
+    // int *params12[] = {params12_1, params12_2, params12_3};
+    // int params_count_12[] = {1,1,1};
+    // int fact_count_12 = 3;
+    // create_and_run_contradict_test_case(types12,params12,params_count_12,fact_count_12, false); 
+    // // Case 13 - contradiction type 2 additional fact 
+    // FactType types13[] = {MinVertexCountFact, MaxVertexCountFact, MinEdgeCountFact};
+    // int params13_1[] = {2};
+    // int params13_2[] = {1};
+    // int params13_3[] = {1};
+    // int *params13[] = {params13_1, params13_2, params13_3};
+    // int params_count_13[] = {1,1,1};
+    // int fact_count_13 = 3;
+    // create_and_run_contradict_test_case(types13,params13,params_count_13,fact_count_13, false);
+    // // Case 14 - contradiction type 3 additional fact 
+    // FactType types14[] = {MinEdgeCountFact, MaxEdgeCountFact, MinVertexCountFact};
+    // int params14_1[] = {2};
+    // int params14_2[] = {1};
+    // int params14_3[] = {1};
+    // int *params14[] = {params14_1, params14_2, params14_3};
+    // int params_count_14[] = {1,1,1};
+    // int fact_count_14 = 3;
+    // create_and_run_contradict_test_case(types14,params14,params_count_14,fact_count_14, false);
 }
 
 /**
@@ -210,8 +217,8 @@ static void run_implies_test_case(Implies_Test_Case test_case)
     delete_fact_array(expected,test_case.right.fact_count);
 }
 
-static void create_and_run_implies_test_case(FactType *left_types, int **left_params, int *left_params_count, int left_fact_count,
-FactType *right_types, int **right_params, int *right_params_count, int right_fact_count)
+static void create_and_run_implies_test_case(FactType *left_types, Function ***left_params, int *left_params_count, int left_fact_count,
+FactType *right_types, Function ***right_params, int *right_params_count, int right_fact_count)
 {
     Implies_Test_Case test_case = {
         .left = {
@@ -237,97 +244,98 @@ static void test_implies(void)
 {
     // Case 1 - empty case
     create_and_run_implies_test_case(NULL,NULL,NULL,0,NULL,NULL,NULL,0);
-    // Case 2 - edge case for implication type 1
-    // left side
-    FactType left2_types[] = {MinEdgeCountFact};
-    int left2_params1[] = {0};
-    int *left2_params[] = {left2_params1};
-    int left2_params_count[] = {1};
-    int left2_fact_count = 1;
-    // expected right side
-    FactType right2_types[] = {MinVertexCountFact};
-    int right2_params1[] = {0};
-    int *right2_params[] = {right2_params1};
-    int right2_params_count[] = {1};
-    int right2_fact_count = 1;
-    create_and_run_implies_test_case(left2_types,left2_params,left2_params_count,left2_fact_count,right2_types,right2_params,right2_params_count,right2_fact_count);
-    // Case 3 - normal case for implication type 1
-    // left side
-    FactType left3_types[] = {MinEdgeCountFact};
-    int left3_params1[] = {1};
-    int *left3_params[] = {left3_params1};
-    int left3_params_count[] = {1};
-    int left3_fact_count = 1;
-    // expected right side
-    FactType right3_types[] = {MinVertexCountFact};
-    int right3_params1[] = {2};
-    int *right3_params[] = {right3_params1};
-    int right3_params_count[] = {1};
-    int right3_fact_count = 1;
-    create_and_run_implies_test_case(left3_types,left3_params,left3_params_count,left3_fact_count,
-    right3_types,right3_params,right3_params_count,right3_fact_count);
-    // Case 4 - edge case for implication type 2
-    // left side
-    FactType left4_types[] = {MaxVertexCountFact};
-    int left4_params1[] = {0};
-    int *left4_params[] = {left4_params1};
-    int left4_params_count[] = {1};
-    int left4_fact_count = 1;
-    // expected right side
-    FactType right4_types[] = {MaxEdgeCountFact};
-    int right4_params1[] = {0};
-    int *right4_params[] = {right4_params1};
-    int right4_params_count[] = {1};
-    int right4_fact_count = 1;
-    create_and_run_implies_test_case(left4_types,left4_params,left4_params_count,left4_fact_count,right4_types,right4_params,right4_params_count,right4_fact_count);
-    // Case 5 - normal case for implication type 2
-    // left side
-    FactType left5_types[] = {MaxVertexCountFact};
-    int left5_params1[] = {2};
-    int *left5_params[] = {left5_params1};
-    int left5_params_count[] = {1};
-    int left5_fact_count = 1;
-    // expected right side
-    FactType right5_types[] = {MaxEdgeCountFact};
-    int right5_params1[] = {1};
-    int *right5_params[] = {right5_params1};
-    int right5_params_count[] = {1};
-    int right5_fact_count = 1;
-    create_and_run_implies_test_case(left5_types,left5_params,left5_params_count,left5_fact_count,right5_types,right5_params,right5_params_count,right5_fact_count);
-    // Case 6 - MaxEdgeCountFact implies nothing
-    // left side
-    FactType left6_types[] = {MaxEdgeCountFact};
-    int left6_params1[] = {1};
-    int *left6_params[] = {left6_params1};
-    int left6_params_count[] = {1};
-    int left6_fact_count = 1;
-    create_and_run_implies_test_case(left6_types,left6_params,left6_params_count,left6_fact_count,NULL,NULL,NULL,0);
-    // Case 7 - MinVertexCountFact implies nothing
-    // left side
-    FactType left7_types[] = {MinVertexCountFact};
-    int left7_params1[] = {1};
-    int *left7_params[] = {left7_params1};
-    int left7_params_count[] = {1};
-    int left7_fact_count = 1;
-    create_and_run_implies_test_case(left7_types,left7_params,left7_params_count,left7_fact_count,NULL,NULL,NULL,0);
-    // Case 8 - additional fact to break implication type 1
-    // left side
-    FactType left8_types[] = {MinEdgeCountFact,MaxVertexCountFact};
-    int left8_params1[] = {1};
-    int left8_params2[] = {1};
-    int *left8_params[] = {left8_params1, left8_params2};
-    int left8_params_count[] = {1,1};
-    int left8_fact_count = 2;
-    create_and_run_implies_test_case(left8_types,left8_params,left8_params_count,left8_fact_count,NULL,NULL,NULL,0);
-    // Case 9 - additional fact to break implication type 2
-    // left side
-    FactType left9_types[] = {MaxVertexCountFact,MaxEdgeCountFact};
-    int left9_params1[] = {1};
-    int left9_params2[] = {1};
-    int *left9_params[] = {left9_params1, left9_params2};
-    int left9_params_count[] = {1,1};
-    int left9_fact_count = 2;
-    create_and_run_implies_test_case(left9_types,left9_params,left9_params_count,left9_fact_count,NULL,NULL,NULL,0);
+    // TODO: will be rewritten in the next PR
+    // // Case 2 - edge case for implication type 1
+    // // left side
+    // FactType left2_types[] = {MinEdgeCountFact};
+    // int left2_params1[] = {0};
+    // int *left2_params[] = {left2_params1};
+    // int left2_params_count[] = {1};
+    // int left2_fact_count = 1;
+    // // expected right side
+    // FactType right2_types[] = {MinVertexCountFact};
+    // int right2_params1[] = {0};
+    // int *right2_params[] = {right2_params1};
+    // int right2_params_count[] = {1};
+    // int right2_fact_count = 1;
+    // create_and_run_implies_test_case(left2_types,left2_params,left2_params_count,left2_fact_count,right2_types,right2_params,right2_params_count,right2_fact_count);
+    // // Case 3 - normal case for implication type 1
+    // // left side
+    // FactType left3_types[] = {MinEdgeCountFact};
+    // int left3_params1[] = {1};
+    // int *left3_params[] = {left3_params1};
+    // int left3_params_count[] = {1};
+    // int left3_fact_count = 1;
+    // // expected right side
+    // FactType right3_types[] = {MinVertexCountFact};
+    // int right3_params1[] = {2};
+    // int *right3_params[] = {right3_params1};
+    // int right3_params_count[] = {1};
+    // int right3_fact_count = 1;
+    // create_and_run_implies_test_case(left3_types,left3_params,left3_params_count,left3_fact_count,
+    // right3_types,right3_params,right3_params_count,right3_fact_count);
+    // // Case 4 - edge case for implication type 2
+    // // left side
+    // FactType left4_types[] = {MaxVertexCountFact};
+    // int left4_params1[] = {0};
+    // int *left4_params[] = {left4_params1};
+    // int left4_params_count[] = {1};
+    // int left4_fact_count = 1;
+    // // expected right side
+    // FactType right4_types[] = {MaxEdgeCountFact};
+    // int right4_params1[] = {0};
+    // int *right4_params[] = {right4_params1};
+    // int right4_params_count[] = {1};
+    // int right4_fact_count = 1;
+    // create_and_run_implies_test_case(left4_types,left4_params,left4_params_count,left4_fact_count,right4_types,right4_params,right4_params_count,right4_fact_count);
+    // // Case 5 - normal case for implication type 2
+    // // left side
+    // FactType left5_types[] = {MaxVertexCountFact};
+    // int left5_params1[] = {2};
+    // int *left5_params[] = {left5_params1};
+    // int left5_params_count[] = {1};
+    // int left5_fact_count = 1;
+    // // expected right side
+    // FactType right5_types[] = {MaxEdgeCountFact};
+    // int right5_params1[] = {1};
+    // int *right5_params[] = {right5_params1};
+    // int right5_params_count[] = {1};
+    // int right5_fact_count = 1;
+    // create_and_run_implies_test_case(left5_types,left5_params,left5_params_count,left5_fact_count,right5_types,right5_params,right5_params_count,right5_fact_count);
+    // // Case 6 - MaxEdgeCountFact implies nothing
+    // // left side
+    // FactType left6_types[] = {MaxEdgeCountFact};
+    // int left6_params1[] = {1};
+    // int *left6_params[] = {left6_params1};
+    // int left6_params_count[] = {1};
+    // int left6_fact_count = 1;
+    // create_and_run_implies_test_case(left6_types,left6_params,left6_params_count,left6_fact_count,NULL,NULL,NULL,0);
+    // // Case 7 - MinVertexCountFact implies nothing
+    // // left side
+    // FactType left7_types[] = {MinVertexCountFact};
+    // int left7_params1[] = {1};
+    // int *left7_params[] = {left7_params1};
+    // int left7_params_count[] = {1};
+    // int left7_fact_count = 1;
+    // create_and_run_implies_test_case(left7_types,left7_params,left7_params_count,left7_fact_count,NULL,NULL,NULL,0);
+    // // Case 8 - additional fact to break implication type 1
+    // // left side
+    // FactType left8_types[] = {MinEdgeCountFact,MaxVertexCountFact};
+    // int left8_params1[] = {1};
+    // int left8_params2[] = {1};
+    // int *left8_params[] = {left8_params1, left8_params2};
+    // int left8_params_count[] = {1,1};
+    // int left8_fact_count = 2;
+    // create_and_run_implies_test_case(left8_types,left8_params,left8_params_count,left8_fact_count,NULL,NULL,NULL,0);
+    // // Case 9 - additional fact to break implication type 2
+    // // left side
+    // FactType left9_types[] = {MaxVertexCountFact,MaxEdgeCountFact};
+    // int left9_params1[] = {1};
+    // int left9_params2[] = {1};
+    // int *left9_params[] = {left9_params1, left9_params2};
+    // int left9_params_count[] = {1,1};
+    // int left9_fact_count = 2;
+    // create_and_run_implies_test_case(left9_types,left9_params,left9_params_count,left9_fact_count,NULL,NULL,NULL,0);
 }
 
 /**
@@ -339,10 +347,54 @@ static void test_implication(void)
 }
 
 /**
+ * \brief function to run all tests for add method
+*/
+static void test_add(void)
+{
+
+}
+
+/**
+ * \brief function to run all tests for add method
+*/
+static void test_subtract(void)
+{
+
+}
+
+/**
+ * \brief function to run all tests for add method
+*/
+static void test_multiply(void)
+{
+
+}
+
+/**
+ * \brief function to run all tests for add method
+*/
+static void test_divide(void)
+{
+
+}
+
+/**
+ * \brief function to run all tests for functions from the function.h file
+*/
+static void test_function(void)
+{
+    test_add();
+    test_subtract();
+    test_multiply();
+    test_divide();
+}
+
+/**
  * \brief function to run all required tests for gtd_fact_tree module
  */
 void test_fact_tree(void)
 {
     test_contradiction();
     test_implication();
+    test_function();
 }

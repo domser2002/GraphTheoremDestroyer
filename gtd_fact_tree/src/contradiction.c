@@ -1,7 +1,7 @@
 #include "contradiction.h"
 #define KNOWN_CONTRADICTIONS_NUMBER 9
 
-typedef bool (*contradiction_occurs_fun)(int *);
+typedef bool (*contradiction_occurs_fun)(Function **);
 
 typedef struct Contradiction
 {
@@ -33,10 +33,21 @@ const Contradiction EMPTY_CONTRADICTION =
  * \param params - array of 2 integers, max vertex count and min edge count
  * \return true if contradiction occurs, false otherwise
  */
-static bool contradiction_type_1_occurs(int *params)
+static bool contradiction_type_1_occurs(Function **params)
 {
-    GTD_LOG("Checking for contradiction type 1, maxVertexCount = %d, minEdgeCount = %d", params[0],params[1]);
-    return (params[0] * (params[0] - 1) / 2) < params[1];
+    char *str1 = get_function_str(params[0]);
+    char *str2 = get_function_str(params[1]);
+    GTD_LOG("Checking for contradiction type 1, maxVertexCount = %s, minEdgeCount = %s", str1,str2);
+    gtd_free(str1);
+    gtd_free(str2);
+    Function *result;
+    result = create(0);
+    subtract_constant(params[0],1,result);
+    multiply(params[0],result,result);
+    divide_constant(result,2,result);
+    int8_t res = compare_functions(result,params[1]);
+    delete_function(result);
+    return res == -1;
 }
 
 /**
@@ -44,10 +55,14 @@ static bool contradiction_type_1_occurs(int *params)
  * \param params - array of 2 integers, min vertex count and max vertex count
  * \return true if contradiction occurs, false otherwise
  */
-static bool contradiction_type_2_occurs(int *params)
+static bool contradiction_type_2_occurs(Function **params)
 {
-    GTD_LOG("Checking for contradiction type 2, minVertexCount = %d, maxVertexCount = %d", params[0],params[1]);
-    return params[0] > params[1];
+    char *str1 = get_function_str(params[0]);
+    char *str2 = get_function_str(params[1]);
+    GTD_LOG("Checking for contradiction type 2, minVertexCount = %s, maxVertexCount = %s", str1, str2);
+    gtd_free(str1);
+    gtd_free(str2);
+    return compare_functions(params[0], params[1]) == 1;
 }
 
 /**
@@ -55,10 +70,14 @@ static bool contradiction_type_2_occurs(int *params)
  * \param params - array of 2 integers, min edge count and max edge count
  * \return true if contradiction occurs, false otherwise
  */
-static bool contradiction_type_3_occurs(int *params)
+static bool contradiction_type_3_occurs(Function **params)
 {
-    GTD_LOG("Checking for contradiction type 2, minEdgeCount = %d, maxEdgeCount = %d", params[0],params[1]);
-    return params[0] > params[1];
+    char *str1 = get_function_str(params[0]);
+    char *str2 = get_function_str(params[1]);
+    GTD_LOG("Checking for contradiction type 2, minEdgeCount = %s, maxEdgeCount = %s", str1, str2);
+    gtd_free(str1);
+    gtd_free(str2);
+    return compare_functions(params[0], params[1]) == 1;
 }
 
 /**
@@ -66,10 +85,21 @@ static bool contradiction_type_3_occurs(int *params)
  * \param params - array of 3 integers, number of partition classes (only 2 is supoorted) and their count 
  * \return true if contradiction occurs (minor actually is K_{3,3} or bigger), false otherwise
  */
-static bool contradiction_type_5_occurs(int *params)
-{
-    GTD_LOG("Checking for contradiction type 5, partitionClassesNum = %d, count1 = %d, count2 = %d", params[0], params[1], params[2]);
-    return params[0] == 2 && params[1] >= 3 && params[2] >= 3;
+static bool contradiction_type_5_occurs(Function **params) {
+    char *str1 = get_function_str(params[0]);
+    char *str2 = get_function_str(params[1]);
+    char *str3 = get_function_str(params[2]);
+    GTD_LOG("Checking for contradiction type 5, partitionClassesNum = %s, count1 = %s, count2 = %s", str1, str2, str3);
+    gtd_free(str1);
+    gtd_free(str2);
+    gtd_free(str3);
+    Function *two;
+    two = create(2); 
+    int8_t res1 = compare_functions(params[0], two);
+    int8_t res2 = compare_functions(params[1], two);
+    int8_t res3 = compare_functions(params[2], two);
+    delete_function(two);
+    return res1 == 0 && (res2 == 0 || res2 == 1) && (res3 == 0 || res3 == 1);
 }
 
 /**
@@ -77,10 +107,16 @@ static bool contradiction_type_5_occurs(int *params)
  * \param params - array of 1 integer, clique size
  * \return true if contradiction occurs (minor actually is K_{5} or bigger), false otherwise
 */
-static bool contradiction_type_6_occurs(int *params)
+static bool contradiction_type_6_occurs(Function **params)
 {
-    GTD_LOG("Checking for contradiction type 6, clique size = %d", params[0]);
-    return params[0] >= 5;
+    char *str = get_function_str(params[0]);
+    GTD_LOG("Checking for contradiction type 6, clique size = %s", str);
+    gtd_free(str);
+    Function *four;
+    four = create(4);
+    int8_t res = compare_functions(params[0],four);
+    delete_function(four);
+    return res == 1 || res == 0;
 }
 
 /**
@@ -88,7 +124,7 @@ static bool contradiction_type_6_occurs(int *params)
  * \param params - array of 1 integer, cycle size, unused
  * \return always true
 */
-static bool contradiction_type_7_occurs(int *params)
+static bool contradiction_type_7_occurs(Function **params)
 {
     GTD_UNUSED(params);
     GTD_LOG("Not checking for contradiction type 7, it always occurs");
@@ -100,10 +136,17 @@ static bool contradiction_type_7_occurs(int *params)
  * \param params - array of 2 integers, k1 meaning k1-partite graph, k2 meaning cycle length
  * \return true if bipartite and odd cycle, false otherwise
 */
-static bool contradiction_type_9_occurs(int *params)
+static bool contradiction_type_9_occurs(Function **params)
 {
-    GTD_LOG("Checking for contradiction type 9, %d-partite graph has a cycle with length %d", params[0],params[1]);
-    return params[0] == 2 && params[1] % 2 == 1;
+    char *str1 = get_function_str(params[0]);
+    char *str2 = get_function_str(params[1]);
+    GTD_LOG("Checking for contradiction type 9, %s-partite graph has a cycle with length %s", str1, str2);
+    gtd_free(str1);
+    gtd_free(str2);
+    Function *two;
+    two = create(2);
+    int8_t res = compare_functions(params[0], two);
+    return res == 0 && mod_function(params[1], 2) == 1;
 }
 
 // according to README
@@ -201,31 +244,41 @@ bool contradict(Fact **factArray, int n_facts)
             GTD_LOG("Number of facts does not match");
             continue;
         }
-        int *params = (int *)gtd_malloc(knownContradictionsArray[i].n_params * sizeof(int));
-        bool fact_types_match = true;
+        Function **params = (Function **)gtd_malloc(knownContradictionsArray[i].n_params * sizeof(Function*));
+        bool types[FACT_TYPE_NUM] = {};
         for (int j = 0; j < n_facts; j++)
         {
-            if (!knownContradictionsArray[i].types[factArray[j]->type])
+            types[factArray[j]->type] = true;
+        }
+        bool fact_types_match = true;
+        for(uint32_t j=0; j<FACT_TYPE_NUM; j++)
+        {
+            if(knownContradictionsArray[i].types[j] != types[j])
             {
                 GTD_LOG("Types of facts do not match");
                 fact_types_match = false;
                 break;
             }
-            else
+        }
+        if(!fact_types_match)
+        {
+            gtd_free(params);
+            continue;
+        }
+        for (int j = 0; j < n_facts; j++)
+        {
+            // fill params array at the correct positions
+            int param_idxs[MAX_PARAMS_IN_FACT];
+            for (int k = 0; k < MAX_PARAMS_IN_FACT; k++)
             {
-                // fill params array at the correct positions
-                int param_idxs[MAX_PARAMS_IN_FACT];
-                for (int k = 0; k < MAX_PARAMS_IN_FACT; k++)
-                {
-                    param_idxs[k] = knownContradictionsArray[i].type_to_param_idx[factArray[j]->type][k];
-                }
-                for (int k = 0; k < factArray[j]->params_count; k++)
-                {
-                    params[param_idxs[k]] = factArray[j]->params[k];
-                }
+                param_idxs[k] = knownContradictionsArray[i].type_to_param_idx[factArray[j]->type][k];
+            }
+            for (int k = 0; k < factArray[j]->params_count; k++)
+            {
+                params[param_idxs[k]] = factArray[j]->params[k];
             }
         }
-        if (fact_types_match && knownContradictionsArray[i].occurs(params))
+        if (knownContradictionsArray[i].occurs(params))
         {
             GTD_LOG("Contradiction occurs");
             return true;

@@ -6,5 +6,6 @@
 #include "fact.h"
 #include "contradiction.h"
 #include "implication.h"
+#include "function.h"
 void test_fact_tree(void);
 #endif

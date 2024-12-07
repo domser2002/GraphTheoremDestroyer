@@ -2,7 +2,7 @@
 #define KNOWN_IMPLICATIONS_NUMBER 17
 #define MAX_RIGHT_SIDE_FACTS 2
 
-typedef bool (*calc_right_side_params_fun)(int *, int *);
+typedef bool (*calc_right_side_params_fun)(Function **, Function **);
 
 typedef struct Implication_Left_Side
 {
@@ -51,12 +51,19 @@ const Implication EMPTY_IMPLICATION =
  * \brief implication type 1 - EdgeCount implies MinEdgeCount and MaxEdgeCount
  * \param left_side_params - 1 element array containing EdgeCount
  * \param right_side_params - 2 element array for MinEdgeCount and MaxEdgeCount
-*/
-bool implication_type_1_calculate_right_side_params(int *left_side_params, int *right_side_params)
+ */
+bool implication_type_1_calculate_right_side_params(Function **left_side_params, Function **right_side_params)
 {
-    right_side_params[0] = left_side_params[0];
-    right_side_params[1] = left_side_params[0];
-    GTD_LOG("Calculated that EdgeCount = %d implies minEdgeCount = %d and maxEdgeCount = %d",left_side_params[0],right_side_params[0], right_side_params[1]);
+    copy_function(left_side_params[0], &right_side_params[0]);
+    copy_function(left_side_params[0], &right_side_params[1]);
+    char *str1 = get_function_str(left_side_params[0]);
+    char *str2 = get_function_str(right_side_params[0]);
+    char *str3 = get_function_str(right_side_params[1]);
+    GTD_LOG("Calculated that EdgeCount = %s implies minEdgeCount = %s and maxEdgeCount = %s", 
+        str1, str2, str3);
+    gtd_free(str1);
+    gtd_free(str2);
+    gtd_free(str3);
     return true;
 }
 
@@ -64,12 +71,19 @@ bool implication_type_1_calculate_right_side_params(int *left_side_params, int *
  * \brief implication type 2 - VertexCount implies MinVertexCount and MaxVertexCount
  * \param left_side_params - 1 element array containing VertexCount
  * \param right_side_params - 2 element array for MinVertexCount and MaxVertexCount
-*/
-bool implication_type_2_calculate_right_side_params(int *left_side_params, int *right_side_params)
+ */
+bool implication_type_2_calculate_right_side_params(Function **left_side_params, Function **right_side_params)
 {
-    right_side_params[0] = left_side_params[0];
-    right_side_params[1] = left_side_params[0];
-    GTD_LOG("Calculated that VertexCount = %d implies minVertexCount = %d and maxVertexCount = %d",left_side_params[0],right_side_params[0], right_side_params[1]);
+    copy_function(left_side_params[0], &right_side_params[0]);
+    copy_function(left_side_params[0], &right_side_params[1]);
+    char *str1 = get_function_str(left_side_params[0]);
+    char *str2 = get_function_str(right_side_params[0]);
+    char *str3 = get_function_str(right_side_params[1]);
+    GTD_LOG("Calculated that VertexCount = %s implies minVertexCount = %s and maxVertexCount = %s",
+        str1, str2, str3);
+    gtd_free(str1);
+    gtd_free(str2);
+    gtd_free(str3);
     return true;
 }
 
@@ -77,12 +91,34 @@ bool implication_type_2_calculate_right_side_params(int *left_side_params, int *
  * \brief implication type 3 - MinEdgeCount implies MinVertexCount
  * \param left_side_params - 1 element array containing MinEdgeCount
  * \param right_side_params - 1 element array for MinVertexCount
-*/
-bool implication_type_3_calculate_right_side_params(int *left_side_params, int *right_side_params)
+ */
+bool implication_type_3_calculate_right_side_params(Function **left_side_params, Function **right_side_params)
 {
-    int m = left_side_params[0];
-    right_side_params[0] = m == 0 ? 0 : ceil((1+sqrt(1+8*m))/2);
-    GTD_LOG("Calculated that minEdgeCount = %d implies minVertexCount = %d",left_side_params[0],right_side_params[0]);
+    if (is_equal_constant_function(left_side_params[0], 0)) {
+        right_side_params[0] = create(0);
+    } else {
+        Function *eight, *one, *sqrt_result, *result;
+        eight = create(8);
+        one = create(1);
+        sqrt_result = create(0);
+        result = create(0);
+
+        multiply_constant(left_side_params[0], 8, result);
+        add_constant(result, 1, result);           
+        sqrt_function(result, sqrt_result);            
+        add_constant(sqrt_result, 1, result);           
+        divide_constant(result, 2, right_side_params[0]);
+
+        delete_function(eight);
+        delete_function(one);
+        delete_function(sqrt_result);
+        delete_function(result);
+    }
+    char *str1 = get_function_str(left_side_params[0]);
+    char *str2 = get_function_str(right_side_params[0]);
+    GTD_LOG("Calculated that minEdgeCount = %s implies minVertexCount = %s", str1, str2);
+    gtd_free(str1);
+    gtd_free(str2);
     return true;
 }
 
@@ -90,12 +126,22 @@ bool implication_type_3_calculate_right_side_params(int *left_side_params, int *
  * \brief implication type 4 - MaxVertexCount implies MaxEdgeCount
  * \param left_side_params - 1 element array containing MaxVertexCount
  * \param right_side_params - 1 element array for MaxEdgeCount
-*/
-bool implication_type_4_calculate_right_side_params(int *left_side_params, int *right_side_params)
+ */
+bool implication_type_4_calculate_right_side_params(Function **left_side_params, Function **right_side_params)
 {
-    int n = left_side_params[0];
-    right_side_params[0] = n*(n-1) / 2;
-    GTD_LOG("Calculated that maxVertexCount = %d implies maxEdgeCount = %d",left_side_params[0],right_side_params[0]);
+    Function *temp;
+    temp = create(0);
+    subtract_constant(left_side_params[0], 1, temp);
+    multiply(left_side_params[0], temp, right_side_params[0]);
+    divide_constant(right_side_params[0], 2, right_side_params[0]);
+
+    delete_function(temp);
+
+    char *str1 = get_function_str(left_side_params[0]);
+    char *str2 = get_function_str(right_side_params[0]);
+    GTD_LOG("Calculated that maxVertexCount = %s implies maxEdgeCount = %s", str1, str2);
+    gtd_free(str1);
+    gtd_free(str2);
     return true;
 }
 
@@ -104,7 +150,7 @@ bool implication_type_4_calculate_right_side_params(int *left_side_params, int *
  * \param left_side_params - 0 element array
  * \param right_side_params - 0 element array
 */
-bool implication_type_5_calculate_right_side_params(int *left_side_params, int *right_side_params)
+bool implication_type_5_calculate_right_side_params(Function **left_side_params, Function **right_side_params)
 {
     GTD_UNUSED(left_side_params);
     GTD_UNUSED(right_side_params);
@@ -117,7 +163,7 @@ bool implication_type_5_calculate_right_side_params(int *left_side_params, int *
  * \param left_side_params - 0 element array
  * \param right_side_params - 0 element array
 */
-bool implication_type_6_calculate_right_side_params(int *left_side_params, int *right_side_params)
+bool implication_type_6_calculate_right_side_params(Function **left_side_params, Function **right_side_params)
 {
     GTD_UNUSED(left_side_params);
     GTD_UNUSED(right_side_params);
@@ -126,16 +172,34 @@ bool implication_type_6_calculate_right_side_params(int *left_side_params, int *
 }
 
 /**
- * \brief implication type 8 - is tree, has no induced complete partite implies is t-nary tree
- * \param left_side_params - 3 element array, describing complete partite graph 
+ * \brief implication type 8 - Is tree, has no induced complete partite implies is t-nary tree
+ * \param left_side_params - 3 element array, describing complete partite graph
  * \param right_side_params - 1 element array for t
-*/
-bool implication_type_8_calculate_right_side_params(int *left_side_params, int *right_side_params)
+ */
+bool implication_type_8_calculate_right_side_params(Function **left_side_params, Function **right_side_params)
 {
-    if(left_side_params[0] != 2 || left_side_params[1] != 1)
+    Function *two, *one;
+    one = create(1);
+    two = create(2);
+
+    int8_t res1 = compare_functions(left_side_params[0], two);
+    int8_t res2 = compare_functions(left_side_params[1], one);
+
+    delete_function(two);
+    delete_function(one);
+
+    if (res1 != 0 || res2 != 0)
         return false;
-    right_side_params[0] = left_side_params[2] - 1;
-    GTD_LOG("Calculated that is tree and contains induced K_{%d,%d} implies is %d-nary tree",left_side_params[1],left_side_params[2],right_side_params[0]);
+
+    subtract_constant(left_side_params[2], 1, right_side_params[0]); // t = c3 - 1
+    char *str1 = get_function_str(left_side_params[1]);
+    char *str2 = get_function_str(left_side_params[2]);
+    char *str3 = get_function_str(right_side_params[0]);
+    GTD_LOG("Calculated that is tree and contains induced K_{%s,%s} implies is %s-nary tree", 
+        str1, str2, str3);
+    gtd_free(str1);
+    gtd_free(str2);
+    gtd_free(str3);
     return true;
 }
 
@@ -143,11 +207,16 @@ bool implication_type_8_calculate_right_side_params(int *left_side_params, int *
  * \brief implication type 9 - is tree, has no induced path implies max tree height
  * \param left_side_params - 1 element array, path length 
  * \param right_side_params - 1 element array for max tree height
-*/
-bool implication_type_9_calculate_right_side_params(int *left_side_params, int *right_side_params)
+ */
+bool implication_type_9_calculate_right_side_params(Function **left_side_params, Function **right_side_params)
 {
-    right_side_params[0] = left_side_params[0] - 1;
-    GTD_LOG("Calculated that is tree and contains induced P_{%d} implies is max tree is %d",left_side_params[0],right_side_params[0]);
+    subtract_constant(left_side_params[0], 1, right_side_params[0]); // max tree height = path length - 1
+    char *str1 = get_function_str(left_side_params[0]);
+    char *str2 = get_function_str(right_side_params[0]);
+    GTD_LOG("Calculated that is tree and contains induced P_{%s} implies max tree height is %s", 
+        str1, str2);
+    gtd_free(str1);
+    gtd_free(str2);
     return true;
 }
 
@@ -155,18 +224,36 @@ bool implication_type_9_calculate_right_side_params(int *left_side_params, int *
  * \brief implication type 10 - is t-nary tree with max tree height implies max vertex count
  * \param left_side_params - 2 element array, t and h
  * \param right_side_params - 1 element array for max vertex count
-*/
-bool implication_type_10_calculate_right_side_params(int *left_side_params, int *right_side_params)
+ */
+bool implication_type_10_calculate_right_side_params(Function **left_side_params, Function **right_side_params)
 {
-    int t = left_side_params[0];
-    int h = left_side_params[1];
-    // (t^h-1)/(t-1)
-    int n = 1;
-    for(int i=0;i<h;i++)
-        n *= t;
-    n = (n-1)/(t-1);
-    right_side_params[0] = n;
-    GTD_LOG("Calculated that is %d-nary tree with max height = %d implies is max vertex count = %d",t,h,n);
+    Function *n, *t_minus_one, *zero;
+    n = create(1);
+    zero = create(0);
+    t_minus_one = create(0);
+
+    // t^h
+    Function *i = NULL;
+    copy_function(left_side_params[1], &i);
+    for (; compare_functions(i, zero) == 1; subtract_constant(i, 1, i)) {
+        multiply(n, left_side_params[0], n);
+    }
+
+    subtract_constant(left_side_params[0], 1, t_minus_one); // t - 1
+    subtract_constant(n, 1, n);                           // t^h - 1
+    divide(n, t_minus_one, right_side_params[0]);         // (t^h - 1) / (t - 1)
+    char *str1 = get_function_str(left_side_params[0]);
+    char *str2 = get_function_str(left_side_params[1]);
+    char *str3 = get_function_str(right_side_params[0]);
+    GTD_LOG("Calculated that is %s-nary tree with max height = %s implies max vertex count = %s", 
+        str1, str2, str3);
+    gtd_free(str1);
+    gtd_free(str2);
+    gtd_free(str3);
+    delete_function(n);
+    delete_function(t_minus_one);
+    delete_function(zero);
+
     return true;
 }
 
@@ -174,13 +261,35 @@ bool implication_type_10_calculate_right_side_params(int *left_side_params, int 
  * \brief implication type 11 - no K_{3,3} and K_{5} as minors implies is planar
  * \param left_side_params - 4 element array, describing complete partite graph and clique size
  * \param right_side_params - 0 element array
-*/
-bool implication_type_11_calculate_right_side_params(int *left_side_params, int *right_side_params)
+ */
+bool implication_type_11_calculate_right_side_params(Function **left_side_params, Function **right_side_params)
 {
     GTD_UNUSED(right_side_params);
-    if(left_side_params[0] != 2 || left_side_params[1] > 3 || left_side_params[2] > 3 || left_side_params[3] > 5)
+
+    Function *two, *three, *five;
+    two = create(2);
+    three = create(3);
+    five = create(5);
+
+    int8_t res1 = compare_functions(left_side_params[0], two);
+    int8_t res2 = compare_functions(left_side_params[1], three);
+    int8_t res3 = compare_functions(left_side_params[2], three);
+    int8_t res4 = compare_functions(left_side_params[3], five);
+
+    delete_function(two);
+    delete_function(three);
+    delete_function(five);
+
+    if (res1 != 0 || res2 == 1 || res3 == 1 || res4 == 1)
         return false;
-    GTD_LOG("Checked that does not contain K_{%d,%d} and K_{%d} implies is planar",left_side_params[1],left_side_params[2],left_side_params[3]);
+    char *str1 = get_function_str(left_side_params[1]);
+    char *str2 = get_function_str(left_side_params[2]);
+    char *str3 = get_function_str(left_side_params[3]);
+    GTD_LOG("Checked that does not contain K_{%s,%s} and K_{%s} implies is planar", 
+        str1, str2, str3);
+    gtd_free(str1);
+    gtd_free(str2);
+    gtd_free(str3);
     return true;
 }
 
@@ -188,13 +297,23 @@ bool implication_type_11_calculate_right_side_params(int *left_side_params, int 
  * \brief implication type 14 - cycle complement graphs with n <= 6 are planar
  * \param left_side_params - 1 element array, max vertex count
  * \param right_side_params - 0 element array
-*/
-bool implication_type_14_calculate_right_side_params(int *left_side_params, int *right_side_params)
+ */
+bool implication_type_14_calculate_right_side_params(Function **left_side_params, Function **right_side_params)
 {
     GTD_UNUSED(right_side_params);
-    if(left_side_params[0] > 6)
+
+    Function *six;
+    six = create(6);
+
+    int8_t res = compare_functions(left_side_params[0], six);
+
+    delete_function(six);
+
+    if (res == 1) // n > 6
         return false;
-    GTD_LOG("Checked that cycle complement graph with %d vertices is planar",left_side_params[0]);
+    char *str = get_function_str(left_side_params[0]);
+    GTD_LOG("Checked that cycle complement graph with %s vertices is planar", str);
+    gtd_free(str);
     return true;
 }
 
@@ -202,14 +321,28 @@ bool implication_type_14_calculate_right_side_params(int *left_side_params, int 
  * \brief implication type 15 - cycle complement graph with n = 7 contains K_{3,3} as minor
  * \param left_side_params - 1 element array, vertex count
  * \param right_side_params - 3 element array, describing complete partite graph
-*/
-bool implication_type_15_calculate_right_side_params(int *left_side_params, int *right_side_params)
+ */
+bool implication_type_15_calculate_right_side_params(Function **left_side_params, Function **right_side_params)
 {
-    if(left_side_params[0] != 7)
+    Function *seven, *two, *three;
+    seven = create(7);
+    two = create(2);
+    three = create(3);
+
+    int8_t res = compare_functions(left_side_params[0], seven);
+
+    delete_function(seven);
+
+    if (res != 0) // n != 7
         return false;
-    right_side_params[0] = 2;
-    right_side_params[1] = 3;
-    right_side_params[2] = 3;
+
+    copy_function(two, &right_side_params[0]);
+    copy_function(three, &right_side_params[1]);
+    copy_function(three, &right_side_params[2]);
+
+    delete_function(two);
+    delete_function(three);
+
     GTD_LOG("Cycle complement graph with 7 vertices contains K_{3,3}");
     return true;
 }
@@ -386,7 +519,7 @@ Fact **implies(Fact **factArray, int n_facts, int *count)
             GTD_LOG("Number of left side facts does not match");
             continue;
         }
-        int *params = (int *)gtd_malloc(knownImplicationsArray[i].left_side.n_params * sizeof(int));
+        Function **params = (Function **)gtd_malloc(knownImplicationsArray[i].left_side.n_params * sizeof(Function*));
         bool fact_types_match = true;
         for (int j = 0; j < n_facts; j++)
         {
@@ -410,7 +543,9 @@ Fact **implies(Fact **factArray, int n_facts, int *count)
         if(fact_types_match)
         {
             GTD_LOG("Implication occurs");
-            int *right_side_params = (int*)gtd_malloc(knownImplicationsArray[i].right_side.n_params * sizeof(int));
+            Function **right_side_params = (Function **)gtd_malloc(knownImplicationsArray[i].right_side.n_params * sizeof(Function *));
+            for(uint8_t i=0; i<knownImplicationsArray[i].right_side.n_params; i++)
+                right_side_params[i] = (Function*)gtd_malloc(sizeof(Function*));
             knownImplicationsArray[i].calculate_params(params,right_side_params);
             *count = knownImplicationsArray[i].right_side.n_facts;
             Fact **right_side_facts = (Fact**)gtd_malloc(*count * sizeof(Fact*));
@@ -419,7 +554,7 @@ Fact **implies(Fact **factArray, int n_facts, int *count)
             {
                 FactType type = knownImplicationsArray[i].right_side.types[k];
                 int n_params = get_param_count(type);
-                int *fact_params = (int*)gtd_malloc(n_params * sizeof(int));
+                Function **fact_params = (Function **)gtd_malloc(n_params * sizeof(Function *));
                 for(int s=0;s<n_params;s++)
                 {
                     fact_params[s] = right_side_params[counter++];

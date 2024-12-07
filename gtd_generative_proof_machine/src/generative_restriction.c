@@ -548,7 +548,8 @@ RestrictionResult *min_degree_condition(Graph *graph, RestrictionParameters *par
     ProofTree *proofTree = get_machine_proof_tree(params->machine);
 
     
-    for(int i = 0; i < n; ++i)
+    // for(int i = 0; i < n; ++i)
+    for(int i = n-1; i > 0; --i)
     {
         int numUnknown = 0;
         int numConnected = 0;

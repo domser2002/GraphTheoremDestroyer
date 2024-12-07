@@ -48,7 +48,7 @@ int destroy_generative_proof_machine(GenerativeProofMachine *machine)
  * \param machine pointer to the GenerativeProofMachine to execute
  * \returns 1 if contradictionw was found, 0 otherwise
  */
-int execute_generative_proof_machine(GenerativeProofMachine *machine)
+uint8_t execute_generative_proof_machine(GenerativeProofMachine *machine)
 {
     int i = 0;
     while (i < machine->numRestrictions)

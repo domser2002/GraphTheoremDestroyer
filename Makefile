@@ -9,7 +9,7 @@ CFLAGS = -std=c99 -fstrict-aliasing -fstack-protector -ftrack-macro-expansion=0 
 LFLAGS = -lm
 
 # Paths
-C_INCLUDE_PATH = gtd_fact_tree/inc:gtd_common/inc:gtd_physical_graph/inc:gtd_generative_proof_machine/inc
+C_INCLUDE_PATH = gtd_fact_tree/inc:gtd_common/inc:gtd_generative_proof_machine/inc
 BIN_PATH = build/bin
 OBJ_PATH = build/obj
 
@@ -27,18 +27,16 @@ SRC_GTD_COMMON = \
 	gtd_common/src/common.c \
 	gtd_common/src/log.c
 
-SRC_GTD_PHYSICAL_GRAPH = \
-	gtd_physical_graph/src/physical_graph.c
-
 SRC_GTD_GENERATIVE_PROOF_MACHINE = \
 	gtd_generative_proof_machine/src/generative_proof_machine.c \
 	gtd_generative_proof_machine/src/generative_restriction.c \
-	gtd_generative_proof_machine/src/proof_tree.c
+	gtd_generative_proof_machine/src/proof_tree.c \
+	gtd_generative_proof_machine/src/physical_graph.c
 
 SRC_TEST = \
 	gtd_test/unit_test.c \
 	gtd_fact_tree/src/test_fact_tree.c \
-	gtd_physical_graph/src/test_physical_graph.c \
+	gtd_generative_proof_machine/src/test_physical_graph.c \
 	gtd_generative_proof_machine/src/test_generative_proof_machine.c
 
 # Object files
@@ -110,7 +108,7 @@ $(OBJ_PATH)/log.o: gtd_common/src/log.c
 	C_INCLUDE_PATH=$(C_INCLUDE_PATH) $(CC) $(CFLAGS) -c $< -o $@
 
 # Compile gtd_physical_graph sources
-$(OBJ_PATH)/physical_graph.o: gtd_physical_graph/src/physical_graph.c
+$(OBJ_PATH)/physical_graph.o: gtd_generative_proof_machine/src/physical_graph.c
 	C_INCLUDE_PATH=$(C_INCLUDE_PATH) $(CC) $(CFLAGS) -c $< -o $@
 
 # Compile gtd_generative_proof_machine sources
@@ -137,7 +135,7 @@ $(OBJ_PATH)/unit_test.o: gtd_test/unit_test.c
 $(OBJ_PATH)/test_fact_tree.o: gtd_fact_tree/src/test_fact_tree.c
 	C_INCLUDE_PATH=$(C_INCLUDE_PATH) $(CC) $(CFLAGS) -c $< -o $@
 
-$(OBJ_PATH)/test_physical_graph.o: gtd_physical_graph/src/test_physical_graph.c
+$(OBJ_PATH)/test_physical_graph.o: gtd_generative_proof_machine/src/test_physical_graph.c
 	C_INCLUDE_PATH=$(C_INCLUDE_PATH) $(CC) $(CFLAGS) -c $< -o $@
 
 $(OBJ_PATH)/test_generative_proof_machine.o: gtd_generative_proof_machine/src/test_generative_proof_machine.c

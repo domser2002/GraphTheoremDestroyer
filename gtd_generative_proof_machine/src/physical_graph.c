@@ -17,6 +17,8 @@ struct Graph
     int is_maximal;
 };
 
+static int int_pow(int base, int exp);
+
 Graph *create_graph(int max_vertices, int vertices)
 {
     Graph *newGraph = (Graph *)gtd_malloc(sizeof(Graph));
@@ -187,7 +189,7 @@ char **create_matrix(int rows, int cols)
     return matrix;
 }
 
-int int_pow(int base, int exp)
+static int int_pow(int base, int exp)
 {
     int res = 1;
     for(int i = 0; i < exp; ++i)

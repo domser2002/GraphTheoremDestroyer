@@ -4,7 +4,6 @@
 #include "common.h"
 #include "physical_graph.h"
 #include "proof_tree.h"
-#include "generative_proof_machine.h"
 
 
 typedef struct GraphNode GraphNode;
@@ -15,7 +14,7 @@ typedef struct GenerativeRestriction GenerativeRestriction;
 typedef struct GenerativeProofMachine GenerativeProofMachine;
 GenerativeProofMachine *create_proof_machine(int num_restrictions, Graph *startGraph);
 int destroy_generative_proof_machine(GenerativeProofMachine *machine);
-int execute_generative_proof_machine(GenerativeProofMachine *machine);
+uint8_t execute_generative_proof_machine(GenerativeProofMachine *machine);
 void set_machine_depth(GenerativeProofMachine *machine, int depth);
 int get_machine_depth(GenerativeProofMachine *machine);
 Graph *get_machine_graph(GenerativeProofMachine *machine);

@@ -19,8 +19,8 @@ typedef struct PathNode
 
 typedef struct RestrictionResult
 {
-    int modified;
-    int contradictionFound;
+    uint8_t modified;
+    uint8_t contradictionFound;
 } RestrictionResult;
 
 typedef struct RestrictionParameters

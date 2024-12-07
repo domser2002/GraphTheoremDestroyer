@@ -8,4 +8,6 @@ void *gtd_malloc(size_t size);
 void *gtd_calloc(size_t nmemb, size_t size);
 void *gtd_realloc(void *ptr, size_t size);
 void gtd_free(void *ptr);
+
+void printProgressBar(int progress, int total);
 #endif

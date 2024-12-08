@@ -1,6 +1,6 @@
 #include "function.h"
 
-Function *create(int32_t c)
+Function *create_function(int32_t c)
 {
     Function *f = (Function*)gtd_malloc(sizeof(Function));
     f->c = c;
@@ -9,64 +9,72 @@ Function *create(int32_t c)
 
 void delete_function(Function *f)
 {
+    if(f == NULL) 
+        return;
     gtd_free(f);
 }
 
-void add(const Function *const f1, const Function *const f2, Function *result)
+Function *add_functions(const Function *const f1, const Function *const f2)
 {
-    result->c = f1->c + f2->c;
+    return create_function(f1->c + f2->c);
 }
 
-void add_constant(const Function *const f, const int32_t c, Function *result)
+void add_constant(Function *f, const int32_t c)
 {
-    result->c = f->c + c;
+    f->c += c;
 }
 
-void subtract(const Function *const f1, const Function *const f2, Function *result)
+Function *subtract_functions(const Function *const f1, const Function *const f2)
 {
-    result->c = f1->c - f2->c;
+    return create_function(f1->c - f2->c);
 }
 
-void subtract_constant(const Function *const f, const int32_t c, Function *result)
+void subtract_constant(Function *f, const int32_t c)
 {
-    if(result == NULL)
-    {
-        result = (Function*)gtd_malloc(sizeof(Function));
-    }
-    result->c = f->c - c;
+    f->c -= c;
 }
 
-void multiply(const Function *const f1, const Function *const f2, Function *result)
+Function *multiply_functions(const Function *const f1, const Function *const f2)
 {
-    result->c = f1->c * f2->c;
+    return create_function(f1->c * f2->c);
 }
 
-void multiply_constant(const Function *const f, const int32_t c, Function *result)
+void multiply_constant(Function *f, const int32_t c)
 {
-    result->c = f->c * c;
+    f->c *= c;
 }
 
-void divide(const Function *const f1, const Function *const f2, Function *result)
+Function *divide_functions(const Function *const f1, const Function *const f2)
 {
-    result->c = f1->c / f2->c;
+    if(is_equal_constant_function(f2, 0))
+        return NULL;
+    return create_function(f1->c / f2->c);
 }
 
-void divide_constant(const Function *const f, const int32_t c, Function *result)
+int8_t divide_constant(Function *f, const int32_t c)
 {
-    result->c = f->c / c;
+    if(c == 0)
+        return OP_NOT_POSSIBLE;
+    f->c /= c;
+    return 0;
 }
 
-int8_t mod_function(const Function *const f, const int8_t c)
+int32_t mod_function(const Function *const f, const int32_t c)
 {
     return f->c % c;
 }
 
-void sqrt_function(const Function *const f, Function *result) {
-    result->c = (int32_t)sqrt(f->c);
+Function *sqrt_function(const Function *const f) {
+    return create_function((int32_t)sqrt(f->c));
 }
 
 int8_t compare_functions(const Function *const f1, const Function *const f2)
 {
+    if(f1 == NULL)
+        return f2 == NULL ? 0 : NULL_ARGUMENT;
+    if(f2 == NULL)
+        return NULL_ARGUMENT;
+
     if(f1->c > f2->c) 
         return 1;
     if(f1->c == f2->c)
@@ -97,6 +105,6 @@ char *get_function_str(const Function *const f)
     return result;
 }
 
-void copy_function(const Function *src, Function **dest) {
-    *dest = create(src->c);
+Function *copy_function(const Function *const f) {
+    return create_function(f->c);
 }

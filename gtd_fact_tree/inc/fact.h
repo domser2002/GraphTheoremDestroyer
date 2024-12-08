@@ -9,6 +9,7 @@
 #include "function.h"
 #define FACT_TYPE_NUM 39
 #define MAX_PARAMS_IN_FACT 3
+#define MAX_FACT_STR_LEN 128
 typedef enum FactType
 {
     IsConnectedFact = 0,
@@ -55,9 +56,9 @@ typedef enum FactType
 typedef struct Fact Fact;
 
 Fact *create_fact(FactType type, Function **params, int params_count);
-int delete_fact(Fact *fact);
+void delete_fact(Fact *fact);
 
-int get_param_count(FactType type);
+uint8_t get_param_count(FactType type);
 
 char *get_fact_str(Fact *fact);
 

@@ -10,13 +10,13 @@ Fact **generate_facts(int *count)
     *count = 5;
     Fact **factArray = gtd_malloc(*count * sizeof(Fact*));
     Function *params_2[3];
-    params_2[0] = create(2);
-    params_2[1] = create(1);
-    params_2[2] = create(3);
+    params_2[0] = create_function(2);
+    params_2[1] = create_function(1);
+    params_2[2] = create_function(3);
     Function *params_3[1];
-    params_3[0] = create(4);
+    params_3[0] = create_function(4);
     Function *params_4[1];
-    params_4[0] = create(8);
+    params_4[0] = create_function(8);
     factArray[0] = create_fact(HasNoCyclesFact,NULL,0);
     factArray[1] = create_fact(HasNoInducedCompletePartiteFact,params_2,3);
     factArray[2] = create_fact(HasNoInducedPathFact,params_3,1);

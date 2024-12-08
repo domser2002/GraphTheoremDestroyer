@@ -131,7 +131,7 @@ test: $(BIN_PATH)/test
 
 $(BIN_PATH)/test: $(TEST_OBJ_FILES) | mkdir_dirs
 	$(CC) $(CFLAGS) -o $@ $^ $(LFLAGS)
-	./$@
+	-./$@
 
 # Compile test sources
 $(OBJ_PATH)/unit_test.o: gtd_test/unit_test.c

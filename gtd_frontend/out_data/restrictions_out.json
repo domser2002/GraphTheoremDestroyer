@@ -1,0 +1,14 @@
+[
+    {
+        "name": "No k cycle",
+        "int_params_values": [
+            "3"
+        ]
+    },
+    {
+        "name": "Min degree",
+        "int_params_values": [
+            "5"
+        ]
+    }
+]

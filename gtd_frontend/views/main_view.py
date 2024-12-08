@@ -3,7 +3,7 @@ from views.proof_details_view import ProofDetailsView
 from views.run_machine_view import RunMachineView
 
 class MainView(CTkFrame):
-    def __init__(self, master):
+    def __init__(self, master, restriction_controller):
         super().__init__(master)
 
         self.grid_rowconfigure(0, weight=1)
@@ -17,8 +17,6 @@ class MainView(CTkFrame):
 
         top_frame.grid_columnconfigure(0, weight=1)
 
-        self.button = RunMachineView(top_frame)
-        self.button.grid(row=0, column=0, padx=10)
 
         self.tabview = CTkTabview(top_frame)
         self.tabview.grid(row=1, column=0, sticky="nsew")
@@ -30,8 +28,11 @@ class MainView(CTkFrame):
         proof_details_tab.grid_rowconfigure(0, weight=1)
         proof_details_tab.grid_columnconfigure(0, weight=1)
 
-        proof_details_view = ProofDetailsView(proof_details_tab)
+        proof_details_view = ProofDetailsView(proof_details_tab, restriction_controller)
         proof_details_view.grid(row=0, column=0, sticky="nsew")
+
+        self.button = RunMachineView(top_frame, proof_details_view.restrictions_input_view)
+        self.button.grid(row=0, column=0, padx=10)
 
         natural_language_tab = self.tabview.tab("Proof in natural language")
         label2 = CTkLabel(natural_language_tab, text="Natural language explanation")

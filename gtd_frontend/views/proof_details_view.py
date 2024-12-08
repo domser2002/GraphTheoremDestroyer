@@ -4,7 +4,7 @@ from views.restrictions_input_view import RestrictionsInputView
 import os
 
 class ProofDetailsView(CTkFrame):
-    def __init__(self, master):
+    def __init__(self, master, restriction_controller):
         super().__init__(master)
 
         self.grid_rowconfigure(0, weight=1)
@@ -15,5 +15,5 @@ class ProofDetailsView(CTkFrame):
         start_graph_input = GraphInputView(self, graph_save_path)
         start_graph_input.grid(row=0, column=0, sticky='nsew', padx=10, pady=(10, 5))
 
-        restrictions_input_view = RestrictionsInputView(self)
-        restrictions_input_view.grid(row=0, column=1, sticky='nsew', padx=10, pady=(10, 5))
+        self.restrictions_input_view = RestrictionsInputView(self, restriction_controller)
+        self.restrictions_input_view.grid(row=0, column=1, sticky='nsew', padx=10, pady=(10, 5))

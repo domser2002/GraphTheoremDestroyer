@@ -1,11 +1,15 @@
-from customtkinter import CTkFrame, CTkLabel
+from customtkinter import CTkFrame, CTkLabel, CTkButton
 
 class RunMachineView(CTkFrame):
-    def __init__(self, master):
+    def __init__(self, master, restrictions_input_view):
         super().__init__(master)
+        self.restrictions_input_view = restrictions_input_view
 
-        self.grid_rowconfigure(0, weight=1)
-        self.grid_columnconfigure(0, weight=1)
+        self.run_button = CTkButton(self, 
+                                    text='RUN', 
+                                    fg_color=('white', 'green'),
+                                    command=self.run_machine)
+        self.run_button.pack(side='right')
 
-        left_label = CTkLabel(self, text="run machine content")
-        left_label.grid(row=0, column=0, sticky="nsew", padx=10, pady=10)
+    def run_machine(self):
+        self.restrictions_input_view.write_data()

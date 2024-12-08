@@ -7,9 +7,9 @@ typedef struct Contradiction
 {
     bool types[FACT_TYPE_NUM];
     contradiction_occurs_fun occurs;
-    int n_facts;
-    int n_params;
-    int type_to_param_idx[FACT_TYPE_NUM][MAX_PARAMS_IN_FACT];
+    uint32_t n_facts;
+    uint8_t n_params;
+    uint8_t type_to_param_idx[FACT_TYPE_NUM][MAX_PARAMS_IN_FACT];
 } Contradiction;
 
 const Contradiction EMPTY_CONTRADICTION = 
@@ -40,11 +40,10 @@ static bool contradiction_type_1_occurs(Function **params)
     GTD_LOG("Checking for contradiction type 1, maxVertexCount = %s, minEdgeCount = %s", str1,str2);
     gtd_free(str1);
     gtd_free(str2);
-    Function *result;
-    result = create(0);
-    subtract_constant(params[0],1,result);
-    multiply(params[0],result,result);
-    divide_constant(result,2,result);
+    Function *result = copy_function(params[0]);
+    subtract_constant(result, 1);
+    result = multiply_functions(params[0],result);
+    divide_constant(result,2);
     int8_t res = compare_functions(result,params[1]);
     delete_function(result);
     return res == -1;
@@ -94,12 +93,12 @@ static bool contradiction_type_5_occurs(Function **params) {
     gtd_free(str2);
     gtd_free(str3);
     Function *two;
-    two = create(2); 
+    two = create_function(2); 
     int8_t res1 = compare_functions(params[0], two);
     int8_t res2 = compare_functions(params[1], two);
     int8_t res3 = compare_functions(params[2], two);
     delete_function(two);
-    return res1 == 0 && (res2 == 0 || res2 == 1) && (res3 == 0 || res3 == 1);
+    return res1 == 0 && res2 == 1 && res3 == 1;
 }
 
 /**
@@ -113,10 +112,10 @@ static bool contradiction_type_6_occurs(Function **params)
     GTD_LOG("Checking for contradiction type 6, clique size = %s", str);
     gtd_free(str);
     Function *four;
-    four = create(4);
+    four = create_function(4);
     int8_t res = compare_functions(params[0],four);
     delete_function(four);
-    return res == 1 || res == 0;
+    return res == 1;
 }
 
 /**
@@ -144,7 +143,7 @@ static bool contradiction_type_9_occurs(Function **params)
     gtd_free(str1);
     gtd_free(str2);
     Function *two;
-    two = create(2);
+    two = create_function(2);
     int8_t res = compare_functions(params[0], two);
     return res == 0 && mod_function(params[1], 2) == 1;
 }
@@ -228,7 +227,7 @@ const Contradiction knownContradictionsArray[KNOWN_CONTRADICTIONS_NUMBER] = {
  * \param n_facts number of facts in array, should be <= MAX_CONTRADICTING_FACTS
  * \return true if facts are in one of the predefined contradictions, false otherwise
  */
-bool contradict(Fact **factArray, int n_facts)
+bool contradict(Fact **factArray, uint32_t n_facts)
 {
     GTD_LOG("Checking if array of %d facts forms a known contradiction",n_facts);
     if (n_facts > MAX_CONTRADICTING_FACTS)
@@ -236,7 +235,12 @@ bool contradict(Fact **factArray, int n_facts)
         GTD_LOG("No contradiction - too many facts");
         return false;
     }
-    for (int i = 0; i < KNOWN_CONTRADICTIONS_NUMBER; i++)
+    if(n_facts < MIN_CONTRADICTING_FACTS)
+    {
+        GTD_LOG("No contradiction - not enough facts");
+        return false;
+    }
+    for (uint32_t i = 0; i < KNOWN_CONTRADICTIONS_NUMBER; i++)
     {
         GTD_LOG("Checking contradiction number %d", i+1);
         if (n_facts != knownContradictionsArray[i].n_facts)
@@ -246,7 +250,7 @@ bool contradict(Fact **factArray, int n_facts)
         }
         Function **params = (Function **)gtd_malloc(knownContradictionsArray[i].n_params * sizeof(Function*));
         bool types[FACT_TYPE_NUM] = {};
-        for (int j = 0; j < n_facts; j++)
+        for (uint32_t j = 0; j < n_facts; j++)
         {
             types[factArray[j]->type] = true;
         }
@@ -265,15 +269,15 @@ bool contradict(Fact **factArray, int n_facts)
             gtd_free(params);
             continue;
         }
-        for (int j = 0; j < n_facts; j++)
+        for (uint32_t j = 0; j < n_facts; j++)
         {
             // fill params array at the correct positions
-            int param_idxs[MAX_PARAMS_IN_FACT];
-            for (int k = 0; k < MAX_PARAMS_IN_FACT; k++)
+            uint8_t param_idxs[MAX_PARAMS_IN_FACT];
+            for (uint8_t k = 0; k < MAX_PARAMS_IN_FACT; k++)
             {
                 param_idxs[k] = knownContradictionsArray[i].type_to_param_idx[factArray[j]->type][k];
             }
-            for (int k = 0; k < factArray[j]->params_count; k++)
+            for (uint8_t k = 0; k < factArray[j]->params_count; k++)
             {
                 params[param_idxs[k]] = factArray[j]->params[k];
             }

@@ -585,7 +585,20 @@ static void test_implies(void)
     // Case 9 - implication type 7
     // IMPLICATION NOT IMPLEMENTED 
     // Case 10 - implication type 8
-    // IMPLICATiON TO BE CHANGED IN THE NEXT PR
+    left_types2[0] = IsTreeFact;
+    left_types2[1] = HasNoInducedCompletePartiteFact; 
+    left_params2_3[0] = create_function(2);
+    left_params2_3[1] = create_function(1);
+    left_params2_3[2] = create_function(3);
+    left_params2[0] = NULL;
+    left_params2[1] = left_params2_3;
+    left_param_count2[0] = 0;
+    left_param_count2[1] = 3;
+    right_types1[0] = IstnaryTreeFact;
+    right_params1_1[0] = create_function(1);
+    right_params1[0] = right_params1_1;
+    right_param_count1[0] = 1;
+    create_and_run_implies_test_case(left_types2, left_params2, left_param_count2, 2, right_types1, right_params1, right_param_count1, 1);
     // Case 11 - implication type 9
     left_types2[0] = IsTreeFact;
     left_types2[1] = HasNoInducedPathFact; 
@@ -599,7 +612,7 @@ static void test_implies(void)
     right_params1[0] = right_params1_1;
     right_param_count1[0] = 1;
     create_and_run_implies_test_case(left_types2, left_params2, left_param_count2, 2, right_types1, right_params1, right_param_count1, 1);
-    // Case 12 - implication type 10
+    // Case - implication type 10
     left_types2[0] = IstnaryTreeFact;
     left_types2[1] = MaxTreeHeightFact; 
     left_params1_1[0] = create_function(2);
@@ -610,6 +623,20 @@ static void test_implies(void)
     left_param_count2[1] = 1;
     right_types1[0] = MaxVertexCountFact;
     right_params1_1[0] = create_function(3);
+    right_params1[0] = right_params1_1;
+    right_param_count1[0] = 1;
+    create_and_run_implies_test_case(left_types2, left_params2, left_param_count2, 2, right_types1, right_params1, right_param_count1, 1);
+    // Case - implication type 10 edge case
+    left_types2[0] = IstnaryTreeFact;
+    left_types2[1] = MaxTreeHeightFact; 
+    left_params1_1[0] = create_function(1);
+    left_params2[0] = left_params1_1;
+    left_params2_1[0] = create_function(2);
+    left_params2[1] = left_params2_1;
+    left_param_count2[0] = 1;
+    left_param_count2[1] = 1;
+    right_types1[0] = MaxVertexCountFact;
+    right_params1_1[0] = create_function(2);
     right_params1[0] = right_params1_1;
     right_param_count1[0] = 1;
     create_and_run_implies_test_case(left_types2, left_params2, left_param_count2, 2, right_types1, right_params1, right_param_count1, 1);
@@ -974,7 +1001,7 @@ static void test_fact(void)
     create_fact_and_run_get_fact_str_test(str, HasNoCyclesFact, 0);
     sprintf(str, "Graph is a 2-nary tree");
     create_fact_and_run_get_fact_str_test(str, IstnaryTreeFact, 1, create_function(2));
-    sprintf(str, "Graph is a 1-nary tree");
+    sprintf(str, "Graph is a path");
     create_fact_and_run_get_fact_str_test(str, IstnaryTreeFact, 1, create_function(1));
     sprintf(str, "Graph is 2-partite");
     create_fact_and_run_get_fact_str_test(str, IsPartiteFact, 1, create_function(2));

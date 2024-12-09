@@ -12,7 +12,7 @@ Fact **generate_facts(int *count)
     Function *params_2[3];
     params_2[0] = create_function(2);
     params_2[1] = create_function(1);
-    params_2[2] = create_function(3);
+    params_2[2] = create_function(4);
     Function *params_3[1];
     params_3[0] = create_function(4);
     Function *params_4[1];

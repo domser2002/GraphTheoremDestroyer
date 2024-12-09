@@ -184,7 +184,7 @@ bool implication_type_8_calculate_right_side_params(Function **left_side_params,
     if (res1 != 0 || res2 != 0)
         return false;
     right_side_params[0] = copy_function(left_side_params[2]);
-    subtract_constant(right_side_params[0], 1);
+    subtract_constant(right_side_params[0], 2);
     char *str1 = get_function_str(left_side_params[1]);
     char *str2 = get_function_str(left_side_params[2]);
     char *str3 = get_function_str(right_side_params[0]);
@@ -221,21 +221,31 @@ bool implication_type_9_calculate_right_side_params(Function **left_side_params,
  */
 bool implication_type_10_calculate_right_side_params(Function **left_side_params, Function **right_side_params)
 {
-    Function *th_minus_one, *t_minus_one;
-
-    // t^h
-    th_minus_one = create_function(1);
-    Function *i = NULL;
-    i = copy_function(left_side_params[1]);
-    for (; !is_equal_constant_function(i, 0); subtract_constant(i, 1))
+    if(is_equal_constant_function(left_side_params[0], 1))
     {
-        th_minus_one = multiply_functions(th_minus_one, left_side_params[0]);
+        right_side_params[0] = copy_function(left_side_params[1]);
     }
+    else
+    {
+        Function *th_minus_one, *t_minus_one;
 
-    t_minus_one = copy_function(left_side_params[0]);
-    subtract_constant(t_minus_one, 1);                        // t - 1
-    subtract_constant(th_minus_one, 1);                       // t^h - 1
-    right_side_params[0] = divide_functions(th_minus_one, t_minus_one); // (t^h - 1) / (t - 1)
+        // t^h
+        th_minus_one = create_function(1);
+        Function *i = NULL;
+        i = copy_function(left_side_params[1]);
+        for (; !is_equal_constant_function(i, 0); subtract_constant(i, 1))
+        {
+            th_minus_one = multiply_functions(th_minus_one, left_side_params[0]);
+        }
+
+        t_minus_one = copy_function(left_side_params[0]);
+        subtract_constant(t_minus_one, 1);                        // t - 1
+        subtract_constant(th_minus_one, 1);                       // t^h - 1
+        right_side_params[0] = divide_functions(th_minus_one, t_minus_one); // (t^h - 1) / (t - 1)
+
+        delete_function(th_minus_one);
+        delete_function(t_minus_one);
+    }
     char *str1 = get_function_str(left_side_params[0]);
     char *str2 = get_function_str(left_side_params[1]);
     char *str3 = get_function_str(right_side_params[0]);
@@ -244,9 +254,6 @@ bool implication_type_10_calculate_right_side_params(Function **left_side_params
     gtd_free(str1);
     gtd_free(str2);
     gtd_free(str3);
-    delete_function(th_minus_one);
-    delete_function(t_minus_one);
-
     return true;
 }
 

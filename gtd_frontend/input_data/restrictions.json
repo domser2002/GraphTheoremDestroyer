@@ -1,0 +1,21 @@
+[
+    {
+        "id": 0,
+        "name": "No k cycle",
+        "int_params": ["k"]
+    },
+    {
+        "id": 1,
+        "name": "No induced k path",
+        "int_params": ["k"]
+    },
+    {
+        "id": 2,
+        "name": "Min degree",
+        "int_params": ["Min degree"]
+    },
+    {
+        "id": 3,
+        "name": "Check edge"
+    }
+]

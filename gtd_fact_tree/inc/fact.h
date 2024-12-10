@@ -6,8 +6,10 @@
 #include <string.h>
 #include "log.h"
 #include "common.h"
+#include "function.h"
 #define FACT_TYPE_NUM 39
 #define MAX_PARAMS_IN_FACT 3
+#define MAX_FACT_STR_LEN 128
 typedef enum FactType
 {
     IsConnectedFact = 0,
@@ -53,20 +55,20 @@ typedef enum FactType
 
 typedef struct Fact Fact;
 
-Fact *create_fact(FactType type, int *params, int params_count);
-int delete_fact(Fact *fact);
+Fact *create_fact(FactType type, Function **params, int params_count);
+void delete_fact(Fact *fact);
 
-int get_param_count(FactType type);
+uint8_t get_param_count(FactType type);
 
 char *get_fact_str(Fact *fact);
 
-bool equal(Fact *fact1, Fact *fact2);
+bool equal_facts(Fact *fact1, Fact *fact2);
 
 #ifdef CAN_ACCESS_FACT
 struct Fact
 {
     FactType type;
-    uint32_t *params;
+    Function **params;
     uint8_t params_count;
 };
 #endif

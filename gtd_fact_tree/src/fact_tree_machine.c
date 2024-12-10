@@ -18,6 +18,8 @@ struct FactTreeMachine
     MachineState state;
 };
 
+static void log_fact_tree(FactTree *ft);
+
 /**
  * \brief initialize new proof machine based on initial fact tree
  * \param FactTree initial fact tree
@@ -59,7 +61,8 @@ void delete_machine(FactTreeMachine *machine)
 */
 void execute(FactTreeMachine *machine)
 {
-    GTD_LOG("Executing proof machine");
+    GTD_LOG("Executing proof machine with fact tree:");
+    log_fact_tree(machine->FactTree);
     machine->state = EXECUTING;
     uint32_t n = machine->FactTree->fact_count;
     // find contradiction
@@ -147,13 +150,15 @@ static void write_deduction(FactTree *FactTree, uint32_t idx, FILE *output)
     }
     for (uint8_t i = 0; i < parent_count; i++)
     {
-        fprintf(output, "%s",get_fact_str(FactTree->facts[parents[i]]));
+        char *str = get_fact_str(FactTree->facts[parents[i]]);
+        fprintf(output, "%s",str);
+        gtd_free(str);
         if(i != parent_count - 1) fprintf(output,", ");
     }
     if(parent_count != 0) fprintf(output, " => ");
     char *str = get_fact_str((Fact *)FactTree->facts[idx]);
     fprintf(output, "%s", (const char *)str);
-    gtd_free((void *)str);
+    gtd_free(str);
 }
 
 bool write_proof(FactTreeMachine *machine, FILE *output)
@@ -184,4 +189,14 @@ bool write_proof(FactTreeMachine *machine, FILE *output)
     }
     machine->state = WRITTEN;
     return true;
+}
+
+static void log_fact_tree(FactTree *ft)
+{
+    for(uint32_t i=0;i<ft->fact_count;i++)
+    {
+        char *str = get_fact_str(ft->facts[i]);
+        GTD_LOG("%s", str);
+        free(str);
+    }
 }

@@ -50,7 +50,7 @@ static bool exists(FactTree *ft,Fact *new_fact)
 {
     for(uint32_t i=0;i<ft->fact_count;i++)
     {
-        if(equal(ft->facts[i],new_fact))
+        if(equal_facts(ft->facts[i],new_fact))
             return true;
     }
     return false;
@@ -65,7 +65,9 @@ static bool exists(FactTree *ft,Fact *new_fact)
 */
 bool add_fact(FactTree *ft, uint32_t *parent_idxs, uint8_t parent_count, Fact *new_fact)
 {
-    GTD_LOG("Adding new fact with parent_idx = %d to a FactTree", parent_idxs[0]);
+    char *fact_str = get_fact_str(new_fact);
+    GTD_LOG("Adding new fact: %s, with parent_idx = %d to a FactTree", fact_str, parent_idxs[0]);
+    free(fact_str);
     if(exists(ft,new_fact)) 
     {
         GTD_LOG("Fact already exists");

@@ -6,6 +6,7 @@ struct GenerativeRestriction
 {
     RestrictionResult* (*restriction)(Graph* graph, RestrictionParameters *params);
     RestrictionParameters *params;
+    FactType type;
 };
 
 typedef struct intNode
@@ -28,6 +29,8 @@ GenerativeRestriction *create_restriction_object(RestrictionResult* (*restrictio
     genRestriction->params = params;
     return genRestriction;
 }
+/*
+*/
 
 /**
  * \brief function to destruct GenerativeRestriction
@@ -120,24 +123,48 @@ RestrictionParameters *get_parameters_from_restriction(GenerativeRestriction *re
     return restr->params;
 }
 
-// =============== max degree restriction ===============
-
 /**
- * \brief function to create a restriction for a maximal degree of a vertex
- * \param max_degree integer specyfing maximal degree of a vertex
- * \param machine pointer to the GenerativeProofMachine, for which restriction will be validated
- * \returns pointer to the newly created GenerativeRestriction that will depict maximal degree restriction
+ * \brief function to create restriction based on FactType and RestrictionParameters
+ * \param restriction_type type of the restriction
+ * \param params parameters for the restriction
+ * \return newly created restriction of type restriction_type with params parameters
  */
-GenerativeRestriction *create_max_degree_restriction(int max_degree, GenerativeProofMachine *machine)
+GenerativeRestriction *create_restriction(FactType restriction_type, RestrictionParameters *params)
 {
-    RestrictionParameters *params = initialize_restriction_parameters();
-    params->numIntParams = 1;
-    params->intParams = gtd_malloc(sizeof(int));
-    params->intParams[0] = max_degree;
-    params->machine = machine;
-    GenerativeRestriction *restrinction = create_restriction_object(max_degree_restriction_condition, params);
-    return restrinction;
+    RestrictionResult* (*restriction)(Graph* graph, RestrictionParameters *params);
+    switch(restriction_type)
+    {
+        case MaxVertexDegreeFact:
+            restriction = max_degree_restriction_condition;
+            break;
+        case MinVertexDegreeFact:
+            restriction = min_degree_condition;
+            break;
+        case HasNoCycleFact:
+            restriction = no_k_cycle_condition;
+            break;
+        case HasNoInducedPathFact:
+            restriction = no_induced_path_k_condition;
+            break;
+        case HasNoUnknownEdgesFact:
+            restriction = edge_check_condition;
+            break;
+        default:
+            restriction = NULL;
+    }
+
+    if(restriction == NULL)
+    {
+        return NULL;
+    }
+
+    GenerativeRestriction *result = create_restriction_object(restriction, params);
+    result->type = restriction_type;
+    return result;
 }
+
+
+// =============== max degree restriction ===============
 
 /**
  * \brief function to validate max degree condition
@@ -186,23 +213,6 @@ RestrictionResult* max_degree_restriction_condition(Graph* graph, RestrictionPar
 
 // =============== max degree restriction ===============
 // =============== no k cycle restriction ===============
-
-/**
- * \brief function to create a restriction for a cycle of a particular length
- * \param k integer specyfying forbidden length of a cycle
- * \param machine pointer to the GenerativeProofMachine, for which restriction will be validated
- * \returns pointer to the newly created GenerativeRestriction that will depict no k cycle restriction
- */
-GenerativeRestriction *create_no_k_cycle_restriction(int k, GenerativeProofMachine *machine)
-{
-    RestrictionParameters *params = initialize_restriction_parameters();
-    params->numIntParams = 1;
-    params->intParams = gtd_malloc(sizeof(int));
-    params->intParams[0] = k;
-    params->machine = machine;
-    GenerativeRestriction *restriction = create_restriction_object(no_k_cycle_condition, params);
-    return restriction;
-}
 
 /**
  * \brief constructor for a helper class that stores information about paths
@@ -397,23 +407,6 @@ RestrictionResult* no_k_cycle_condition(Graph *graph, RestrictionParameters *par
 // =============== no induced pk restriction ============
 
 /**
- * \brief function to create a restriction for a induced path of a particular length
- * \param k integer specyfying forbidden length of a path
- * \param machine pointer to the GenerativeProofMachine, for which restriction will be validated
- * \returns pointer to the newly created GenerativeRestriction that will depict no induced k path
- */
-GenerativeRestriction *create_no_induced_path_k_restriction(int k, GenerativeProofMachine *machine)
-{
-    RestrictionParameters *params = initialize_restriction_parameters();
-    params->numIntParams = 1;
-    params->intParams = gtd_malloc(sizeof(int));
-    params->intParams[0] = k;
-    params->machine = machine;
-    GenerativeRestriction *restriction = create_restriction_object(no_induced_path_k_condition, params);
-    return restriction;
-}
-
-/**
  * \brief function to validate no induced k path condition
  * \param machine pointer to the GenerativeProofMachine, for which restriction will be validated
  * \returns pointer to the RestrictionResult that will store information about result of restriction validation
@@ -516,23 +509,6 @@ RestrictionResult* no_induced_path_k_condition(Graph *graph, RestrictionParamete
 // =============== min degree restriction ============
 
 /**
- * \brief function to create a restriction for a minimal degree of a vertex
- * \param k integer specyfing minimal degree of a vertex
- * \param machine pointer to the GenerativeProofMachine, for which restriction will be validated
- * \returns pointer to the newly created GenerativeRestriction that will depict minimal degree restriction
- */
-GenerativeRestriction *create_min_degree_restriction(int k, GenerativeProofMachine *machine)
-{
-    RestrictionParameters *params = initialize_restriction_parameters();
-    params->numIntParams = 1;
-    params->intParams = gtd_malloc(sizeof(int));
-    params->intParams[0] = k;
-    params->machine = machine;
-    GenerativeRestriction *restriction = create_restriction_object(min_degree_condition, params);
-    return restriction;
-}
-
-/**
  * \brief function to validate min degree condition
  * \param machine pointer to the GenerativeProofMachine, for which restriction will be validated
  * \returns pointer to the RestrictionResult that will store information about result of restriction validation
@@ -591,23 +567,6 @@ RestrictionResult *min_degree_condition(Graph *graph, RestrictionParameters *par
 
 // =============== min degree restriction ============
 // =============== check edge restriction ============
-
-/**
- * \brief function to apply checking different possibilites logic
- * \param max_depth integer specyfying how many subcases can be considered
- * \param machine pointer to the GenerativeProofMachine, for which restriction will be validated
- * \returns pointer to the newly created GenerativeRestriction that will depict checking edges action
- */
-GenerativeRestriction *create_edge_check_restriction(int max_depth, GenerativeProofMachine *machine)
-{
-    RestrictionParameters *params = initialize_restriction_parameters();
-    params->numIntParams = 1;
-    params->intParams = gtd_malloc(sizeof(int));
-    params->intParams[0] = max_depth;
-    params->machine = machine;
-    GenerativeRestriction *restriction = create_restriction_object(edge_check_condition, params);
-    return restriction;
-}
 
 /**
  * \brief function to validate edge check condition
@@ -682,7 +641,7 @@ RestrictionResult *edge_check_condition(Graph *graph, RestrictionParameters *par
                 proofNode1->subtree = get_machine_proof_tree(connMachine);
                 append_proof_node(get_machine_proof_tree(originMachine), proofNode1);
             }
-            if(contrNotConn)
+            if(contrNotConn) 
             {
                 set_edge_connected(graph, i, i);
                 result->modified = 1;

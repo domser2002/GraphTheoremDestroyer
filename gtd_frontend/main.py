@@ -12,9 +12,7 @@ class App(CTk):
         self.grid_rowconfigure(0, weight=1)
         self.grid_columnconfigure(0, weight=1)
 
-        restr_schema_path = os.path.join('input_data', 'restrictions.json')
-        restr_output_path = os.path.join('out_data', 'restrictions_out.json')
-        restriction_controller = RestrictionController(restr_schema_path, restr_output_path)
+        restriction_controller = RestrictionController()
         main_view = MainView(self, restriction_controller)
         main_view.grid(row=0, column=0, sticky="nsew")
 

@@ -12,7 +12,7 @@ class RestrictionParameters:
     def __init__(self, 
                  restriction_id: int,
                  restriction_name: str,
-                 int_params_values: list[int]):
+                 int_params_values: dict):
         
         self.int_params_values = int_params_values
         self.restriction_id = restriction_id

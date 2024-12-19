@@ -25,10 +25,19 @@ void test_generative_proof_machine(void)
 
     printf("Erdos gyarfas p7 free\n");
     // k, max_vertices, max_depth
-    test_erdos_gyarfas_pk_free(7, 25, 2);
+    test_erdos_gyarfas_pk_free(7, 25, 2, 1);
 
     printf("Edros gyarfas p8 free\n");
-    test_erdos_gyarfas_pk_free(8, 25, 2);
+    test_erdos_gyarfas_pk_free(8, 40, 5, 1);
+
+    printf("Erdos gyarfas p9 free\n");
+    test_erdos_gyarfas_pk_free(9, 40, 2, 1);
+
+    printf("Erdos gyarfas p10 free\n");
+    test_erdos_gyarfas_pk_free(10, 50, 2, 1);
+
+    printf("Erdos gyarfas p11 free\n");
+    test_erdos_gyarfas_pk_free(11, 50, 2, 1);
 }
 
 void test_machine_creation_and_deletion(void)
@@ -533,8 +542,10 @@ void test_minimum_degree_restriction(void)
     // assert(degree2[0] == 7);
 }
 
-void test_erdos_gyarfas_pk_free(int k, int max_vertices, int max_depth)
+void test_erdos_gyarfas_pk_free(int k, int max_vertices, int max_depth, int save_to_file)
 {
+    GTD_UNUSED(save_to_file);
+
     for(int t = k; t >= 5; --t)
     {
         // create induced cycle with t vertices
@@ -570,7 +581,7 @@ void test_erdos_gyarfas_pk_free(int k, int max_vertices, int max_depth)
         RestrictionParameters *params3 = initialize_restriction_parameters();
         params3->numIntParams = 1;
         params3->intParams = (int *)gtd_malloc(sizeof(int));
-        params3->intParams[0] = 7;
+        params3->intParams[0] = k;
         params3->machine = machine;
         get_machine_restrictions(machine)[2] = create_restriction(HasNoInducedPathFact, params3);
 
@@ -593,5 +604,14 @@ void test_erdos_gyarfas_pk_free(int k, int max_vertices, int max_depth)
         int contr = execute_generative_proof_machine(machine);
         printf("Done!\n");
         assert(contr == 1);
+
+        if(save_to_file)
+        {   
+            char filename[100];
+            sprintf(filename, "out-data/p%d_free_with_c%d.txt", k, t);
+            FILE *file = fopen(filename, "w");
+            write_proof_tree(get_machine_proof_tree(machine), file);
+            fclose(file);
+        }
     }
 }

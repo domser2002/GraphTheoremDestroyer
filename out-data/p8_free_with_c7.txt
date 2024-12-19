@@ -1,0 +1,32 @@
+Wierzcholek 6 musi miec nowego sasiada - niech bedzie nim 7
+Nie moze powstac krawedz (1 7), bo powstalby cykl C4: [ 1 0 6 7 ]
+Nie moze powstac krawedz (4 7), bo powstalby cykl C4: [ 4 5 6 7 ]
+Nie moze powstac krawedz (0 7), bo powstalby cykl C8: [ 0 1 2 3 4 5 6 7 ]
+Nie moze powstac krawedz (5 7), bo powstalby cykl C8: [ 5 4 3 2 1 0 6 7 ]
+Wierzcholek 5 musi miec nowego sasiada - niech bedzie nim 8
+Nie moze powstac krawedz (0 8), bo powstalby cykl C4: [ 0 6 5 8 ]
+Nie moze powstac krawedz (3 8), bo powstalby cykl C4: [ 3 4 5 8 ]
+Nie moze powstac krawedz (7 8), bo powstalby cykl C4: [ 7 6 5 8 ]
+Nie moze powstac krawedz (4 8), bo powstalby cykl C8: [ 4 3 2 1 0 6 5 8 ]
+Nie moze powstac krawedz (6 8), bo powstalby cykl C8: [ 6 0 1 2 3 4 5 8 ]
+Wierzcholek 4 musi miec nowego sasiada - niech bedzie nim 9
+Nie moze powstac krawedz (2 9), bo powstalby cykl C4: [ 2 3 4 9 ]
+Nie moze powstac krawedz (6 9), bo powstalby cykl C4: [ 6 5 4 9 ]
+Nie moze powstac krawedz (8 9), bo powstalby cykl C4: [ 8 5 4 9 ]
+Nie moze powstac krawedz (3 9), bo powstalby cykl C8: [ 3 2 1 0 6 5 4 9 ]
+Nie moze powstac krawedz (5 9), bo powstalby cykl C8: [ 5 6 0 1 2 3 4 9 ]
+Nie moze powstac krawedz (7 9), bo powstalby cykl C8: [ 7 6 0 1 2 3 4 9 ]
+Zalozmy, ze krawedz (9 1) istnieje:
+	Nie moze powstac krawedz (0 9), bo powstalby cykl C8: [ 0 6 5 4 3 2 1 9 ]
+	Nie moze powstac krawedz (2 7), bo powstalby cykl C8: [ 2 3 4 9 1 0 6 7 ]
+	Nie moze powstac krawedz (3 7), bo powstalby cykl C8: [ 3 2 1 9 4 5 6 7 ]
+	Musi istniec krawedz (1 8), bo powstalaby indukowana P8: [ 3 4 9 1 0 6 5 8 ]
+	Musi istniec krawedz (2 8), bo powstalaby indukowana P8: [ 4 3 2 1 0 6 5 8 ]
+	Sprzecznosc - istnieje cykl C8: [ 0 1 8 2 3 4 5 6 ]
+Zalozmy, ze krawedz (9 1) nie istnieje:
+	Musi istniec krawedz (0 9), bo powstalaby indukowana P8: [ 3 2 1 0 6 5 4 9 ]
+	Nie moze powstac krawedz (2 7), bo powstalby cykl C8: [ 2 1 0 9 4 5 6 7 ]
+	Nie moze powstac krawedz (2 8), bo powstalby cykl C8: [ 2 3 4 9 0 6 5 8 ]
+	Musi istniec krawedz (3 7), bo powstalaby indukowana P8: [ 0 1 2 3 4 5 6 7 ]
+	Musi istniec krawedz (1 8), bo powstalaby indukowana P8: [ 3 2 1 0 9 4 5 8 ]
+	Sprzecznosc - istnieje cykl C8: [ 0 1 8 5 4 3 7 6 ]

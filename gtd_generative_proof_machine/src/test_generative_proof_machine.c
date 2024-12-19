@@ -2,6 +2,9 @@
 #include "generative_restriction.h"
 #include "generative_proof_machine.h"
 #include <assert.h>
+#include <stdio.h>
+#include <sys/stat.h>
+#include <sys/types.h>
 
 void test_generative_proof_machine(void)
 {
@@ -25,7 +28,7 @@ void test_generative_proof_machine(void)
 
     printf("Erdos gyarfas p7 free\n");
     // k, max_vertices, max_depth
-    test_erdos_gyarfas_pk_free(7, 25, 2, 1);
+    test_erdos_gyarfas_pk_free(7, 25, 5, 1);
 
     printf("Edros gyarfas p8 free\n");
     test_erdos_gyarfas_pk_free(8, 40, 5, 1);
@@ -607,6 +610,14 @@ void test_erdos_gyarfas_pk_free(int k, int max_vertices, int max_depth, int save
 
         if(save_to_file)
         {   
+            // if ya got a segfault here
+            // that means you dont have out-data folder
+            struct stat info;
+            if (stat("out-data", &info) == 0)
+            {
+                mkdir("out-data", 0777);
+            }
+
             char filename[100];
             sprintf(filename, "out-data/p%d_free_with_c%d.txt", k, t);
             FILE *file = fopen(filename, "w");

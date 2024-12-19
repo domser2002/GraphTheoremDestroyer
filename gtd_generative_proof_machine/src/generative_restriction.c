@@ -427,7 +427,8 @@ RestrictionResult* no_induced_path_k_condition(Graph *graph, RestrictionParamete
         PathNode *path = paths;
         paths = paths->next;
 
-        int notConnectedCount = 0;
+        // int notConnectedCount = 0;
+        int connectedCount = 0;
         int unknownCount = 0;
         int lastUnknownStart = -1;
         int lastUnknownEnd = -1;
@@ -438,10 +439,16 @@ RestrictionResult* no_induced_path_k_condition(Graph *graph, RestrictionParamete
             {
                 int iver = path->path[i];
                 int jver = path->path[j];
+                /*
                 if(adjMatrix[iver][jver] == notConnectedCount)
                 {
                     ++notConnectedCount;
                 }
+                */
+               if(adjMatrix[iver][jver] == CONNECTED_SYMBOL)
+               {
+                    ++connectedCount;
+               }
                 if(adjMatrix[iver][jver] == UNKNOWN_SYMBOL)
                 {
                     ++unknownCount;
@@ -451,7 +458,8 @@ RestrictionResult* no_induced_path_k_condition(Graph *graph, RestrictionParamete
             }
         }
 
-        if(notConnectedCount == (k-1)*(k-2) / 2)
+        // if(notConnectedCount == (k-1)*(k-2) / 2)
+        if(connectedCount == k-1 && unknownCount == 0)
         {
 
             // add to proof tree
@@ -480,7 +488,8 @@ RestrictionResult* no_induced_path_k_condition(Graph *graph, RestrictionParamete
             return result;
         }
 
-        if(unknownCount == 1)
+        // if(unknownCount == 1)
+        if(connectedCount == k-1 && unknownCount == 1)
         {
             set_edge_connected(graph, lastUnknownStart, lastUnknownEnd);
             result->modified = 1;

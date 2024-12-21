@@ -23,24 +23,29 @@ void test_generative_proof_machine(void)
     printf("Min degree\n");
     test_minimum_degree_restriction();
 
+    /*
+    */
     printf("Erdos gyarfas subcase\n");
     test_erdos_gyarfas_case();
-
+    /*
     printf("Erdos gyarfas p7 free\n");
     // k, max_vertices, max_depth
-    test_erdos_gyarfas_pk_free(7, 25, 5, 1);
+    test_erdos_gyarfas_pk_free(7, 15, 2, 1);
 
     printf("Edros gyarfas p8 free\n");
     test_erdos_gyarfas_pk_free(8, 40, 5, 1);
 
     printf("Erdos gyarfas p9 free\n");
-    test_erdos_gyarfas_pk_free(9, 40, 2, 1);
+    test_erdos_gyarfas_pk_free(9, 25, 3, 1);
 
     printf("Erdos gyarfas p10 free\n");
-    test_erdos_gyarfas_pk_free(10, 50, 2, 1);
+    test_erdos_gyarfas_pk_free(10, 50, 5, 1);
 
     printf("Erdos gyarfas p11 free\n");
-    test_erdos_gyarfas_pk_free(11, 50, 2, 1);
+    test_erdos_gyarfas_pk_free(11, 50, 5, 1);
+    */
+    printf("Erdos gyarfas p12 free\n");
+    test_erdos_gyarfas_pk_free(12, 50, 5, 1);
 }
 
 void test_machine_creation_and_deletion(void)
@@ -593,14 +598,14 @@ void test_erdos_gyarfas_pk_free(int k, int max_vertices, int max_depth, int save
         params4->intParams = (int *)gtd_malloc(sizeof(int));
         params4->intParams[0] = 3;
         params4->machine = machine;
-        get_machine_restrictions(machine)[3] = create_restriction(MinVertexDegreeFact, params4);
+        get_machine_restrictions(machine)[4] = create_restriction(MinVertexDegreeFact, params4);
         
         RestrictionParameters *params5 = initialize_restriction_parameters();
         params5->numIntParams = 1;
         params5->intParams = (int *)gtd_malloc(sizeof(int));
         params5->intParams[0] = max_depth;
         params5->machine = machine;
-        get_machine_restrictions(machine)[4] = create_restriction(HasNoUnknownEdgesFact, params5);
+        get_machine_restrictions(machine)[3] = create_restriction(HasNoUnknownEdgesFact, params5);
 
         printf("Proving for t = %d... ", t);
         fflush(stdout);

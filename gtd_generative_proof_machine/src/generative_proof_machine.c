@@ -150,3 +150,20 @@ GenerativeRestriction **get_machine_restrictions(GenerativeProofMachine *machine
 {
     return machine->restrictions;
 }
+
+
+void load_machine(GenerativeProofMachine *m1, GenerativeProofMachine *m2)
+{
+    destroy_graph(m1->graph);
+    m1->graph = m2->graph;
+    GenerativeRestriction **restrictions = get_machine_restrictions(m1);
+    for(int i = 0; i < m1->numRestrictions; ++i)
+    {
+        destroy_restriction_parameters_soft(get_parameters_from_restriction(restrictions[i]));
+        delete_restriction_object(restrictions[i]);
+    }
+    m1->depth = m2->depth;
+    m1->restrictions = m2->restrictions;
+    m1->numRestrictions = m2->numRestrictions;
+    gtd_free(restrictions);
+}

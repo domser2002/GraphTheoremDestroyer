@@ -21,5 +21,17 @@ Graph *get_machine_graph(GenerativeProofMachine *machine);
 GenerativeProofMachine *copy_proof_machine(GenerativeProofMachine *machine);
 ProofTree *get_machine_proof_tree(GenerativeProofMachine *machine);
 GenerativeRestriction **get_machine_restrictions(GenerativeProofMachine *machine);
+void load_machine(GenerativeProofMachine *m1, GenerativeProofMachine *m2);
 
 #endif
+
+/*
+typedef struct GenerativeProofMachine
+{
+    Graph *graph;
+    GenerativeRestriction **restrictions;
+    int numRestrictions;
+    int depth;
+    ProofTree *proofTree;
+} GenerativeProofMachine;
+*/

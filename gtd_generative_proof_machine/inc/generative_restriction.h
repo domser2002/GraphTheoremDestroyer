@@ -28,10 +28,12 @@ typedef struct RestrictionParameters
     int numIntParams;
     int *intParams;
     GenerativeProofMachine *machine;
+    int blockRestriction;
 } RestrictionParameters;
 
 RestrictionParameters *initialize_restriction_parameters(void);
 void destroy_restriction_parameters(RestrictionParameters *params);
+void destroy_restriction_parameters_soft(RestrictionParameters *params);
 PathNode *find_k_paths(Graph *graph, int k);
 int delete_restriction_object(GenerativeRestriction *restriction);
 RestrictionResult *validate_restriction(Graph *graph, GenerativeRestriction *restriction);
@@ -44,6 +46,7 @@ RestrictionResult *no_k_cycle_condition(Graph *graph, RestrictionParameters *par
 RestrictionResult *no_induced_path_k_condition(Graph *graph, RestrictionParameters *params);
 RestrictionResult *min_degree_condition(Graph *graph, RestrictionParameters *params);
 RestrictionResult *edge_check_condition(Graph *graph, RestrictionParameters *params);
+RestrictionResult *no_unknown_edges_condition(Graph *graph, RestrictionParameters *params);
 
 RestrictionParameters *deep_copy_restriction_parameters(RestrictionParameters *params);
 GenerativeRestriction *deep_copy_restriction(GenerativeRestriction *restriction);

@@ -73,9 +73,14 @@ char *get_fact_str(Fact *fact)
         sprintf(result, "Graph is a tree");
         return result;
     case IstnaryTreeFact:
-        str = get_function_str(fact->params[0]);
-        sprintf(result, "Graph is a %s-nary tree", str);
-        gtd_free(str);
+        if(is_equal_constant_function(fact->params[0], 1))
+            sprintf(result, "Graph is a path");
+        else
+        {
+            str = get_function_str(fact->params[0]);
+            sprintf(result, "Graph is a %s-nary tree", str);
+            gtd_free(str);
+        }
         return result;
     case IsPlanarFact:
         sprintf(result, "Graph is planar");

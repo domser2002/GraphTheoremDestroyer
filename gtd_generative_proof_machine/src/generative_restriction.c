@@ -599,8 +599,6 @@ RestrictionResult *min_degree_condition(Graph *graph, RestrictionParameters *par
  */
 RestrictionResult *edge_check_condition(Graph *graph, RestrictionParameters *params)
 {
-    // printf("Hello, world %d\n", rand());
-    // int max_depth = params[0];
     int max_depth = params->intParams[0];
     int n = get_graph_num_vertices(graph);
     char **adjMatrix = get_graph_adjacency_matrix(graph);
@@ -612,10 +610,9 @@ RestrictionResult *edge_check_condition(Graph *graph, RestrictionParameters *par
     {
         return result;
     }
-    // for(int i = n-1; i > 0; --i)
+    
     for(int i = 0; i < n; ++i)
     {
-        // for(int j = n-1; j > 0; --j)
         for(int j = n-1; j > i; --j)
         {
             if(i == j || adjMatrix[i][j] != UNKNOWN_SYMBOL)
@@ -650,10 +647,8 @@ RestrictionResult *edge_check_condition(Graph *graph, RestrictionParameters *par
                 continue;
             }
 
-            // Graph *graph = get_machine_graph(params->machine);
             if(contrConn || contrNotConn)
             {
-                // set_edge_not_connected(graph, i, j);
                 result->modified = 1;
 
                 char buffer1[100];
@@ -680,7 +675,6 @@ RestrictionResult *edge_check_condition(Graph *graph, RestrictionParameters *par
                 return result;
             }
 
-
             if(contrConn)
             {
                 int depth = get_machine_depth(originMachine);
@@ -704,80 +698,3 @@ RestrictionResult *edge_check_condition(Graph *graph, RestrictionParameters *par
 }
 
 // =============== check edge restriction ============
-// =============== no unknown edges restriction ======
-
-void generateSubsetsWithK(int n, int k, int start, int currentSubset[], int currentSize, int** subsets, int* subsetCount) {
-    // Base case: If the subset has reached the desired size, store it
-    if (currentSize == k) {
-        for (int i = 0; i < k; i++) {
-            subsets[*subsetCount][i] = currentSubset[i];
-        }
-        (*subsetCount)++;
-        return;
-    }
-
-    // Recursive case: Try all elements starting from 'start'
-    for (int i = start; i <= n; i++) {
-        currentSubset[currentSize] = i; // Include current element in the subset
-        generateSubsetsWithK(n, k, i + 1, currentSubset, currentSize + 1, subsets, subsetCount); // Recurse
-    }
-}
-
-int** get_all_subsets(int n, int k, int total_subsets)
-{
-    // Allocate memory for subsets
-    int** subsets = (int**)malloc(total_subsets * sizeof(int*));
-    for (int i = 0; i < total_subsets; i++) {
-        subsets[i] = (int*)malloc(k * sizeof(int));
-    }
-
-    int currentSubset[k]; // Temporary array to store the current subset
-    int subsetCount = 0;  // Counter for the number of subsets generated
-
-    // Generate all subsets
-    generateSubsetsWithK(n, k, 1, currentSubset, 0, subsets, &subsetCount);
-    return subsets;
-}
-
-RestrictionResult *no_unknown_edges_condition(Graph *graph, RestrictionParameters *params)
-{
-    int n = get_graph_num_vertices(graph);
-    RestrictionResult *result = gtd_malloc(sizeof(RestrictionResult));
-    result->contradictionFound = 0;
-    result->modified = 0;
-
-    int max_depth = params->intParams[0];
-    int machine_depth = get_machine_depth(params->machine);
-    if(max_depth == machine_depth)
-    {
-        return result;
-    }
-
-    int total_subsets = 1;
-    for (int i = 0; i < max_depth; i++) {
-        total_subsets *= (n - i);
-        total_subsets /= (i + 1);
-    }
-    int **subsets = get_all_subsets(n, max_depth, total_subsets);
-    GTD_UNUSED(subsets);
-    /*
-    long long pow_2_max_depth = 1;
-    for(int i = 0; i < max_depth; ++i)
-    {
-        pow_2_max_depth = pow_2_max_depth << 1;
-    }
-    Graph *graph = get_machine_graph(params->machine);
-    for(int i = 0; i < total_subsets; ++i)
-    {
-        int *subset = subsets[i];
-        for(long long j = j; j < i; ++j)
-        {
-            GenerativeProofMachine *machineCopy = copy_proof_machine(params->machine);
-
-        }
-    }
-    */
-    
-    return result;
-}
-// =============== no unknown edges restriction ======

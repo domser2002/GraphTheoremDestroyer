@@ -23,18 +23,17 @@ void test_generative_proof_machine(void)
     printf("Min degree\n");
     test_minimum_degree_restriction();
 
-    /*
-    */
     printf("Erdos gyarfas subcase\n");
     test_erdos_gyarfas_case();
-    /*
+
     printf("Erdos gyarfas p7 free\n");
-    // k, max_vertices, max_depth
     test_erdos_gyarfas_pk_free(7, 15, 2, 1);
 
     printf("Edros gyarfas p8 free\n");
     test_erdos_gyarfas_pk_free(8, 40, 5, 1);
 
+    // uncomment below lines for more erdos-gyarfas cases
+    /*
     printf("Erdos gyarfas p9 free\n");
     test_erdos_gyarfas_pk_free(9, 25, 3, 1);
 
@@ -43,9 +42,10 @@ void test_generative_proof_machine(void)
 
     printf("Erdos gyarfas p11 free\n");
     test_erdos_gyarfas_pk_free(11, 50, 5, 1);
-    */
+
     printf("Erdos gyarfas p12 free\n");
     test_erdos_gyarfas_pk_free(12, 50, 5, 1);
+    */
 }
 
 void test_machine_creation_and_deletion(void)
@@ -615,10 +615,8 @@ void test_erdos_gyarfas_pk_free(int k, int max_vertices, int max_depth, int save
 
         if(save_to_file)
         {   
-            // if ya got a segfault here
-            // that means you dont have out-data folder
-            struct stat info;
-            if (stat("out-data", &info) == 0)
+            struct stat sb;
+            if((stat("out-data", &sb) == 0 && S_ISDIR(sb.st_mode)) == 0)
             {
                 mkdir("out-data", 0777);
             }

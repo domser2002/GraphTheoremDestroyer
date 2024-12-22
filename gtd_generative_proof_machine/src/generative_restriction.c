@@ -33,7 +33,7 @@ GenerativeRestriction *create_restriction_object(RestrictionResult* (*restrictio
 */
 
 /**
- * \brief function to destruct GenerativeRestriction
+ * \brief function to destruct GenerativeRestriction without its parameters
  * \param machine pointer to the GenerativeRestriction to destroy
  * \returns 1 if suceeded, otherwise raises fault
  */
@@ -55,6 +55,13 @@ int delete_restriction_object(GenerativeRestriction *genRestriction)
  */
 RestrictionResult* validate_restriction(Graph *graph, GenerativeRestriction *restriction)
 {
+    if(restriction->params->blockRestriction)
+    {
+        RestrictionResult *res = gtd_malloc(sizeof(RestrictionResult));
+        res->contradictionFound = 0;
+        res->modified = 0;
+        return res;
+    }
     RestrictionResult* res = restriction->restriction(graph, restriction->params);
     return res;
 }
@@ -69,6 +76,7 @@ RestrictionParameters *initialize_restriction_parameters(void)
     result->numIntParams = 0;
     result->intParams = NULL;
     result->machine = NULL;
+    result->blockRestriction = 0;
 
     return result;
 }
@@ -79,8 +87,13 @@ RestrictionParameters *initialize_restriction_parameters(void)
  */
 void destroy_restriction_parameters(RestrictionParameters *params)
 {
-    gtd_free(params->intParams);
+    destroy_restriction_parameters_soft(params);
     destroy_generative_proof_machine(params->machine);
+}
+
+void destroy_restriction_parameters_soft(RestrictionParameters *params)
+{
+    gtd_free(params->intParams);
 }
 
 /**
@@ -98,6 +111,7 @@ RestrictionParameters *deep_copy_restriction_parameters(RestrictionParameters *p
         result->intParams[i] = params->intParams[i];
     }
     result->machine = params->machine;
+    result->blockRestriction = params->blockRestriction;
     return result;
 }
 
@@ -427,7 +441,8 @@ RestrictionResult* no_induced_path_k_condition(Graph *graph, RestrictionParamete
         PathNode *path = paths;
         paths = paths->next;
 
-        int notConnectedCount = 0;
+        // int notConnectedCount = 0;
+        int connectedCount = 0;
         int unknownCount = 0;
         int lastUnknownStart = -1;
         int lastUnknownEnd = -1;
@@ -438,10 +453,16 @@ RestrictionResult* no_induced_path_k_condition(Graph *graph, RestrictionParamete
             {
                 int iver = path->path[i];
                 int jver = path->path[j];
+                /*
                 if(adjMatrix[iver][jver] == notConnectedCount)
                 {
                     ++notConnectedCount;
                 }
+                */
+               if(adjMatrix[iver][jver] == CONNECTED_SYMBOL)
+               {
+                    ++connectedCount;
+               }
                 if(adjMatrix[iver][jver] == UNKNOWN_SYMBOL)
                 {
                     ++unknownCount;
@@ -451,7 +472,8 @@ RestrictionResult* no_induced_path_k_condition(Graph *graph, RestrictionParamete
             }
         }
 
-        if(notConnectedCount == (k-1)*(k-2) / 2)
+        // if(notConnectedCount == (k-1)*(k-2) / 2)
+        if(connectedCount == k-1 && unknownCount == 0)
         {
 
             // add to proof tree
@@ -480,7 +502,8 @@ RestrictionResult* no_induced_path_k_condition(Graph *graph, RestrictionParamete
             return result;
         }
 
-        if(unknownCount == 1)
+        // if(unknownCount == 1)
+        if(connectedCount == k-1 && unknownCount == 1)
         {
             set_edge_connected(graph, lastUnknownStart, lastUnknownEnd);
             result->modified = 1;
@@ -525,6 +548,7 @@ RestrictionResult *min_degree_condition(Graph *graph, RestrictionParameters *par
 
     
     for(int i = 0; i < n; ++i)
+    // for(int i = n-1; i >= 0; --i)
     {
         int numUnknown = 0;
         int numConnected = 0;
@@ -575,7 +599,6 @@ RestrictionResult *min_degree_condition(Graph *graph, RestrictionParameters *par
  */
 RestrictionResult *edge_check_condition(Graph *graph, RestrictionParameters *params)
 {
-    // int max_depth = params[0];
     int max_depth = params->intParams[0];
     int n = get_graph_num_vertices(graph);
     char **adjMatrix = get_graph_adjacency_matrix(graph);
@@ -587,10 +610,10 @@ RestrictionResult *edge_check_condition(Graph *graph, RestrictionParameters *par
     {
         return result;
     }
-
-    for(int i = n-1; i > 0; --i)
+    
+    for(int i = 0; i < n; ++i)
     {
-        for(int j = n-1; j > 0; --j)
+        for(int j = n-1; j > i; --j)
         {
             if(i == j || adjMatrix[i][j] != UNKNOWN_SYMBOL)
             {
@@ -607,9 +630,7 @@ RestrictionResult *edge_check_condition(Graph *graph, RestrictionParameters *par
 
             GenerativeProofMachine *notConnMachine = copy_proof_machine(params->machine);
             Graph *notConnGraph = get_machine_graph(notConnMachine);
-
             set_edge_not_connected(notConnGraph, i, j);
-
             set_machine_depth(notConnMachine, get_machine_depth(notConnMachine) + 1);
             get_machine_proof_tree(notConnMachine)->depth = get_machine_depth(notConnMachine);
 
@@ -626,10 +647,8 @@ RestrictionResult *edge_check_condition(Graph *graph, RestrictionParameters *par
                 continue;
             }
 
-            Graph *graph = get_machine_graph(params->machine);
-            if(contrConn)
+            if(contrConn || contrNotConn)
             {
-                set_edge_not_connected(graph, i, j);
                 result->modified = 1;
 
                 char buffer1[100];
@@ -640,11 +659,6 @@ RestrictionResult *edge_check_condition(Graph *graph, RestrictionParameters *par
                 proofNode1->message = strdup(buffer1);
                 proofNode1->subtree = get_machine_proof_tree(connMachine);
                 append_proof_node(get_machine_proof_tree(originMachine), proofNode1);
-            }
-            if(contrNotConn) 
-            {
-                set_edge_connected(graph, i, i);
-                result->modified = 1;
 
                 char buffer2[100];
                 snprintf(buffer2, sizeof(buffer2), 
@@ -658,6 +672,20 @@ RestrictionResult *edge_check_condition(Graph *graph, RestrictionParameters *par
             if(contrConn && contrNotConn)
             {
                 result->contradictionFound = 1;
+                return result;
+            }
+
+            if(contrConn)
+            {
+                int depth = get_machine_depth(originMachine);
+                load_machine(originMachine, connMachine);
+                set_machine_depth(originMachine, depth);
+            }
+            if(contrNotConn)
+            {
+                int depth = get_machine_depth(originMachine);
+                load_machine(originMachine, notConnMachine);
+                set_machine_depth(originMachine, depth);
             }
 
             if(contrConn || contrNotConn)

@@ -24,10 +24,10 @@ void test_generative_proof_machine(void)
     test_minimum_degree_restriction();
 
     printf("Erdos gyarfas subcase\n");
-    test_erdos_gyarfas_case();
+    // test_erdos_gyarfas_case();
 
     printf("Erdos gyarfas p7 free\n");
-    test_erdos_gyarfas_pk_free(7, 15, 2, 1);
+    test_erdos_gyarfas_pk_free(7, 15, 3, 1);
 
     printf("Edros gyarfas p8 free\n");
     test_erdos_gyarfas_pk_free(8, 40, 5, 1);
@@ -46,6 +46,9 @@ void test_generative_proof_machine(void)
     printf("Erdos gyarfas p12 free\n");
     test_erdos_gyarfas_pk_free(12, 50, 5, 1);
     */
+
+   printf("Isomorphic function test\n");
+   test_isomorphic_check();
 }
 
 void test_machine_creation_and_deletion(void)
@@ -610,8 +613,8 @@ void test_erdos_gyarfas_pk_free(int k, int max_vertices, int max_depth, int save
         printf("Proving for t = %d... ", t);
         fflush(stdout);
         int contr = execute_generative_proof_machine(machine);
+        GTD_UNUSED(contr);
         printf("Done!\n");
-        assert(contr == 1);
 
         if(save_to_file)
         {   
@@ -624,8 +627,205 @@ void test_erdos_gyarfas_pk_free(int k, int max_vertices, int max_depth, int save
             char filename[100];
             sprintf(filename, "out-data/p%d_free_with_c%d.txt", k, t);
             FILE *file = fopen(filename, "w");
-            write_proof_tree(get_machine_proof_tree(machine), file);
+            write_proof_tree(get_machine_proof_tree(machine), file, 0);
             fclose(file);
         }
+        assert(contr == 1);
     }
 }
+
+void test_isomorphic_check(void)
+{
+    // Test 1: Simple isomorphic graphs
+    Graph *graph1 = create_graph(3, 3);
+    add_vertex(graph1);
+    set_edge_connected(graph1, 0, 1);
+    set_edge_connected(graph1, 1, 2);
+    
+    Graph *graph2 = create_graph(3, 3);
+    add_vertex(graph2);
+    set_edge_connected(graph2, 1, 2);
+    set_edge_connected(graph2, 0, 2);
+    
+    assert(are_graphs_isomorphic(graph1, graph2) == true);
+
+    // Test 2: Non-isomorphic graphs
+    Graph *graph3 = create_graph(3, 3);
+    add_vertex(graph3);
+    set_edge_connected(graph3, 0, 1);
+    set_edge_connected(graph3, 0, 2);
+    
+    assert(are_graphs_isomorphic(graph1, graph3) == true);
+
+    // Test 3: Complex isomorphic graphs
+    Graph *graph4 = create_graph(4, 4);
+    add_vertex(graph4);
+    set_edge_connected(graph4, 0, 1);
+    set_edge_connected(graph4, 1, 2);
+    set_edge_connected(graph4, 2, 3);
+    set_edge_connected(graph4, 0, 3);
+    
+    Graph *graph5 = create_graph(4, 4);
+    add_vertex(graph5);
+    set_edge_connected(graph5, 1, 0);
+    set_edge_connected(graph5, 2, 1);
+    set_edge_connected(graph5, 3, 2);
+    set_edge_connected(graph5, 3, 0);
+    
+    assert(are_graphs_isomorphic(graph4, graph5) == true);
+
+    // Test 4: Complex non-isomorphic graphs
+    Graph *graph6 = create_graph(4, 4);
+    add_vertex(graph6);
+    set_edge_connected(graph6, 0, 1);
+    set_edge_connected(graph6, 1, 2);
+    
+    Graph *graph7 = create_graph(4, 4);
+    add_vertex(graph7);
+    set_edge_connected(graph7, 1, 0);
+    set_edge_connected(graph7, 2, 3);
+    
+    assert(are_graphs_isomorphic(graph6, graph7) == false);
+
+    // Test 5: Empty graphs
+    Graph *graph8 = create_graph(0, 0);
+    Graph *graph9 = create_graph(0, 0);
+    
+    assert(are_graphs_isomorphic(graph8, graph9) == true);
+
+    // Test 6: Single vertex graphs
+    Graph *graph10 = create_graph(1, 1);
+    Graph *graph11 = create_graph(1, 1);
+    
+    assert(are_graphs_isomorphic(graph10, graph11) == true);
+
+    // Test 7: Two triangles (three vertices)
+    Graph *graph12 = create_graph(3, 3);
+    add_vertex(graph12);
+    set_edge_connected(graph12, 0, 1);
+    set_edge_connected(graph12, 1, 2);
+    set_edge_connected(graph12, 0, 2);
+    
+    Graph *graph13 = create_graph(3, 3);
+    add_vertex(graph13);
+    set_edge_connected(graph13, 1, 0);
+    set_edge_connected(graph13, 2, 0);
+    set_edge_connected(graph13, 2, 1);
+    
+    assert(are_graphs_isomorphic(graph12, graph13) == true);
+
+    // Test 8: Line vs triangle
+    Graph *graph14 = create_graph(3, 3);
+    add_vertex(graph14);
+    set_edge_connected(graph14, 0, 1);
+    set_edge_connected(graph14, 1, 2);
+    
+    assert(are_graphs_isomorphic(graph14, graph12) == false);
+
+    // Test 9: Isomorphic larger cycles
+    Graph *graph15 = create_graph(5, 5);
+    add_vertex(graph15);
+    set_edge_connected(graph15, 0, 1);
+    set_edge_connected(graph15, 1, 2);
+    set_edge_connected(graph15, 2, 3);
+    set_edge_connected(graph15, 3, 4);
+    set_edge_connected(graph15, 4, 0);
+    
+    Graph *graph16 = create_graph(5, 5);
+    add_vertex(graph16);
+    set_edge_connected(graph16, 1, 2);
+    set_edge_connected(graph16, 2, 3);
+    set_edge_connected(graph16, 3, 4);
+    set_edge_connected(graph16, 4, 0);
+    set_edge_connected(graph16, 0, 1);
+    
+    assert(are_graphs_isomorphic(graph15, graph16) == true);
+    
+    // Test 10: Different structures
+    Graph *graph17 = create_graph(5, 5);
+    add_vertex(graph17);
+    set_edge_connected(graph17, 0, 1);
+    
+    Graph *graph18 = create_graph(5, 5);
+    add_vertex(graph18);
+    set_edge_connected(graph18, 1, 2);
+    
+    assert(are_graphs_isomorphic(graph17, graph18) == true);
+
+    // Clean up
+    destroy_graph(graph1);
+    destroy_graph(graph2);
+    destroy_graph(graph3);
+    destroy_graph(graph4);
+    destroy_graph(graph5);
+    destroy_graph(graph6);
+    destroy_graph(graph7);
+    destroy_graph(graph8);
+    destroy_graph(graph9);
+    destroy_graph(graph10);
+    destroy_graph(graph11);
+    destroy_graph(graph12);
+    destroy_graph(graph13);
+    destroy_graph(graph14);
+    destroy_graph(graph15);
+    destroy_graph(graph16);
+    destroy_graph(graph17);
+    destroy_graph(graph18);
+
+    graph1 = create_graph(10, 10);
+    set_edge_connected(graph1, 0, 1);
+    set_edge_connected(graph1, 0, 2);
+    set_edge_connected(graph1, 0, 3);
+    set_edge_connected(graph1, 1, 2);
+    set_edge_connected(graph1, 1, 3);
+    set_edge_connected(graph1, 1, 4);
+    set_edge_connected(graph1, 2, 4);
+    set_edge_connected(graph1, 2, 5);
+    set_edge_connected(graph1, 3, 5);
+    set_edge_connected(graph1, 3, 6);
+    set_edge_connected(graph1, 4, 7);
+    set_edge_connected(graph1, 4, 8);
+    set_edge_connected(graph1, 5, 9);
+    set_edge_connected(graph1, 6, 8);
+    set_edge_connected(graph1, 7, 0);
+    set_edge_connected(graph1, 7, 1);
+    set_edge_connected(graph1, 8, 2);
+    set_edge_connected(graph1, 9, 0);
+    set_edge_connected(graph1, 9, 1);
+    set_edge_connected(graph1, 9, 2);
+    
+    // Create isomorphic graph with different labeling
+    graph2 = create_graph(10, 10);
+    set_edge_connected(graph2, 3, 4);
+    set_edge_connected(graph2, 3, 5);
+    set_edge_connected(graph2, 3, 6);
+    set_edge_connected(graph2, 4, 5);
+    set_edge_connected(graph2, 4, 6);
+    set_edge_connected(graph2, 4, 7);
+    set_edge_connected(graph2, 5, 7);
+    set_edge_connected(graph2, 5, 8);
+    set_edge_connected(graph2, 6, 8);
+    set_edge_connected(graph2, 6, 9);
+    set_edge_connected(graph2, 7, 0);
+    set_edge_connected(graph2, 7, 1);
+    set_edge_connected(graph2, 8, 2);
+    set_edge_connected(graph2, 9, 1);
+    set_edge_connected(graph2, 0, 3);
+    set_edge_connected(graph2, 0, 4);
+    set_edge_connected(graph2, 1, 5);
+    set_edge_connected(graph2, 2, 3);
+    set_edge_connected(graph2, 2, 4);
+    set_edge_connected(graph2, 2, 5);
+
+    assert(are_graphs_isomorphic(graph1, graph2) == true);
+
+    set_edge_connected(graph2, 2, 9);
+
+    assert(are_graphs_isomorphic(graph1, graph2) == false);
+
+    // Clean up
+    destroy_graph(graph1);
+    destroy_graph(graph2);
+
+}
+

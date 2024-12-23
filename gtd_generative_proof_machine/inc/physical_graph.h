@@ -13,6 +13,7 @@ Graph *create_graph(int max_vertices, int vertices);
 int destroy_graph(Graph *graph);
 int get_graph_max_vertices(Graph *graph);
 int get_graph_num_vertices(Graph *graph);
+int get_graph_num_edges(Graph *graph);
 char **get_graph_adjacency_matrix(Graph *graph);
 int set_edge_connected(Graph *graph, int from, int to);
 int set_edge_not_connected(Graph *graph, int from, int to);

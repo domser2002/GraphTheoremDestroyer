@@ -29,6 +29,7 @@ typedef struct RestrictionParameters
     int *intParams;
     GenerativeProofMachine *machine;
     int blockRestriction;
+    Graph *graph;
 } RestrictionParameters;
 
 RestrictionParameters *initialize_restriction_parameters(void);
@@ -47,6 +48,8 @@ RestrictionResult *no_induced_path_k_condition(Graph *graph, RestrictionParamete
 RestrictionResult *min_degree_condition(Graph *graph, RestrictionParameters *params);
 RestrictionResult *edge_check_condition(Graph *graph, RestrictionParameters *params);
 RestrictionResult *no_unknown_edges_condition(Graph *graph, RestrictionParameters *params);
+bool are_graphs_isomorphic(Graph *graph1, Graph *graph2);
+// RestrictionResult *contains_to_minor(Graph *graph, RestrictionParameters *params);
 
 RestrictionParameters *deep_copy_restriction_parameters(RestrictionParameters *params);
 GenerativeRestriction *deep_copy_restriction(GenerativeRestriction *restriction);

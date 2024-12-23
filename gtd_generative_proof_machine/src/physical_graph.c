@@ -69,6 +69,24 @@ int get_graph_num_vertices(Graph *graph)
     return graph->vertices;
 }
 
+int get_graph_num_edges(Graph *graph)
+{
+    int result = 0;
+    char **adjMatrix = get_graph_adjacency_matrix(graph);
+    int n = get_graph_num_vertices(graph);
+    for(int i = 0; i < n; ++i)
+    {
+        for(int j = i+1; i < n; ++j)
+        {
+            if(adjMatrix[i][j] == CONNECTED_SYMBOL)
+            {
+                ++result;
+            }
+        }
+    }
+    return result;
+}
+
 char **get_graph_adjacency_matrix(Graph *graph)
 {
     return graph->adjacency_matrix;

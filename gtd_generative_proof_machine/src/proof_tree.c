@@ -16,7 +16,6 @@ ProofNode *create_proof_node(void)
 ProofTree *create_proof_tree(void)
 {
     ProofTree *tree = gtd_malloc(sizeof(ProofTree));
-    tree->depth = 0;
     tree->head = NULL;
     tree->tail = NULL;
     return tree;
@@ -49,18 +48,17 @@ void write_proof_node(ProofNode *node, FILE *outFile, int depth)
         fprintf(outFile, "%s\n", node->message);
     }
 
-    write_proof_tree(node->subtree, outFile);
+    write_proof_tree(node->subtree, outFile, depth+1);
 }
 
 
-void write_proof_tree(ProofTree *tree, FILE *outFile)
+void write_proof_tree(ProofTree *tree, FILE *outFile, int depth)
 {
     if(tree == NULL)
     {
         return;
     }
 
-    int depth = tree->depth;
     ProofNode *proofNode = tree->head;
     while(proofNode != NULL)
     {

@@ -77,6 +77,7 @@ RestrictionParameters *initialize_restriction_parameters(void)
     result->intParams = NULL;
     result->machine = NULL;
     result->blockRestriction = 0;
+    result->graph = NULL;
 
     return result;
 }
@@ -626,31 +627,17 @@ RestrictionResult *edge_check_condition(Graph *graph, RestrictionParameters *par
             Graph *connGraph = get_machine_graph(connMachine);
             set_edge_connected(connGraph, i, j);
             set_machine_depth(connMachine, get_machine_depth(connMachine) + 1);
-            get_machine_proof_tree(connMachine)->depth = get_machine_depth(connMachine);
 
             GenerativeProofMachine *notConnMachine = copy_proof_machine(params->machine);
             Graph *notConnGraph = get_machine_graph(notConnMachine);
             set_edge_not_connected(notConnGraph, i, j);
             set_machine_depth(notConnMachine, get_machine_depth(notConnMachine) + 1);
-            get_machine_proof_tree(notConnMachine)->depth = get_machine_depth(notConnMachine);
 
             int contrConn = execute_generative_proof_machine(connMachine);
-
             int contrNotConn = execute_generative_proof_machine(notConnMachine);
 
-            params->machine = originMachine;
-
-            // todo destroy machines
-
-            if(!contrConn && !contrNotConn)
+            if(contrConn)
             {
-                continue;
-            }
-
-            if(contrConn || contrNotConn)
-            {
-                result->modified = 1;
-
                 char buffer1[100];
                 snprintf(buffer1, sizeof(buffer1), 
                     "Zalozmy, ze krawedz (%d %d) istnieje:", 
@@ -659,37 +646,63 @@ RestrictionResult *edge_check_condition(Graph *graph, RestrictionParameters *par
                 proofNode1->message = strdup(buffer1);
                 proofNode1->subtree = get_machine_proof_tree(connMachine);
                 append_proof_node(get_machine_proof_tree(originMachine), proofNode1);
-
-                char buffer2[100];
-                snprintf(buffer2, sizeof(buffer2), 
-                    "Zalozmy, ze krawedz (%d %d) nie istnieje:", 
+                
+                char buffer1_1[100];
+                snprintf(buffer1_1, sizeof(buffer1_1),
+                    "Istnienie krawedzi (%d %d) prowadzi do sprzecznosci, czyli nie moze ona istniec",
                     i, j);
+                ProofNode *proofNode1_1 = create_proof_node();
+                proofNode1_1->message = strdup(buffer1_1);
+                append_proof_node(get_machine_proof_tree(originMachine), proofNode1_1);
+                
+            }
+            if(contrNotConn)
+            {
                 ProofNode *proofNode2 = create_proof_node();
+                char buffer2[100];
+                snprintf(buffer2, sizeof(buffer2),
+                    "Zalozmy, ze krawedz (%d %d) nie istnieje:",
+                    i, j);
                 proofNode2->message = strdup(buffer2);
                 proofNode2->subtree = get_machine_proof_tree(notConnMachine);
                 append_proof_node(get_machine_proof_tree(originMachine), proofNode2);
+                
+                char buffer2_1[100];
+                snprintf(buffer2_1, sizeof(buffer2_1),
+                    "Brak krawedzi (%d %d) prowadzi do sprzecznosci, czyli musi ona istniec",
+                    i, j);
+                ProofNode *proofNode2_1 = create_proof_node();
+                proofNode2_1->message = strdup(buffer2_1);
+                append_proof_node(get_machine_proof_tree(originMachine), proofNode2_1);
             }
+            
+
             if(contrConn && contrNotConn)
             {
                 result->contradictionFound = 1;
+                char buffer[100];
+                snprintf(buffer, sizeof(buffer),
+                    "Krawedz (%d %d) jednoczesnie musi i nie moze istniec - sprzecznosc",
+                    i, j);
+                ProofNode *proofNode = create_proof_node();
+                proofNode->message = strdup(buffer);
+                append_proof_node(get_machine_proof_tree(originMachine), proofNode);
                 return result;
             }
 
             if(contrConn)
             {
-                int depth = get_machine_depth(originMachine);
-                load_machine(originMachine, connMachine);
-                set_machine_depth(originMachine, depth);
+                load_machine(originMachine, notConnMachine);
             }
+
             if(contrNotConn)
             {
-                int depth = get_machine_depth(originMachine);
-                load_machine(originMachine, notConnMachine);
-                set_machine_depth(originMachine, depth);
+                load_machine(originMachine, connMachine);
             }
 
             if(contrConn || contrNotConn)
             {
+                result->modified = 1;
                 return result;
             }
         }
@@ -698,3 +711,188 @@ RestrictionResult *edge_check_condition(Graph *graph, RestrictionParameters *par
 }
 
 // =============== check edge restriction ============
+// ===============   contains no minor    ============
+
+typedef struct GraphNode
+{
+    Graph *graph;
+    GraphNode *next;
+}GraphNode;
+
+GraphNode *init_graph_node(void)
+{
+    GraphNode *res = gtd_malloc(sizeof(GraphNode));
+    res->graph = NULL;
+    res->next = NULL;
+    return res;
+}
+
+void add_new_graph(GraphNode **head, Graph *graph)
+{
+    GraphNode *node = init_graph_node();
+    node->graph = graph;
+    node->next = *head;
+    *head = node;
+}
+
+// Helper function to check if two graphs are isomorphic using a given mapping
+bool check_isomorphism(char **adj_matrix1, char **adj_matrix2, int num_vertices, int *mapping) 
+{
+    for (int i = 0; i < num_vertices; i++) 
+    {
+        for (int j = 0; j < num_vertices; j++) 
+        {
+            //if (adj_matrix1[i][j] != adj_matrix2[mapping[i]][mapping[j]])
+            if((adj_matrix1[i][j] == CONNECTED_SYMBOL && adj_matrix2[mapping[i]][mapping[j]] != CONNECTED_SYMBOL) ||
+               (adj_matrix1[i][j] != CONNECTED_SYMBOL && adj_matrix2[mapping[i]][mapping[j]] == CONNECTED_SYMBOL))
+            {
+                return false;
+            }
+        }
+    }
+    return true;
+}
+
+// Helper function to generate all permutations of vertex mappings
+void generate_permutations(int *array, int start, int end, char **adj_matrix1, char **adj_matrix2, int num_vertices, bool *found) 
+{
+    if (*found) return;
+
+    if (start == end) 
+    {
+        if (check_isomorphism(adj_matrix1, adj_matrix2, num_vertices, array)) {
+            *found = true;
+        }
+        return;
+    }
+
+    for (int i = start; i <= end; i++) 
+    {
+        // Swap
+        int temp = array[start];
+        array[start] = array[i];
+        array[i] = temp;
+
+        generate_permutations(array, start + 1, end, adj_matrix1, adj_matrix2, num_vertices, found);
+
+        // Swap back
+        temp = array[start];
+        array[start] = array[i];
+        array[i] = temp;
+    }
+}
+
+bool are_graphs_isomorphic(Graph *graph1, Graph *graph2) 
+{
+    int num_vertices1 = get_graph_num_vertices(graph1);
+    int num_vertices2 = get_graph_num_vertices(graph2);
+
+    if (num_vertices1 != num_vertices2) 
+    {
+        return false;
+    }
+
+    if(num_vertices1 == 0)
+    {
+        return true;
+    }
+
+    char **adj_matrix1 = get_graph_adjacency_matrix(graph1);
+    char **adj_matrix2 = get_graph_adjacency_matrix(graph2);
+
+    int *vertex_mapping = malloc(num_vertices1 * sizeof(int));
+    for (int i = 0; i < num_vertices1; i++) 
+    {
+        vertex_mapping[i] = i;
+    }
+
+    bool found_isomorphism = false;
+    generate_permutations(vertex_mapping, 0, num_vertices1 - 1, adj_matrix1, adj_matrix2, num_vertices1, &found_isomorphism);
+
+    free(vertex_mapping);
+    return found_isomorphism;
+}
+
+/**
+ * \brief function checks, if Graph G contains H as a minor
+ * \param G - pointer to the Graph class object
+ * \param H - pointer to the Graph class object
+ * \return pointer to the int array that is NULL if G does not contain H minor
+ * \return otherwise, the length of an array in number of vertices in G
+ * \return and array[i] = 1 iff vertex i spans H, 0 otherwise 
+ */
+int check_minor_existance(Graph *G, Graph *H)
+{
+    GraphNode *head = init_graph_node();
+    head->graph = H;
+    int nG = get_graph_num_vertices(G);
+    int mG = get_graph_num_edges(G);
+
+    while(head != NULL)
+    {
+        GraphNode *node = head;
+        GTD_UNUSED(node);
+        head = head->next;
+        Graph *graph = head->graph;
+
+        if(get_graph_num_vertices(graph) > nG || get_graph_num_edges(graph) > mG)
+        {
+            continue;
+        }
+        if(are_graphs_isomorphic(G, graph))
+        {
+            // TODO clean memory
+            return 1;
+        }
+
+        int n = get_graph_num_vertices(graph);
+        char **adjMatrix = get_graph_adjacency_matrix(graph);
+
+        // add edge
+        for(int i = 0; i < n; ++i)
+        {
+            for(int j = i+1; j < n; ++j)
+            {
+                if(adjMatrix[i][j] == CONNECTED_SYMBOL)
+                {
+                    continue;
+                }
+                Graph *new_graph = copy_graph(graph);
+                set_edge_connected(new_graph, i, j);
+                add_new_graph(&head, new_graph);
+            }
+        }
+
+        if(n == nG)
+        {
+            continue;
+        }
+
+        // subdivide edge
+        for(int i = 0; i < n; ++i)
+        {
+            for(int j = i+1; j < n; ++j)
+            {
+                if(adjMatrix[i][j] != CONNECTED_SYMBOL)
+                {
+                    continue;
+                }
+                Graph *new_graph = copy_graph(graph);
+                add_vertex(graph);
+                set_edge_not_connected(new_graph, i, j);
+                set_edge_connected(new_graph, i, n);
+                set_edge_connected(new_graph, j, n);
+                add_new_graph(&head, new_graph);
+            }
+        }
+
+        // add vertex
+        Graph *new_graph = copy_graph(graph);
+        add_vertex(graph);
+        add_new_graph(&head, new_graph);
+    }
+
+    return 0;
+}
+
+// ===============   contains no minor    ============

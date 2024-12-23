@@ -161,14 +161,12 @@ void load_machine(GenerativeProofMachine *m1, GenerativeProofMachine *m2)
 {
     destroy_graph(m1->graph);
     m1->graph = m2->graph;
-    GenerativeRestriction **restrictions = get_machine_restrictions(m1);
-    for(int i = 0; i < m1->numRestrictions; ++i)
+    ProofTree *m2Tree = get_machine_proof_tree(m2);
+    GTD_UNUSED(m2Tree);
+    if(m2Tree != NULL && m2Tree->head != NULL)
     {
-        destroy_restriction_parameters_soft(get_parameters_from_restriction(restrictions[i]));
-        delete_restriction_object(restrictions[i]);
+        ProofNode *node = m2Tree->head;
+        ProofTree *m1Tree = get_machine_proof_tree(m1);
+        append_proof_node(m1Tree, node);
     }
-    m1->depth = m2->depth;
-    m1->restrictions = m2->restrictions;
-    m1->numRestrictions = m2->numRestrictions;
-    gtd_free(restrictions);
 }

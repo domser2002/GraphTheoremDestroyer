@@ -49,6 +49,8 @@ RestrictionResult *min_degree_condition(Graph *graph, RestrictionParameters *par
 RestrictionResult *edge_check_condition(Graph *graph, RestrictionParameters *params);
 RestrictionResult *no_unknown_edges_condition(Graph *graph, RestrictionParameters *params);
 bool are_graphs_isomorphic(Graph *graph1, Graph *graph2);
+int check_minor_existance(Graph *G, Graph *H);
+int check_induced_subgraph_existance(Graph *G, Graph *H);
 // RestrictionResult *contains_to_minor(Graph *graph, RestrictionParameters *params);
 
 RestrictionParameters *deep_copy_restriction_parameters(RestrictionParameters *params);

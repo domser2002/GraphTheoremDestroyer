@@ -76,7 +76,7 @@ int get_graph_num_edges(Graph *graph)
     int n = get_graph_num_vertices(graph);
     for(int i = 0; i < n; ++i)
     {
-        for(int j = i+1; i < n; ++j)
+        for(int j = i+1; j < n; ++j)
         {
             if(adjMatrix[i][j] == CONNECTED_SYMBOL)
             {

@@ -760,7 +760,8 @@ void generate_permutations(int *array, int start, int end, char **adj_matrix1, c
 
     if (start == end) 
     {
-        if (check_isomorphism(adj_matrix1, adj_matrix2, num_vertices, array)) {
+        if (check_isomorphism(adj_matrix1, adj_matrix2, num_vertices, array)) 
+        {
             *found = true;
         }
         return;
@@ -797,6 +798,13 @@ bool are_graphs_isomorphic(Graph *graph1, Graph *graph2)
         return true;
     }
 
+    int hash1 = get_graph_hash(graph1);
+    int hash2 = get_graph_hash(graph2);
+    if(hash1 != hash2)
+    {
+        return false;
+    }
+
     char **adj_matrix1 = get_graph_adjacency_matrix(graph1);
     char **adj_matrix2 = get_graph_adjacency_matrix(graph2);
 
@@ -817,10 +825,11 @@ bool are_graphs_isomorphic(Graph *graph1, Graph *graph2)
  * \brief function checks, if Graph G contains H as a minor
  * \param G - pointer to the Graph class object
  * \param H - pointer to the Graph class object
- * \return pointer to the int array that is NULL if G does not contain H minor
- * \return otherwise, the length of an array in number of vertices in G
- * \return and array[i] = 1 iff vertex i spans H, 0 otherwise 
+ * \return 1 if H is a minor of H, 0 otherwise
  */
+// bruh this function so inefficient
+// 16GB ram aint enough to check simple case
+// (｡•́︿•̀｡)
 int check_minor_existance(Graph *G, Graph *H)
 {
     GraphNode *head = init_graph_node();
@@ -828,12 +837,15 @@ int check_minor_existance(Graph *G, Graph *H)
     int nG = get_graph_num_vertices(G);
     int mG = get_graph_num_edges(G);
 
+    int ctr = 1;
+
     while(head != NULL)
     {
         GraphNode *node = head;
-        GTD_UNUSED(node);
-        head = head->next;
         Graph *graph = head->graph;
+        head = head->next;
+        ctr--;
+        printf("There are %d graph in a queue\n", ctr);
 
         if(get_graph_num_vertices(graph) > nG || get_graph_num_edges(graph) > mG)
         {
@@ -841,7 +853,14 @@ int check_minor_existance(Graph *G, Graph *H)
         }
         if(are_graphs_isomorphic(G, graph))
         {
-            // TODO clean memory
+            return 1;
+            while(node != NULL)
+            {
+                destroy_graph(node->graph);
+                GraphNode *next = node->next;
+                gtd_free(node);
+                node = next;
+            }
             return 1;
         }
 
@@ -860,8 +879,11 @@ int check_minor_existance(Graph *G, Graph *H)
                 Graph *new_graph = copy_graph(graph);
                 set_edge_connected(new_graph, i, j);
                 add_new_graph(&head, new_graph);
+                ++ctr;
             }
         }
+        /*
+        */
 
         if(n == nG)
         {
@@ -883,16 +905,126 @@ int check_minor_existance(Graph *G, Graph *H)
                 set_edge_connected(new_graph, i, n);
                 set_edge_connected(new_graph, j, n);
                 add_new_graph(&head, new_graph);
+                ++ctr;
             }
         }
+        /*
+        */
 
         // add vertex
         Graph *new_graph = copy_graph(graph);
-        add_vertex(graph);
-        add_new_graph(&head, new_graph);
+        int added = add_vertex(new_graph);
+        if(added == 1)
+        {
+            add_new_graph(&head, new_graph);
+            ++ctr;
+        }
+        else
+        {
+            destroy_graph(new_graph);
+        }
+
+        destroy_graph(graph);
     }
 
     return 0;
 }
 
 // ===============   contains no minor    ============
+// ===============   contains no subgraph ============
+
+void printSubset(int* subset, int k) {
+    printf("{");
+    for (int i = 0; i < k; i++) {
+        printf("%d", subset[i]);
+        if (i < k - 1) {
+            printf(", ");
+        }
+    }
+    printf("}\n");
+}
+
+void generateSubsets(int start, int n, int k, int* subset, int index, int** subsets, int* count) {
+    if (index == k) {
+        subsets[*count] = (int*)gtd_malloc(k * sizeof(int));
+        for (int i = 0; i < k; i++) {
+            subsets[*count][i] = subset[i];
+        }
+        (*count)++;
+        return;
+    }
+
+    for (int i = start; i < n; i++) {
+        subset[index] = i;
+        generateSubsets(i + 1, n, k, subset, index + 1, subsets, count);
+    }
+}
+
+int** findSubsets(int k, int n, int* totalSubsets) {
+    if (k > n) {
+        *totalSubsets = 0;
+        return NULL;
+    }
+
+    int subsetCount = 1;
+    for(int i = 0; i < k; ++i)
+    {
+        subsetCount *= n-i;
+        subsetCount /= (i+1);
+    }
+
+    int** subsets = (int**)malloc(subsetCount * sizeof(int*)); // Allocate memory for pointers to subsets
+    int* subset = (int*)malloc(k * sizeof(int));
+    *totalSubsets = 0;
+
+    generateSubsets(0, n, k, subset, 0, subsets, totalSubsets);
+
+    free(subset);
+    return subsets;
+}
+
+void freeSubsets(int** subsets, int totalSubsets) {
+    for (int i = 0; i < totalSubsets; i++) {
+        free(subsets[i]);
+    }
+    free(subsets);
+}
+
+int check_induced_subgraph_existance(Graph *G, Graph *H)
+{
+    int n = get_graph_num_vertices(G);
+    int k = get_graph_num_vertices(H);
+    int totalSubsets;
+
+    int** subsets = findSubsets(k, n, &totalSubsets);
+    char **GMatrix = get_graph_adjacency_matrix(G);
+
+    int result = 0;
+    for(int i = 0; i < totalSubsets; ++i)
+    {
+        Graph *GPrim = create_graph(k, k);
+        int *mapping = subsets[i];
+        for(int j = 0; j < k; ++j)
+        {
+            for(int l = j+1; l < k; ++l)
+            {
+                if(GMatrix[mapping[j]][mapping[l]] == CONNECTED_SYMBOL)
+                {
+                    set_edge_connected(GPrim, j, l);
+                }
+            }
+        }
+        int isomorphic = are_graphs_isomorphic(GPrim, H);
+        destroy_graph(GPrim);
+        if(isomorphic)
+        {
+            result = 1;
+            break;
+        }
+    }
+
+    freeSubsets(subsets, totalSubsets);
+    return result;
+}
+
+// ===============   contains no subgraph ============

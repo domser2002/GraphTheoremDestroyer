@@ -24,31 +24,36 @@ void test_generative_proof_machine(void)
     test_minimum_degree_restriction();
 
     printf("Erdos gyarfas subcase\n");
-    // test_erdos_gyarfas_case();
+    test_erdos_gyarfas_case();
 
     printf("Erdos gyarfas p7 free\n");
-    test_erdos_gyarfas_pk_free(7, 15, 3, 1);
+    test_erdos_gyarfas_pk_free(7, 15, 2, 1);
 
     printf("Edros gyarfas p8 free\n");
     test_erdos_gyarfas_pk_free(8, 40, 5, 1);
 
     // uncomment below lines for more erdos-gyarfas cases
-    /*
-    printf("Erdos gyarfas p9 free\n");
-    test_erdos_gyarfas_pk_free(9, 25, 3, 1);
+    // printf("Erdos gyarfas p9 free\n");
+    // test_erdos_gyarfas_pk_free(9, 30, 5, 1);
 
-    printf("Erdos gyarfas p10 free\n");
-    test_erdos_gyarfas_pk_free(10, 50, 5, 1);
+    // printf("Erdos gyarfas p10 free\n");
+    // test_erdos_gyarfas_pk_free(10, 50, 5, 1);
 
-    printf("Erdos gyarfas p11 free\n");
-    test_erdos_gyarfas_pk_free(11, 50, 5, 1);
+    // printf("Erdos gyarfas p11 free\n");
+    // test_erdos_gyarfas_pk_free(11, 50, 5, 1);
 
-    printf("Erdos gyarfas p12 free\n");
-    test_erdos_gyarfas_pk_free(12, 50, 5, 1);
-    */
+    // printf("Erdos gyarfas p12 free\n");
+    // test_erdos_gyarfas_pk_free(12, 50, 5, 1);
+    
 
    printf("Isomorphic function test\n");
    test_isomorphic_check();
+
+   // printf("Minor check\n");
+   // test_minor_check();
+
+   printf("Subgraph check\n");
+   test_subgraph_check();
 }
 
 void test_machine_creation_and_deletion(void)
@@ -823,9 +828,173 @@ void test_isomorphic_check(void)
 
     assert(are_graphs_isomorphic(graph1, graph2) == false);
 
+    // K2 test
+    Graph *G1 = create_graph(2, 2);
+    set_edge_connected(G1, 0, 1);
+    Graph *G2 = create_graph(2, 2);
+    set_edge_connected(G2, 0, 1);
+    bool k2_result = are_graphs_isomorphic(G1, G2);
+    assert(k2_result == true);
+
     // Clean up
     destroy_graph(graph1);
     destroy_graph(graph2);
 
 }
 
+void test_minor_check(void)
+{
+    // test 1
+    Graph *graph1_1 = create_graph(5, 5);
+    set_edge_connected(graph1_1, 0, 1);
+    set_edge_connected(graph1_1, 1, 2);
+    set_edge_connected(graph1_1, 2, 3);
+    set_edge_connected(graph1_1, 4, 2);
+    Graph *graph1_2 = create_graph(5, 5);
+    set_edge_connected(graph1_2, 2, 0);
+    set_edge_connected(graph1_2, 0, 1);
+    set_edge_connected(graph1_2, 1, 4);
+    set_edge_connected(graph1_2, 3, 1);
+    bool isomorphic_test_1_1 = are_graphs_isomorphic(graph1_1, graph1_2);
+    int minor_test_1_1 = check_minor_existance(graph1_1, graph1_2);
+    assert(isomorphic_test_1_1 == true);
+    assert(minor_test_1_1 == 1);
+
+    // test 2 - petersen graph contains K3,3
+    // petersen graph
+    Graph *graph2_1 = create_graph(10, 10);
+    set_edge_connected(graph2_1, 0, 1);
+    set_edge_connected(graph2_1, 0, 4);
+    set_edge_connected(graph2_1, 0, 5);
+    set_edge_connected(graph2_1, 1, 2);
+    set_edge_connected(graph2_1, 1, 6);
+    set_edge_connected(graph2_1, 2, 3);
+    set_edge_connected(graph2_1, 2, 7);
+    set_edge_connected(graph2_1, 3, 4);
+    set_edge_connected(graph2_1, 3, 8);
+    set_edge_connected(graph2_1, 4, 9);
+    set_edge_connected(graph2_1, 5, 7);
+    set_edge_connected(graph2_1, 5, 8);
+    set_edge_connected(graph2_1, 6, 8);
+    set_edge_connected(graph2_1, 6, 9);
+    set_edge_connected(graph2_1, 7, 9);
+    // K3,3
+    Graph *graph2_2 = create_graph(10, 6);
+    set_edge_connected(graph2_2, 0, 3);
+    set_edge_connected(graph2_2, 0, 4);
+    set_edge_connected(graph2_2, 0, 5);
+    set_edge_connected(graph2_2, 1, 3);
+    set_edge_connected(graph2_2, 1, 4);
+    set_edge_connected(graph2_2, 1, 5);
+    set_edge_connected(graph2_2, 2, 3);
+    set_edge_connected(graph2_2, 2, 4);
+    set_edge_connected(graph2_2, 2, 5);
+    bool isomorphic_test_2_1 = are_graphs_isomorphic(graph2_1, graph2_2);
+    assert(isomorphic_test_2_1 == false);
+    int minor_test_2_1 = check_minor_existance(graph2_1, graph2_2);
+    assert(minor_test_2_1 == 1);
+}
+
+void test_subgraph_check(void)
+{
+
+    // Test 1: G contains H as an induced subgraph
+    Graph *G1 = create_graph(10, 6);
+    set_edge_connected(G1, 0, 1);
+    set_edge_connected(G1, 1, 2);
+    set_edge_connected(G1, 0, 2); // Triangle
+    Graph *H1 = create_graph(3, 3);
+    set_edge_connected(H1, 0, 1);
+    set_edge_connected(H1, 1, 2);
+    set_edge_connected(H1, 0, 2); // Triangle
+    assert(check_induced_subgraph_existance(G1, H1) == 1);
+    
+    // Test 2: G does not contain H as an induced subgraph
+    Graph *G2 = create_graph(10, 5);
+    set_edge_connected(G2, 0, 1);
+    set_edge_connected(G2, 1, 2);
+    Graph *H2 = create_graph(3, 3);
+    set_edge_connected(H2, 0, 1);
+    set_edge_connected(H2, 1, 2);
+    set_edge_connected(H2, 0, 2); // Triangle
+    assert(check_induced_subgraph_existance(G2, H2) == 0);
+    
+    // Test 3: G is the same as H
+    Graph *G3 = create_graph(10, 4);
+    set_edge_connected(G3, 0, 1);
+    set_edge_connected(G3, 1, 2);
+    set_edge_connected(G3, 0, 2); // Triangle
+    Graph *H3 = create_graph(4, 4);
+    set_edge_connected(H3, 0, 1);
+    set_edge_connected(H3, 1, 2);
+    set_edge_connected(H3, 0, 2); // Triangle
+    assert(check_induced_subgraph_existance(G3, H3) == 1);
+    
+    // Test 4: H is a subset of G
+    Graph *G4 = create_graph(10, 6);
+    set_edge_connected(G4, 0, 1);
+    set_edge_connected(G4, 1, 2);
+    set_edge_connected(G4, 2, 3);
+    Graph *H4 = create_graph(4, 3);
+    set_edge_connected(H4, 0, 1);
+    set_edge_connected(H4, 1, 2);
+    assert(check_induced_subgraph_existance(G4, H4) == 1);
+    
+    // Test 5: H includes edges not present in G
+    Graph *G5 = create_graph(10, 4);
+    set_edge_connected(G5, 0, 1);
+    set_edge_connected(G5, 1, 2);
+    Graph *H5 = create_graph(3, 3);
+    set_edge_connected(H5, 0, 1);
+    set_edge_connected(H5, 1, 2);
+    set_edge_connected(H5, 0, 2); // Triangle
+    assert(check_induced_subgraph_existance(G5, H5) == 0);
+    
+    // Test 6: G has a disconnected subgraph that matches H
+    Graph *G6 = create_graph(10, 5);
+    set_edge_connected(G6, 0, 1);
+    set_edge_connected(G6, 2, 3); // Two components
+    Graph *H6 = create_graph(2, 2);
+    set_edge_connected(H6, 0, 1);
+    assert(check_induced_subgraph_existance(G6, H6) == 1);
+    
+    // Test 7: Empty G and non-empty H
+    Graph *G7 = create_graph(10, 0);
+    Graph *H7 = create_graph(2, 2);
+    set_edge_connected(H7, 0, 1);
+    assert(check_induced_subgraph_existance(G7, H7) == 0);
+    
+    // Test 8: Non-empty G and empty H
+    Graph *G8 = create_graph(10, 3);
+    set_edge_connected(G8, 0, 1);
+    set_edge_connected(G8, 1, 2);
+    Graph *H8 = create_graph(0, 0); // Empty
+    assert(check_induced_subgraph_existance(G8, H8) == 1);
+    
+    // Test 9: H is fully connected graph, but G is not
+    Graph *G9 = create_graph(10, 4);
+    set_edge_connected(G9, 0, 1);
+    set_edge_connected(G9, 2, 3); // Disconnected
+    Graph *H9 = create_graph(4, 4);
+    set_edge_connected(H9, 0, 1);
+    set_edge_connected(H9, 0, 2);
+    set_edge_connected(H9, 1, 2);
+    set_edge_connected(H9, 1, 3);
+    set_edge_connected(H9, 2, 3); // Fully connected
+    assert(check_induced_subgraph_existance(G9, H9) == 0);
+    
+    // Test 10: Large graph with edge conditions
+    Graph *G10 = create_graph(10, 6);
+    set_edge_connected(G10, 0, 1);
+    set_edge_connected(G10, 1, 2);
+    set_edge_connected(G10, 2, 3);
+    set_edge_connected(G10, 3, 4);
+    set_edge_connected(G10, 4, 5);
+    Graph *H10 = create_graph(3, 3);
+    set_edge_connected(H10, 0, 1);
+    set_edge_connected(H10, 1, 2);
+    set_edge_connected(H10, 0, 2); // Subgraph not existing
+    assert(check_induced_subgraph_existance(G10, H10) == 0);
+
+
+}

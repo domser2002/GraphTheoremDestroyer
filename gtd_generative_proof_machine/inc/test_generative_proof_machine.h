@@ -11,5 +11,7 @@ void test_erdos_gyarfas_case(void);
 void test_minimum_degree_restriction(void);
 void test_erdos_gyarfas_pk_free(int k, int max_vertices, int max_depth, int save_to_file);
 void test_isomorphic_check(void);
+void test_minor_check(void);
+void test_subgraph_check(void);
 
 #endif

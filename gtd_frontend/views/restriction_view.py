@@ -11,9 +11,9 @@ class RestrictionView(CTkFrame):
         self.pack_propagate(False)  # Prevent the frame from shrinking to fit its contents
         self.configure(height=RESTRICTION_BOX_HEIGHT)
         
-        default_schema = RestrictionSchema(None, RESTRICTION_COMBO_BOX_DEFAULT_OPTION, [], None)
+        default_schema = RestrictionSchema(None, RESTRICTION_COMBO_BOX_DEFAULT_OPTION, [], [])
         self.restriction_schemas = [default_schema] + restr_schemas
-        self.restriction_params: RestrictionParameters = RestrictionParameters(None, RESTRICTION_COMBO_BOX_DEFAULT_OPTION, {}, None)
+        self.restriction_params: RestrictionParameters = RestrictionParameters(None, RESTRICTION_COMBO_BOX_DEFAULT_OPTION, {}, {})
         self.chosen_schema = self.restriction_schemas[0]
         self.options = [x.name for x in self.restriction_schemas]
 
@@ -50,11 +50,13 @@ class RestrictionView(CTkFrame):
             entry.pack(side='left', padx=10)
     
     def display_function_input_field(self):
-        if self.chosen_schema.function is not None:
-            label = CTkLabel(self, text=f'{self.chosen_schema.function}:')
-            label.pack(side='left', padx=5)
-            self.restriction_params.function = FunctionInputFrame(self)
-            self.restriction_params.function.pack(side='left', padx=5)
+        for function_name in self.chosen_schema.functions:
+                label = CTkLabel(self, text=f'{function_name}:')
+                label.pack(side='left', padx=5)
+                function_frame = FunctionInputFrame(self)
+                self.restriction_params.functions[function_name] = function_frame
+                function_frame.pack(side='left', padx=5)
+
 
     def select_choice(self, choice):
         if choice == self.restriction_params.restriction_name:
@@ -72,9 +74,10 @@ class RestrictionView(CTkFrame):
         for key in self.restriction_params.int_params_values.keys():
             value = self.restriction_params.int_params_values[key].get()
             int_params_values[key] = value
-        function = None
-        if type(self.restriction_params.function) is FunctionInputFrame:
-            function = self.restriction_params.function.get_value()
-        params = RestrictionParameters(id, name, int_params_values, function)
+        function_values = {}
+        for key in self.restriction_params.functions.keys():
+            value = self.restriction_params.functions[key].get_value()
+            function_values[key] = value
+        params = RestrictionParameters(id, name, int_params_values, function_values)
         result = Restriction(params)
         return result

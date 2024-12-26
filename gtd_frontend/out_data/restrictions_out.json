@@ -1,20 +1,15 @@
 [
     {
         "id": 4,
-        "name": "Example function"
-    },
-    {
-        "id": 0,
-        "name": "No k cycle",
-        "int_params_values": {
-            "k": "3"
-        }
-    },
-    {
-        "id": 1,
-        "name": "No induced k path",
-        "int_params_values": {
-            "k": "7"
+        "name": "Example function",
+        "functions": {
+            "very nice function": [
+                [
+                    3,
+                    8,
+                    7
+                ]
+            ]
         }
     }
 ]

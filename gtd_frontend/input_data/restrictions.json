@@ -21,6 +21,6 @@
     {
         "id": 4,
         "name": "Example function",
-        "function": "very nice function"
+        "functions": ["very nice function"]
     }
 ]

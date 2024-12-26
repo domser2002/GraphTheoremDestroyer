@@ -31,7 +31,7 @@ class RestrictionController:
             id = None
             name = None
             int_params = []
-            function = None
+            functions = []
 
             if 'id' in x.keys():
                 id = x['id']
@@ -39,10 +39,10 @@ class RestrictionController:
                 name = x['name']
             if 'int_params' in x.keys():
                 int_params = x['int_params']
-            if 'function' in x.keys():
-                function = x['function']
+            if 'functions' in x.keys():
+                functions = x['functions']
             
-            schema = RestrictionSchema(id, name, int_params, function)
+            schema = RestrictionSchema(id, name, int_params, functions)
             result.append(schema)
         return result
     
@@ -62,8 +62,8 @@ class RestrictionController:
                     data['name'] = restr.name
                 if restr.int_params_values is not None and len(restr.int_params_values) > 0:
                     data['int_params_values'] = restr.int_params_values
-                if restr.function is not None:
-                    data['function'] = restr.function
+                if restr.functions is not None and len(restr.functions) > 0:
+                    data['functions'] = restr.functions
                 datas.append(data)
             json.dump(datas, file, indent=4)
     

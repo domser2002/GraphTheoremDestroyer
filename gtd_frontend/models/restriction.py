@@ -1,10 +1,10 @@
 class RestrictionSchema:
 
-    def __init__(self, id, name, int_params: list[str], function: str):
+    def __init__(self, id, name, int_params: list[str], functions: list[str]):
         self.id = id
         self.name = name
         self.int_params = int_params
-        self.function = function
+        self.functions = functions
 
     def __repr__(self):
         return f'RestrictionSchema(id: {self.id}, name: {self.name}, int_params: {self.int_params})\n'
@@ -14,12 +14,12 @@ class RestrictionParameters:
                  restriction_id: int,
                  restriction_name: str,
                  int_params_values: dict,
-                 function: list[(int, int)]):
+                 functions: dict):
         
         self.int_params_values = int_params_values
         self.restriction_id = restriction_id
         self.restriction_name = restriction_name
-        self.function = function
+        self.functions = functions
     
 class Restriction:
 
@@ -27,9 +27,9 @@ class Restriction:
         id = params.restriction_id
         name = params.restriction_name
         int_params_values = params.int_params_values
-        function = params.function
+        functions = params.functions
 
         self.id = id
         self.name = name
         self.int_params_values = int_params_values
-        self.function = function
+        self.functions = functions

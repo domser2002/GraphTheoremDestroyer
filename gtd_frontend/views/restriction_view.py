@@ -53,8 +53,8 @@ class RestrictionView(CTkFrame):
         if self.chosen_schema.function is not None:
             label = CTkLabel(self, text=f'{self.chosen_schema.function}:')
             label.pack(side='left', padx=5)
-            function_input = FunctionInputFrame(self)
-            function_input.pack(side='left', padx=5)
+            self.restriction_params.function = FunctionInputFrame(self)
+            self.restriction_params.function.pack(side='left', padx=5)
 
     def select_choice(self, choice):
         if choice == self.restriction_params.restriction_name:
@@ -72,7 +72,9 @@ class RestrictionView(CTkFrame):
         for key in self.restriction_params.int_params_values.keys():
             value = self.restriction_params.int_params_values[key].get()
             int_params_values[key] = value
-        function = self.restriction_params.function
+        function = None
+        if type(self.restriction_params.function) is FunctionInputFrame:
+            function = self.restriction_params.function.get_value()
         params = RestrictionParameters(id, name, int_params_values, function)
         result = Restriction(params)
         return result

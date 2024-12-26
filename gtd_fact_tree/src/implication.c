@@ -54,8 +54,8 @@ const Implication EMPTY_IMPLICATION =
  */
 bool implication_type_1_calculate_right_side_params(Function **left_side_params, Function **right_side_params)
 {
-    copy_function(left_side_params[0], &right_side_params[0]);
-    copy_function(left_side_params[0], &right_side_params[1]);
+    right_side_params[0] = copy_function(left_side_params[0]);
+    right_side_params[1] = copy_function(left_side_params[0]);
     char *str1 = get_function_str(left_side_params[0]);
     char *str2 = get_function_str(right_side_params[0]);
     char *str3 = get_function_str(right_side_params[1]);
@@ -74,8 +74,8 @@ bool implication_type_1_calculate_right_side_params(Function **left_side_params,
  */
 bool implication_type_2_calculate_right_side_params(Function **left_side_params, Function **right_side_params)
 {
-    copy_function(left_side_params[0], &right_side_params[0]);
-    copy_function(left_side_params[0], &right_side_params[1]);
+    right_side_params[0] = copy_function(left_side_params[0]);
+    right_side_params[1] = copy_function(left_side_params[0]);
     char *str1 = get_function_str(left_side_params[0]);
     char *str2 = get_function_str(right_side_params[0]);
     char *str3 = get_function_str(right_side_params[1]);
@@ -95,23 +95,17 @@ bool implication_type_2_calculate_right_side_params(Function **left_side_params,
 bool implication_type_3_calculate_right_side_params(Function **left_side_params, Function **right_side_params)
 {
     if (is_equal_constant_function(left_side_params[0], 0)) {
-        right_side_params[0] = create(0);
+        right_side_params[0] = create_function(0);
     } else {
-        Function *eight, *one, *sqrt_result, *result;
-        eight = create(8);
-        one = create(1);
-        sqrt_result = create(0);
-        result = create(0);
+        Function *result;
+        result = copy_function(left_side_params[0]);
+        multiply_constant(result, 8);
+        add_constant(result, 1);           
+        result = sqrt_function(result);            
+        add_constant(result, 1);           
+        divide_constant(result, 2);
+        right_side_params[0] = copy_function(result);
 
-        multiply_constant(left_side_params[0], 8, result);
-        add_constant(result, 1, result);           
-        sqrt_function(result, sqrt_result);            
-        add_constant(sqrt_result, 1, result);           
-        divide_constant(result, 2, right_side_params[0]);
-
-        delete_function(eight);
-        delete_function(one);
-        delete_function(sqrt_result);
         delete_function(result);
     }
     char *str1 = get_function_str(left_side_params[0]);
@@ -129,11 +123,10 @@ bool implication_type_3_calculate_right_side_params(Function **left_side_params,
  */
 bool implication_type_4_calculate_right_side_params(Function **left_side_params, Function **right_side_params)
 {
-    Function *temp;
-    temp = create(0);
-    subtract_constant(left_side_params[0], 1, temp);
-    multiply(left_side_params[0], temp, right_side_params[0]);
-    divide_constant(right_side_params[0], 2, right_side_params[0]);
+    Function *temp = copy_function(left_side_params[0]);
+    subtract_constant(temp, 1);
+    right_side_params[0] = multiply_functions(left_side_params[0], temp);
+    divide_constant(right_side_params[0], 2);
 
     delete_function(temp);
 
@@ -179,8 +172,8 @@ bool implication_type_6_calculate_right_side_params(Function **left_side_params,
 bool implication_type_8_calculate_right_side_params(Function **left_side_params, Function **right_side_params)
 {
     Function *two, *one;
-    one = create(1);
-    two = create(2);
+    one = create_function(1);
+    two = create_function(2);
 
     int8_t res1 = compare_functions(left_side_params[0], two);
     int8_t res2 = compare_functions(left_side_params[1], one);
@@ -190,8 +183,8 @@ bool implication_type_8_calculate_right_side_params(Function **left_side_params,
 
     if (res1 != 0 || res2 != 0)
         return false;
-
-    subtract_constant(left_side_params[2], 1, right_side_params[0]); // t = c3 - 1
+    right_side_params[0] = copy_function(left_side_params[2]);
+    subtract_constant(right_side_params[0], 2);
     char *str1 = get_function_str(left_side_params[1]);
     char *str2 = get_function_str(left_side_params[2]);
     char *str3 = get_function_str(right_side_params[0]);
@@ -210,7 +203,8 @@ bool implication_type_8_calculate_right_side_params(Function **left_side_params,
  */
 bool implication_type_9_calculate_right_side_params(Function **left_side_params, Function **right_side_params)
 {
-    subtract_constant(left_side_params[0], 1, right_side_params[0]); // max tree height = path length - 1
+    right_side_params[0] = copy_function(left_side_params[0]);
+    subtract_constant(right_side_params[0], 1); // max tree height = path length - 1
     char *str1 = get_function_str(left_side_params[0]);
     char *str2 = get_function_str(right_side_params[0]);
     GTD_LOG("Calculated that is tree and contains induced P_{%s} implies max tree height is %s", 
@@ -227,33 +221,39 @@ bool implication_type_9_calculate_right_side_params(Function **left_side_params,
  */
 bool implication_type_10_calculate_right_side_params(Function **left_side_params, Function **right_side_params)
 {
-    Function *n, *t_minus_one, *zero;
-    n = create(1);
-    zero = create(0);
-    t_minus_one = create(0);
-
-    // t^h
-    Function *i = NULL;
-    copy_function(left_side_params[1], &i);
-    for (; compare_functions(i, zero) == 1; subtract_constant(i, 1, i)) {
-        multiply(n, left_side_params[0], n);
+    if(is_equal_constant_function(left_side_params[0], 1))
+    {
+        right_side_params[0] = copy_function(left_side_params[1]);
     }
+    else
+    {
+        Function *th_minus_one, *t_minus_one;
 
-    subtract_constant(left_side_params[0], 1, t_minus_one); // t - 1
-    subtract_constant(n, 1, n);                           // t^h - 1
-    divide(n, t_minus_one, right_side_params[0]);         // (t^h - 1) / (t - 1)
+        // t^h
+        th_minus_one = create_function(1);
+        Function *i = NULL;
+        i = copy_function(left_side_params[1]);
+        for (; !is_equal_constant_function(i, 0); subtract_constant(i, 1))
+        {
+            th_minus_one = multiply_functions(th_minus_one, left_side_params[0]);
+        }
+
+        t_minus_one = copy_function(left_side_params[0]);
+        subtract_constant(t_minus_one, 1);                        // t - 1
+        subtract_constant(th_minus_one, 1);                       // t^h - 1
+        right_side_params[0] = divide_functions(th_minus_one, t_minus_one); // (t^h - 1) / (t - 1)
+
+        delete_function(th_minus_one);
+        delete_function(t_minus_one);
+    }
     char *str1 = get_function_str(left_side_params[0]);
     char *str2 = get_function_str(left_side_params[1]);
     char *str3 = get_function_str(right_side_params[0]);
-    GTD_LOG("Calculated that is %s-nary tree with max height = %s implies max vertex count = %s", 
-        str1, str2, str3);
+    GTD_LOG("Calculated that is %s-nary tree with max height = %s implies max vertex count = %s",
+            str1, str2, str3);
     gtd_free(str1);
     gtd_free(str2);
     gtd_free(str3);
-    delete_function(n);
-    delete_function(t_minus_one);
-    delete_function(zero);
-
     return true;
 }
 
@@ -267,9 +267,9 @@ bool implication_type_11_calculate_right_side_params(Function **left_side_params
     GTD_UNUSED(right_side_params);
 
     Function *two, *three, *five;
-    two = create(2);
-    three = create(3);
-    five = create(5);
+    two = create_function(2);
+    three = create_function(3);
+    five = create_function(5);
 
     int8_t res1 = compare_functions(left_side_params[0], two);
     int8_t res2 = compare_functions(left_side_params[1], three);
@@ -303,7 +303,7 @@ bool implication_type_14_calculate_right_side_params(Function **left_side_params
     GTD_UNUSED(right_side_params);
 
     Function *six;
-    six = create(6);
+    six = create_function(6);
 
     int8_t res = compare_functions(left_side_params[0], six);
 
@@ -324,24 +324,12 @@ bool implication_type_14_calculate_right_side_params(Function **left_side_params
  */
 bool implication_type_15_calculate_right_side_params(Function **left_side_params, Function **right_side_params)
 {
-    Function *seven, *two, *three;
-    seven = create(7);
-    two = create(2);
-    three = create(3);
-
-    int8_t res = compare_functions(left_side_params[0], seven);
-
-    delete_function(seven);
-
-    if (res != 0) // n != 7
+    if (!is_equal_constant_function(left_side_params[0], 7)) // n != 7
         return false;
 
-    copy_function(two, &right_side_params[0]);
-    copy_function(three, &right_side_params[1]);
-    copy_function(three, &right_side_params[2]);
-
-    delete_function(two);
-    delete_function(three);
+    right_side_params[0] = create_function(2);
+    right_side_params[1] = create_function(3);
+    right_side_params[2] = create_function(3);
 
     GTD_LOG("Cycle complement graph with 7 vertices contains K_{3,3}");
     return true;
@@ -545,7 +533,7 @@ Fact **implies(Fact **factArray, int n_facts, int *count)
             GTD_LOG("Implication occurs");
             Function **right_side_params = (Function **)gtd_malloc(knownImplicationsArray[i].right_side.n_params * sizeof(Function *));
             for(uint8_t i=0; i<knownImplicationsArray[i].right_side.n_params; i++)
-                right_side_params[i] = (Function*)gtd_malloc(sizeof(Function*));
+                right_side_params[i] = (Function*)gtd_malloc(sizeof(Function));
             knownImplicationsArray[i].calculate_params(params,right_side_params);
             *count = knownImplicationsArray[i].right_side.n_facts;
             Fact **right_side_facts = (Fact**)gtd_malloc(*count * sizeof(Fact*));
@@ -561,9 +549,9 @@ Fact **implies(Fact **factArray, int n_facts, int *count)
                 }
                 right_side_facts[k] = create_fact(type,fact_params,n_params);
                 gtd_free(fact_params);
-                gtd_free(params);
-                return right_side_facts;
             }
+            gtd_free(params);
+            return right_side_facts;
         }
         gtd_free(params);
     }

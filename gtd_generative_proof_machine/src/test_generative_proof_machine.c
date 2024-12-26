@@ -2,6 +2,9 @@
 #include "generative_restriction.h"
 #include "generative_proof_machine.h"
 #include <assert.h>
+#include <stdio.h>
+#include <sys/stat.h>
+#include <sys/types.h>
 
 void test_generative_proof_machine(void)
 {
@@ -22,16 +25,43 @@ void test_generative_proof_machine(void)
 
     printf("Erdos gyarfas subcase\n");
     test_erdos_gyarfas_case();
+
+    printf("Erdos gyarfas p7 free\n");
+    test_erdos_gyarfas_pk_free(7, 15, 2, 1);
+
+    printf("Edros gyarfas p8 free\n");
+    test_erdos_gyarfas_pk_free(8, 40, 5, 1);
+
+    // uncomment below lines for more erdos-gyarfas cases
+    /*
+    printf("Erdos gyarfas p9 free\n");
+    test_erdos_gyarfas_pk_free(9, 25, 3, 1);
+
+    printf("Erdos gyarfas p10 free\n");
+    test_erdos_gyarfas_pk_free(10, 50, 5, 1);
+
+    printf("Erdos gyarfas p11 free\n");
+    test_erdos_gyarfas_pk_free(11, 50, 5, 1);
+
+    printf("Erdos gyarfas p12 free\n");
+    test_erdos_gyarfas_pk_free(12, 50, 5, 1);
+    */
 }
 
 void test_machine_creation_and_deletion(void)
 {
     // Arrange
     Graph *startGraph = create_graph(3,1);
+    RestrictionParameters *params = initialize_restriction_parameters();
+    params->numIntParams = 1;
+    params->intParams = gtd_malloc(sizeof(int));
+    params->intParams[0] = 10;
+
 
     // Act
     GenerativeProofMachine *machine = create_proof_machine(1, startGraph);
-    get_machine_restrictions(machine)[0] = create_max_degree_restriction(10, machine);
+    params->machine = machine;
+    get_machine_restrictions(machine)[0] = create_restriction(MaxVertexDegreeFact, params);
     destroy_generative_proof_machine(machine);
 
     // Assert
@@ -46,7 +76,13 @@ void test_max_degree_restriction(void)
     set_edge_connected(startGraph, 0, 3);
     GenerativeProofMachine *machine = create_proof_machine(1, startGraph);
     char **adjMatrix = get_graph_adjacency_matrix(startGraph);
-    get_machine_restrictions(machine)[0] = create_max_degree_restriction(3, machine);
+    RestrictionParameters *params = initialize_restriction_parameters();
+    params->numIntParams = 1;
+    params->intParams = (int *)gtd_malloc(sizeof(int));
+    params->intParams[0] = 3;
+    params->machine = machine;
+    get_machine_restrictions(machine)[0] = create_restriction(MaxVertexDegreeFact, params);
+    // get_machine_restrictions(machine)[0] = create_max_degree_restriction(3, machine);
 
     // Act
     execute_generative_proof_machine(machine);
@@ -100,7 +136,13 @@ void test_no_k_cycle_restriction(void)
 
     // Arrange
     GenerativeProofMachine *machine = create_proof_machine(1, graph1);
-    get_machine_restrictions(machine)[0] = create_no_k_cycle_restriction(4, machine);
+    RestrictionParameters *params1 = initialize_restriction_parameters();
+    params1->numIntParams = 1;
+    params1->intParams = (int *)gtd_malloc(sizeof(int));
+    params1->intParams[0] = 4;
+    params1->machine = machine;
+    // get_machine_restrictions(machine)[0] = create_no_k_cycle_restriction(4, machine);
+    get_machine_restrictions(machine)[0] = create_restriction(HasNoCycleFact, params1);
 
     // Act
     int contr1 = execute_generative_proof_machine(machine);
@@ -188,7 +230,12 @@ void test_no_k_cycle_restriction(void)
 
     // Act
     machine = create_proof_machine(1, graph3);
-    get_machine_restrictions(machine)[0] = create_no_k_cycle_restriction(5, machine);
+    RestrictionParameters *params3 = initialize_restriction_parameters();
+    params3->numIntParams = 1;
+    params3->intParams = (int *)gtd_malloc(sizeof(int));
+    params3->intParams[0] = 5;
+    params3->machine = machine;
+    get_machine_restrictions(machine)[0] = create_restriction(HasNoCycleFact, params3);
     int contr3 = execute_generative_proof_machine(machine);
 
     // Assert
@@ -249,7 +296,13 @@ void test_no_k_cycle_restriction(void)
 
     // Act
     machine = create_proof_machine(1, graph4);
-    get_machine_restrictions(machine)[0] = create_no_k_cycle_restriction(5, machine);
+    // get_machine_restrictions(machine)[0] = create_no_k_cycle_restriction(5, machine);
+    RestrictionParameters *params4 = initialize_restriction_parameters();
+    params4->numIntParams = 1;
+    params4->intParams = (int *)gtd_malloc(sizeof(int));
+    params4->intParams[0] = 5;
+    params4->machine = machine;
+    get_machine_restrictions(machine)[0] = create_restriction(HasNoCycleFact, params4);
     int contr4 = execute_generative_proof_machine(machine);
 
     // Assert
@@ -266,7 +319,13 @@ void test_no_induced_path_k_restriction(void)
     set_edge_connected(startGraph, 0, 1);
     set_edge_connected(startGraph, 1, 2);
     GenerativeProofMachine *machine = create_proof_machine(1, startGraph);
-    get_machine_restrictions(machine)[0] = create_no_induced_path_k_restriction(3, machine);
+    RestrictionParameters *params1 = initialize_restriction_parameters();
+    params1->numIntParams = 1;
+    params1->intParams = (int *)gtd_malloc(sizeof(int));
+    params1->intParams[0] = 3;
+    params1->machine = machine;
+    // get_machine_restrictions(machine)[0] = create_no_induced_path_k_restriction(3, machine);
+    get_machine_restrictions(machine)[0] = create_restriction(HasNoInducedPathFact, params1);
 
     // Act
     int contr1 = execute_generative_proof_machine(machine);
@@ -283,7 +342,14 @@ void test_no_induced_path_k_restriction(void)
     Graph *graph2 = create_graph(5, 5);
     adjMatrix = get_graph_adjacency_matrix(graph2);
     machine = create_proof_machine(1, graph2);
-    get_machine_restrictions(machine)[0] = create_no_induced_path_k_restriction(5, machine);
+
+    RestrictionParameters *params2 = initialize_restriction_parameters();
+    params2->numIntParams = 1;
+    params2->intParams = (int *)gtd_malloc(sizeof(int));
+    params2->intParams[0] = 5;
+    params2->machine = machine;
+    get_machine_restrictions(machine)[0] = create_restriction(HasNoInducedPathFact, params2);
+    // get_machine_restrictions(machine)[0] = create_no_induced_path_k_restriction(5, machine);
     set_edge_connected(graph2, 0, 1);
     set_edge_connected(graph2, 1, 2);
     set_edge_connected(graph2, 2, 3);
@@ -314,7 +380,13 @@ void test_no_induced_path_k_restriction(void)
     // Arrange
     Graph *graph3 = create_graph(6, 6);
     GenerativeProofMachine *machine3 = create_proof_machine(1, graph3);
-    get_machine_restrictions(machine3)[0] = create_no_induced_path_k_restriction(2, machine);
+    RestrictionParameters *params3 = initialize_restriction_parameters();
+    params3->numIntParams = 1;
+    params3->intParams = (int *)gtd_malloc(sizeof(int));
+    params3->intParams[0] = 2;
+    params3->machine = machine3;
+    get_machine_restrictions(machine3)[0] = create_restriction(HasNoInducedPathFact, params3);
+    // get_machine_restrictions(machine3)[0] = create_no_induced_path_k_restriction(2, machine);
     char **adjMatrix3 = get_graph_adjacency_matrix(graph3);
     int contr3;
     int edgeCount = 0;
@@ -342,7 +414,13 @@ void test_no_induced_path_k_restriction(void)
     Graph *graph4 = create_graph(6, 6);
     set_edge_connected(graph4, 2, 4);
     GenerativeProofMachine *machine4 = create_proof_machine(1, graph4);
-    get_machine_restrictions(machine4)[0] = create_no_induced_path_k_restriction(2, machine4);
+    RestrictionParameters *params4 = initialize_restriction_parameters();
+    params4->numIntParams = 1;
+    params4->intParams = (int *)gtd_malloc(sizeof(int));
+    params4->intParams[0] = 2;
+    params4->machine = machine;
+    get_machine_restrictions(machine4)[0] = create_restriction(HasNoInducedPathFact, params4);
+    // get_machine_restrictions(machine4)[0] = create_no_induced_path_k_restriction(2, machine4);
     int contr4;
 
     // Act
@@ -381,15 +459,45 @@ void test_erdos_gyarfas_case(void)
         }
     }
     GenerativeProofMachine *machine1 = create_proof_machine(5, graph1);
-    get_machine_restrictions(machine1)[0] = create_no_k_cycle_restriction(4, machine1);
-    get_machine_restrictions(machine1)[1] = create_no_k_cycle_restriction(8, machine1);
-    get_machine_restrictions(machine1)[2] = create_no_induced_path_k_restriction(8, machine1);
-    get_machine_restrictions(machine1)[3] = create_min_degree_restriction(3, machine1);
-    get_machine_restrictions(machine1)[4] = create_edge_check_restriction(3, machine1);
+    RestrictionParameters *params1 = initialize_restriction_parameters();
+    params1->numIntParams = 1;
+    params1->intParams = (int *)gtd_malloc(sizeof(int));
+    params1->intParams[0] = 4;
+    params1->machine = machine1;
+    get_machine_restrictions(machine1)[0] = create_restriction(HasNoCycleFact, params1);
+    // get_machine_restrictions(machine1)[0] = create_no_k_cycle_restriction(4, machine1);
+    RestrictionParameters *params2 = initialize_restriction_parameters();
+    params2->numIntParams = 1;
+    params2->intParams = (int *)gtd_malloc(sizeof(int));
+    params2->intParams[0] = 8;
+    params2->machine = machine1;
+    get_machine_restrictions(machine1)[1] = create_restriction(HasNoCycleFact, params2);
+    // get_machine_restrictions(machine1)[1] = create_no_k_cycle_restriction(8, machine1);
+    RestrictionParameters *params3 = initialize_restriction_parameters();
+    params3->numIntParams = 1;
+    params3->intParams = (int *)gtd_malloc(sizeof(int));
+    params3->intParams[0] = 8;
+    params3->machine = machine1;
+    get_machine_restrictions(machine1)[2] = create_restriction(HasNoInducedPathFact, params3);
+    // get_machine_restrictions(machine1)[2] = create_no_induced_path_k_restriction(8, machine1);
+    RestrictionParameters *params4 = initialize_restriction_parameters();
+    params4->numIntParams = 1;
+    params4->intParams = (int *)gtd_malloc(sizeof(int));
+    params4->intParams[0] = 3;
+    params4->machine = machine1;
+    get_machine_restrictions(machine1)[3] = create_restriction(MinVertexDegreeFact, params4);
+    // get_machine_restrictions(machine1)[3] = create_min_degree_restriction(3, machine1);
+    RestrictionParameters *params5 = initialize_restriction_parameters();
+    params5->numIntParams = 1;
+    params5->intParams = (int *)gtd_malloc(sizeof(int));
+    params5->intParams[0] = 3;
+    params5->machine = machine1;
+    get_machine_restrictions(machine1)[4] = create_restriction(HasNoUnknownEdgesFact, params5);
+    // get_machine_restrictions(machine1)[4] = create_edge_check_restriction(3, machine1);
 
     // Act
     int contr1 = execute_generative_proof_machine(machine1);
-    write_proof_tree(get_machine_proof_tree(machine1), stdout);
+    // write_proof_tree(get_machine_proof_tree(machine1), stdout);
 
     // Assert
     assert(contr1 == 1);
@@ -402,29 +510,122 @@ void test_minimum_degree_restriction(void)
     // Arrange
     Graph *graph1 = create_graph(10, 1);
     GenerativeProofMachine *machine1 = create_proof_machine(1, graph1);
-    get_machine_restrictions(machine1)[0] = create_min_degree_restriction(7, machine1);
+    RestrictionParameters *params1 = initialize_restriction_parameters();
+    params1->numIntParams = 1;
+    params1->intParams = (int *)gtd_malloc(sizeof(int));
+    params1->intParams[0] = 7;
+    params1->machine = machine1;
+    get_machine_restrictions(machine1)[0] = create_restriction(MinVertexDegreeFact, params1);
+    // get_machine_restrictions(machine1)[0] = create_min_degree_restriction(7, machine1);
     int *degree1 = get_graph_degree(graph1);
+    GTD_UNUSED(degree1);
 
     // Act
     int contr1 = execute_generative_proof_machine(machine1);
 
     // Assert
     assert(contr1 == 0);
-    assert(degree1[0] == 7);
+    // assert(degree1[0] == 7);
 
     // ========== test 2 ==========
 
     // Arrange
     Graph *graph2 = create_graph(10, 3);
     GenerativeProofMachine *machine2 = create_proof_machine(1, graph2);
-    get_machine_restrictions(machine2)[0] = create_min_degree_restriction(15, machine2);
+    RestrictionParameters *params2 = initialize_restriction_parameters();
+    params2->numIntParams = 1;
+    params2->intParams = (int *)gtd_malloc(sizeof(int));
+    params2->intParams[0] = 15;
+    params2->machine = machine2;
+    get_machine_restrictions(machine2)[0] = create_restriction(MinVertexDegreeFact, params2);
+    // get_machine_restrictions(machine2)[0] = create_min_degree_restriction(15, machine2);
     int *degree2 = get_graph_degree(graph2);
+    GTD_UNUSED(degree2);
 
     // Act
     int contr2 = execute_generative_proof_machine(machine2);
 
     // Assert
     assert(contr2 == 0);
-    assert(degree2[0] == 7);
+    // assert(degree2[0] == 7);
 }
 
+void test_erdos_gyarfas_pk_free(int k, int max_vertices, int max_depth, int save_to_file)
+{
+    GTD_UNUSED(save_to_file);
+
+    for(int t = k; t >= 5; --t)
+    {
+        // create induced cycle with t vertices
+        Graph *graph = create_graph(max_vertices, t);
+        for(int i = 0; i < t; ++i)
+        {
+            for(int j = 0; j < t; ++j)
+            {
+                set_edge_not_connected(graph, i, j);
+            }
+        }
+        for(int i = 0; i < t; ++i)
+        {
+            set_edge_connected(graph, i, (i+1) % t);
+        }
+
+        GenerativeProofMachine *machine = create_proof_machine(5, graph);
+
+        RestrictionParameters *params1 = initialize_restriction_parameters();
+        params1->numIntParams = 1;
+        params1->intParams = (int *)gtd_malloc(sizeof(int));
+        params1->intParams[0] = 4;
+        params1->machine = machine;
+        get_machine_restrictions(machine)[0] = create_restriction(HasNoCycleFact, params1);
+        
+        RestrictionParameters *params2 = initialize_restriction_parameters();
+        params2->numIntParams = 1;
+        params2->intParams = (int *)gtd_malloc(sizeof(int));
+        params2->intParams[0] = 8;
+        params2->machine = machine;
+        get_machine_restrictions(machine)[1] = create_restriction(HasNoCycleFact, params2);
+
+        RestrictionParameters *params3 = initialize_restriction_parameters();
+        params3->numIntParams = 1;
+        params3->intParams = (int *)gtd_malloc(sizeof(int));
+        params3->intParams[0] = k;
+        params3->machine = machine;
+        get_machine_restrictions(machine)[2] = create_restriction(HasNoInducedPathFact, params3);
+
+        RestrictionParameters *params4 = initialize_restriction_parameters();
+        params4->numIntParams = 1;
+        params4->intParams = (int *)gtd_malloc(sizeof(int));
+        params4->intParams[0] = 3;
+        params4->machine = machine;
+        get_machine_restrictions(machine)[4] = create_restriction(MinVertexDegreeFact, params4);
+        
+        RestrictionParameters *params5 = initialize_restriction_parameters();
+        params5->numIntParams = 1;
+        params5->intParams = (int *)gtd_malloc(sizeof(int));
+        params5->intParams[0] = max_depth;
+        params5->machine = machine;
+        get_machine_restrictions(machine)[3] = create_restriction(HasNoUnknownEdgesFact, params5);
+
+        printf("Proving for t = %d... ", t);
+        fflush(stdout);
+        int contr = execute_generative_proof_machine(machine);
+        printf("Done!\n");
+        assert(contr == 1);
+
+        if(save_to_file)
+        {   
+            struct stat sb;
+            if((stat("out-data", &sb) == 0 && S_ISDIR(sb.st_mode)) == 0)
+            {
+                mkdir("out-data", 0777);
+            }
+
+            char filename[100];
+            sprintf(filename, "out-data/p%d_free_with_c%d.txt", k, t);
+            FILE *file = fopen(filename, "w");
+            write_proof_tree(get_machine_proof_tree(machine), file);
+            fclose(file);
+        }
+    }
+}

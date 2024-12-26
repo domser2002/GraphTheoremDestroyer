@@ -23,71 +23,18 @@ Fact *create_fact(FactType type, Function **params, int params_count)
 /**
  * \brief destructor for Fact class
 */
-int delete_fact(Fact *fact)
+void delete_fact(Fact *fact)
 {
+    if(fact == NULL) 
+        return;
     for(uint8_t i=0; i<fact->params_count;i++)
         delete_function(fact->params[i]);
     gtd_free(fact->params);
     gtd_free(fact);
-    return 0;
+    return;
 }
 
-/**
- * \brief function to check how many parameters are required for fact type
- * \param type fact type
- * \return number of parameters needed
-*/
-int get_param_count(FactType type)
-{
-    switch (type)
-    {
-    case IstnaryTreeFact:
-    case IsPartiteFact:
-    case VertexCountFact:
-    case MinVertexCountFact:
-    case MaxVertexCountFact:
-    case EdgeCountFact:
-    case MinEdgeCountFact:
-    case MaxEdgeCountFact:
-    case TreeHeightFact:
-    case MinTreeHeightFact:
-    case MaxTreeHeightFact:
-    case HasCycleFact:
-    case HasNoCycleFact:
-    case HasInducedCycleFact:
-    case HasNoInducedCycleFact:
-    case HasMinorCycleFact:
-    case HasNoMinorCycleFact:
-    case HasPathFact:
-    case HasNoPathFact:
-    case HasInducedPathFact:
-    case HasNoInducedPathFact:
-    case HasMinorPathFact:
-    case HasNoMinorPathFact:
-    case HasCliqueFact:
-    case HasNoCliqueFact:
-    case HasMinorCliqueFact:
-    case HasNoMinorCliqueFact:
-        return 1;
-    case IsConnectedFact:
-    case IsTreeFact:
-    case IsPlanarFact:
-    case IsCycleFact:
-    case IsCycleComplementFact:
-    case HasNoCyclesFact:
-        return 0;
-    case HasCompletePartiteFact:
-    case HasNoCompletePartiteFact:
-    case HasInducedCompletePartiteFact:
-    case HasNoInducedCompletePartiteFact:
-    case HasMinorCompletePartiteFact:
-    case HasNoMinorCompletePartiteFact:
-        // handle only bipartite for now
-        return 3;
-    default:
-        return 0;
-    }
-}
+
 
 /**
  * \brief function to check if 2 facts are equal
@@ -115,7 +62,7 @@ bool equal_facts(Fact *fact1, Fact *fact2)
 */
 char *get_fact_str(Fact *fact)
 {
-    char *result = (char *)gtd_malloc(128 * sizeof(char));
+    char *result = (char *)gtd_malloc(MAX_FACT_STR_LEN * sizeof(char));
     char *str = NULL;
     switch (fact->type)
     {
@@ -126,9 +73,14 @@ char *get_fact_str(Fact *fact)
         sprintf(result, "Graph is a tree");
         return result;
     case IstnaryTreeFact:
-        str = get_function_str(fact->params[0]);
-        sprintf(result, "Graph is a %s-nary tree", str);
-        gtd_free(str);
+        if(is_equal_constant_function(fact->params[0], 1))
+            sprintf(result, "Graph is a path");
+        else
+        {
+            str = get_function_str(fact->params[0]);
+            sprintf(result, "Graph is a %s-nary tree", str);
+            gtd_free(str);
+        }
         return result;
     case IsPlanarFact:
         sprintf(result, "Graph is planar");
@@ -257,12 +209,12 @@ char *get_fact_str(Fact *fact)
         for(int32_t i=0;i<fact->params[0]->c;i++)
         {
             str = get_function_str(fact->params[i+1]);
-            sprintf(result,"%s", str);
+            sprintf(result + strlen(result),"%s", str);
             gtd_free(str);
             if(i != fact->params[0]->c - 1) 
-                sprintf(result,",");
+                sprintf(result + strlen(result),",");
         }
-        sprintf(result, " as a subgraph");
+        sprintf(result + strlen(result), " as a subgraph");
         return result;   
     case HasNoCompletePartiteFact:
         sprintf(result, "Graph does not contain K_");

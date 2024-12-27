@@ -1,24 +1,21 @@
-from customtkinter import CTkFrame
-from customtkinter import CTkLabel
-from customtkinter import CTkButton
-from customtkinter import CTkComboBox
-from customtkinter import CTkEntry
-from models.restriction import RestrictionParameters
-from models.restriction import RestrictionSchema
-from models.restriction import Restriction
+from customtkinter import CTkFrame, CTkLabel, CTkButton, CTkComboBox, CTkEntry
+from models.restriction import RestrictionParameters, RestrictionSchema, Restriction
 import tkinter as tk
 from config import *
+from views.function_input_frame import FunctionInputFrame
 
 class RestrictionView(CTkFrame):
     def __init__(self, master, restr_schemas: list[RestrictionSchema]):
-        super().__init__(master, height=RESTRICTION_BOX_HEIGHT)
-        default_schema = RestrictionSchema(None, RESTRICTION_COMBO_BOX_DEFAULT_OPTION, [])
+        super().__init__(master)
+        # self.configure(fg_color='blue')
+        self.pack_propagate(False)  # Prevent the frame from shrinking to fit its contents
+        self.configure(height=RESTRICTION_BOX_HEIGHT)
+        
+        default_schema = RestrictionSchema(None, RESTRICTION_COMBO_BOX_DEFAULT_OPTION, [], [])
         self.restriction_schemas = [default_schema] + restr_schemas
-        self.restriction_params: RestrictionParameters = RestrictionParameters(None, RESTRICTION_COMBO_BOX_DEFAULT_OPTION, {})
+        self.restriction_params: RestrictionParameters = RestrictionParameters(None, RESTRICTION_COMBO_BOX_DEFAULT_OPTION, {}, {})
         self.chosen_schema = self.restriction_schemas[0]
-
         self.options = [x.name for x in self.restriction_schemas]
-
 
     def clear_params(self):
         self.restriction_params.restriction_id = None
@@ -28,23 +25,22 @@ class RestrictionView(CTkFrame):
     def clear_frame(self):
         for widget in self.winfo_children():
             widget.destroy()
-    
+
     def display(self):
         self.clear_frame()
         self.display_combo_box()
         self.display_int_input_fields()
-    
+        self.display_function_input_field()
+
     def display_combo_box(self):
-        combo_box = CTkComboBox(self, values=self.options, command=self.select_choice,
-                                    width=RESTRICTION_COMBO_BOX_WIDTH)
+        combo_box = CTkComboBox(self, values=self.options, command=self.select_choice, width=RESTRICTION_COMBO_BOX_WIDTH)
         combo_box.pack(side='left')
         combo_box.set(self.restriction_params.restriction_name)
-    
+
     def display_int_input_fields(self):
         for int_field_label in self.chosen_schema.int_params:
             label = CTkLabel(self, text=f'{int_field_label}:')
             label.pack(side='left', padx=5)
-
             if int_field_label in self.restriction_params.int_params_values.keys():
                 int_var = self.restriction_params.int_params_values[int_field_label]
             else:
@@ -52,6 +48,15 @@ class RestrictionView(CTkFrame):
                 self.restriction_params.int_params_values[int_field_label] = int_var
             entry = CTkEntry(self, width=50, textvariable=int_var)
             entry.pack(side='left', padx=10)
+    
+    def display_function_input_field(self):
+        for function_name in self.chosen_schema.functions:
+                label = CTkLabel(self, text=f'{function_name}:')
+                label.pack(side='left', padx=5)
+                function_frame = FunctionInputFrame(self)
+                self.restriction_params.functions[function_name] = function_frame
+                function_frame.pack(side='left', padx=5)
+
 
     def select_choice(self, choice):
         if choice == self.restriction_params.restriction_name:
@@ -69,6 +74,10 @@ class RestrictionView(CTkFrame):
         for key in self.restriction_params.int_params_values.keys():
             value = self.restriction_params.int_params_values[key].get()
             int_params_values[key] = value
-        params = RestrictionParameters(id, name, int_params_values)
+        function_values = {}
+        for key in self.restriction_params.functions.keys():
+            value = self.restriction_params.functions[key].get_value()
+            function_values[key] = value
+        params = RestrictionParameters(id, name, int_params_values, function_values)
         result = Restriction(params)
         return result

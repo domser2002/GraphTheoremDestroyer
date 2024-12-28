@@ -1,6 +1,7 @@
 from customtkinter import CTk
 from views.main_view import MainView
 from controllers.restriction_controller import RestrictionController
+from controllers.proof_controller import ProofController
 import os
 import matplotlib.pyplot as plt
 
@@ -14,7 +15,8 @@ class App(CTk):
         self.grid_columnconfigure(0, weight=1)
 
         restriction_controller = RestrictionController()
-        main_view = MainView(self, restriction_controller)
+        proof_controller = ProofController()
+        main_view = MainView(self, restriction_controller, proof_controller)
         main_view.grid(row=0, column=0, sticky="nsew")
 
 if __name__ == '__main__':

@@ -1,0 +1,23 @@
+[
+    {
+        "result": "success",
+        "proof_path": "",
+        "restrictions":[
+            {
+                "id": 0,
+                "name": "No k cycle",
+                "int_params_values": {
+                    "k": "12"
+                }
+            },
+            {
+                "id": 1,
+                "name": "No induced k path",
+                "int_params_values": {
+                    "k": "1"
+                }
+            }
+
+        ]
+    }
+]

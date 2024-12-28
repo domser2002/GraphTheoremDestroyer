@@ -33,3 +33,18 @@ class Restriction:
         self.name = name
         self.int_params_values = int_params_values
         self.functions = functions
+    
+    @staticmethod
+    def from_dictionary(dictionary: dict):
+        id = dictionary['id']
+        name = dictionary['name']
+        int_params_values = {}
+        functions = {}
+        if 'int_params_values' in dictionary:
+            int_params_values = dictionary['int_params_values']
+        if 'functions' in dictionary:
+            functions = dictionary['functions']
+        
+        params = RestrictionParameters(id, name, int_params_values, functions)
+        restriction = Restriction(params)
+        return restriction

@@ -19,6 +19,7 @@ class ProofFrame(CTkFrame):
         self.left_frame = None
         self.middle_frame = None
         self.right_frame = None
+        self.right_frame_to_destroy = []
         self.display()
         
     def display(self):
@@ -206,6 +207,7 @@ class ProofFrame(CTkFrame):
             text_color="#00BFFF"
         )
         header_label.pack(pady=(10, 5))
+        self.right_frame_to_destroy.append(header_label)
 
         is_success = self.proof.result.lower() == 'success'
         is_failure = self.proof.result.lower() == 'failure'
@@ -219,6 +221,7 @@ class ProofFrame(CTkFrame):
             justify="center"
         )
         result_content.pack(expand=True, fill="both", padx=10, pady=(0, 10))
+        self.right_frame_to_destroy.append(result_content)
 
         def display_proof_window():
             new_window = ctk.CTkToplevel()
@@ -232,10 +235,12 @@ class ProofFrame(CTkFrame):
         if is_success:
             proof_button = CTkButton(frame, text='View proof', width=self.right_width-10, command=display_proof_window)
             proof_button.pack(padx=0, pady=5, expand=False)
-            pass
+            self.right_frame_to_destroy.append(proof_button)
     
     def redisplay_result(self):
-        for widget in self.right_frame.winfo_children():
-            if not isinstance(widget, (ctk.CTkBaseClass,)):
-                widget.destroy()
+        # for widget in self.right_frame.winfo_children():
+        #     if not isinstance(widget, (ctk.CTkBaseClass,)):
+        #         widget.destroy()
+        for widget in self.right_frame_to_destroy:
+            widget.destroy()
         self.display_result(self.right_frame)

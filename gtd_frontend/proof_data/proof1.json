@@ -2,6 +2,7 @@
     {
         "result": "failure",
         "proof_path": "",
+        "timestamp": "2024-12-23T18:34",
         "restrictions":[
             {
                 "id": 4,

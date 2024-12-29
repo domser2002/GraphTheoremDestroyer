@@ -24,6 +24,7 @@ class ProofController:
         
     def add_proof(self, proof:Proof):
         self.proofs.append(proof)
+        self.proofs.sort(key=lambda x:x.timestamp, reverse=True)
     
     def get_proofs(self):
         proofs = self.proofs

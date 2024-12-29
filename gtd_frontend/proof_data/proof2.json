@@ -1,7 +1,7 @@
 [
     {
         "result": "success",
-        "proof_path": "",
+        "proof_path": "proof_data/proof2.txt",
         "timestamp": "2024-12-28T14:53",
         "restrictions":[
             {

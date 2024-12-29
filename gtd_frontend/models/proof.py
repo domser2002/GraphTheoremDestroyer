@@ -12,7 +12,12 @@ class Proof:
     @staticmethod
     def from_dictionary(dictionary: dict):
         result = dictionary['result']
-        proof_path = dictionary['proof_path']
+        proof_text = []
+        if result.lower() == 'success':
+            proof_path = dictionary['proof_path']
+            with open(proof_path, 'r') as file:
+                proof_text = file.readlines()
+                proof_text = [x.rstrip() for x in proof_text]
         restrictions = []
         restrictions_raw = dictionary['restrictions']
         timestamp = dictionary['timestamp']
@@ -23,7 +28,7 @@ class Proof:
         
         proof = Proof()
         proof.result = result
-        proof.text = ""
+        proof.text = proof_text
         proof.restrictions = restrictions
         proof.timestamp = timestamp
 

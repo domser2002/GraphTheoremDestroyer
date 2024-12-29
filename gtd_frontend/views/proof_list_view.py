@@ -23,3 +23,9 @@ class ProofListView(CTkScrollableFrame):
         proof_frame = ProofFrame(self, proof)
         self.proof_views.append(proof_frame)
         proof_frame.grid(row=len(self.proof_views) - 1, column=0, sticky="ew", pady=10)
+
+    def update_proof_result(self, proof: Proof):
+        for proof_view in self.proof_views:
+            if proof_view.proof is not proof:
+                continue
+            proof_view.redisplay_result()

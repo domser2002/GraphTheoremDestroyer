@@ -5,8 +5,9 @@ import json
 
 class ProofController:
 
-    def __init__(self):
+    def __init__(self, proof_list_view):
         self.proofs:list[Proof] = []
+        self.proof_list_view = proof_list_view
         self.read_proofs()
         pass
 
@@ -24,7 +25,14 @@ class ProofController:
         
     def add_proof(self, proof:Proof):
         self.proofs.append(proof)
-        self.proofs.sort(key=lambda x:x.timestamp, reverse=True)
+        self.proofs.sort(key=lambda x:x.timestamp, reverse=False)
+    
+    def add_pending_proof(self, proof:Proof):
+        self.add_proof(proof)
+        self.proof_list_view.add_proof_frame(proof)
+    
+    def update_proof_result(self, proof:Proof):
+        self.proof_list_view.update_proof_result(proof)
     
     def get_proofs(self):
         proofs = self.proofs

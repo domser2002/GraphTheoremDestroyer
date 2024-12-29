@@ -31,7 +31,10 @@ class MainView(CTkFrame):
         proof_details_view = ProofDetailsView(proof_details_tab, restriction_controller)
         proof_details_view.grid(row=0, column=0, sticky="nsew")
 
-        self.button = RunMachineView(top_frame, proof_details_view.restrictions_input_view, restriction_controller)
+        self.button = RunMachineView(top_frame, 
+                                     proof_details_view.restrictions_input_view, 
+                                     restriction_controller, 
+                                     proof_controller)
         self.button.grid(row=1, column=0, padx=10)
 
         proof_tab = self.tabview.tab("Proof in natural language")
@@ -39,5 +42,6 @@ class MainView(CTkFrame):
         proof_tab.grid_columnconfigure(0, weight=1)
 
         proof_list_view = ProofListView(proof_tab, proof_controller)
+        proof_controller.proof_list_view = proof_list_view
         proof_list_view.grid(row=0, column=0, sticky='nsew')
 

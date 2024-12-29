@@ -1,14 +1,22 @@
 import json
-from models.restriction import RestrictionSchema
-from models.restriction import Restriction
-from models.restriction import RestrictionParameters
 import os
+import asyncio
+from models.restriction import RestrictionSchema, Restriction, RestrictionParameters
+import threading
+import time
+import random
+from models.response import *
+from controllers.proof_controller import ProofController
+from models.proof import Proof
+import datetime
+from config import *
 
 class RestrictionController:
-    def __init__(self):
+    def __init__(self, proof_controller:ProofController):
         self.restrictions: list[Restriction] = []
+        self.proof_controller:ProofController = proof_controller
         self.init_controller()
-    
+
     def init_controller(self):
         '''
         override this function
@@ -66,7 +74,52 @@ class RestrictionController:
                     data['functions'] = restr.functions
                 datas.append(data)
             json.dump(datas, file, indent=4)
+
+        # wait for a data in a separate thread
+        threading.Thread(target=self.wait_for_result, args=(self.restrictions,), daemon=True).start()
     
+    def wait_for_result(self, restrictions:list[Restriction]):
+
+        # add pending proof to the proof controller
+        proof = Proof()
+        proof.result = 'Pending'
+        proof.restrictions = restrictions
+        proof.timestamp = datetime.datetime.now()#.strftime('%Y-%m-%d %H:%M')
+        self.proof_controller.add_pending_proof(proof)
+
+        # wait for the incoming data
+        time.sleep(3)
+
+        # simulate response from backend
+        response = Response(ResponseResult.FAILURE, "")
+        if random.randint(0, 1) == 1:
+            response.result = ResponseResult.SUCCESS
+            with open(os.path.join('proof_data', 'example.txt'), 'w') as file:
+                file.write('A = B\n')
+                file.write('B = C\n')
+                file.write('if A = B and B = C, then A = C')
+            response.proof_path = os.path.join('proof_data', 'example.txt')
+        print('result is done!')
+
+        # modify proof
+        if response.result == ResponseResult.SUCCESS:
+            proof.result = 'success'
+            proof_path = response.proof_path
+            with open(proof_path, 'r') as file:
+                proof_text = file.readlines()
+                proof_text = [x.rstrip() for x in proof_text]
+            proof.text = proof_text
+        else:
+            proof.result = "failure"
+        
+        # update user interface
+        self.proof_controller.update_proof_result(proof)
+
+        # save to history
+        proof.save_to_json(PROOF_DATA_PATH, response.proof_path)
+        
+
+
     def clear_restrictions(self):
         self.restrictions.clear()
 
@@ -74,10 +127,9 @@ class RestrictionController:
         self.restrictions.append(restriction)
     
     def remove_restriction(self, idx):
-        if idx < 0 or idx > len(self.restrictions):
+        if idx < 0 or idx >= len(self.restrictions):
             return
         self.restrictions = self.restrictions[:idx] + self.restrictions[idx+1:]
-
 
     @staticmethod
     def create_restriction_from_params(params: RestrictionParameters):

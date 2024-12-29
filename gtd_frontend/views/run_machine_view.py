@@ -1,7 +1,10 @@
 from customtkinter import CTkFrame, CTkLabel, CTkButton
 
 class RunMachineView(CTkFrame):
-    def __init__(self, master, restrictions_input_view, restriction_controller):
+    def __init__(self, master, 
+                restrictions_input_view,
+                restriction_controller,
+                proof_controller):
         super().__init__(master)
         self.restrictions_input_view = restrictions_input_view
         self.restriction_controller = restriction_controller

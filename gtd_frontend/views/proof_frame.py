@@ -16,6 +16,9 @@ class ProofFrame(CTkFrame):
         self.parent_frame_height = 150
         self.left_width = 120
         self.right_width = 150
+        self.left_frame = None
+        self.middle_frame = None
+        self.right_frame = None
         self.display()
         
     def display(self):
@@ -48,6 +51,7 @@ class ProofFrame(CTkFrame):
             height=parent_frame_height
         )
         left_frame.grid(row=0, column=0, sticky="nsew", padx=5, pady=5)
+        self.left_frame = left_frame
 
         middle_frame = CTkScrollableFrame(
             parent_frame, 
@@ -57,6 +61,7 @@ class ProofFrame(CTkFrame):
             height=parent_frame_height
         )
         middle_frame.grid(row=0, column=1, sticky="nsew", padx=5, pady=5)
+        self.middle_frame = middle_frame
 
         right_frame = CTkFrame(
             parent_frame, 
@@ -67,6 +72,7 @@ class ProofFrame(CTkFrame):
             height=parent_frame_height
         )
         right_frame.grid(row=0, column=2, sticky="nsew", padx=5, pady=5)
+        self.right_frame = right_frame
 
         self.display_general_info(left_frame)
         self.display_restrictions(middle_frame)
@@ -191,9 +197,6 @@ class ProofFrame(CTkFrame):
             func_frame.grid(row=idx, column=0, sticky='w')
             idx += 1
 
-
-
-
     def display_result(self, frame: CTkFrame):
         # Header Label
         header_label = CTkLabel(
@@ -204,14 +207,15 @@ class ProofFrame(CTkFrame):
         )
         header_label.pack(pady=(10, 5))
 
-        is_success = self.proof.result == 'success'
+        is_success = self.proof.result.lower() == 'success'
+        is_failure = self.proof.result.lower() == 'failure'
 
         # Result Content (Placeholder)
         result_content = CTkLabel(
             frame,
-            text="Success" if is_success else "Failure",
+            text="Success" if is_success else "Failure" if is_failure else "Pending",
             font=("Helvetica", 16, "bold"),
-            text_color="#32CD32" if is_success else "#FF4500",  # Green for success, OrangeRed otherwise
+            text_color="#32CD32" if is_success else "#FF4500" if is_failure else 'gray',
             justify="center"
         )
         result_content.pack(expand=True, fill="both", padx=10, pady=(0, 10))
@@ -229,3 +233,9 @@ class ProofFrame(CTkFrame):
             proof_button = CTkButton(frame, text='View proof', width=self.right_width-10, command=display_proof_window)
             proof_button.pack(padx=0, pady=5, expand=False)
             pass
+    
+    def redisplay_result(self):
+        for widget in self.right_frame.winfo_children():
+            if not isinstance(widget, (ctk.CTkBaseClass,)):
+                widget.destroy()
+        self.display_result(self.right_frame)

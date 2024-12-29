@@ -1,5 +1,7 @@
 from models.restriction import Restriction
 import datetime
+import os
+import json
 
 class Proof:
     
@@ -8,6 +10,22 @@ class Proof:
         self.text:list[str] = None
         self.restrictions:list[Restriction] = None
         self.timestamp:datetime.datetime = None
+    
+    def save_to_json(self, folder_path: str, proof_path: str):
+        idx = 0
+        file_path = os.path.join(folder_path, f'proof{idx}.json')
+        while os.path.exists(file_path):
+            idx += 1
+            file_path = os.path.join(folder_path, f'proof{idx}.json')
+        result = {}
+        result['result'] = self.result
+        result['proof_path'] = proof_path
+        result['timestamp'] = self.timestamp.strftime('%Y-%m-%dT%H:%M')
+        result['restrictions'] = []
+        for restr in self.restrictions:
+            result['restrictions'].append(restr.to_dictionary())
+        with open(file_path, 'w') as file:
+            json.dump([result], file, indent=4, ensure_ascii=False, sort_keys=False)
     
     @staticmethod
     def from_dictionary(dictionary: dict):

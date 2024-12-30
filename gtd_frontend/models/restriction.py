@@ -64,3 +64,4 @@ class Restriction:
         params = RestrictionParameters(id, name, int_params_values, functions)
         restriction = Restriction(params)
         return restriction
+

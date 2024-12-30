@@ -54,9 +54,10 @@ class RestrictionController:
             result.append(schema)
         return result
     
-    def send_restriction_data(self):
+    
+    def get_backend_response(self):
         '''
-        override this function
+        override the code below
         use it to send info about chosen restrictions to the backend
         '''
         restr_output_path = os.path.join('out_data', 'restrictions_out.json')
@@ -74,23 +75,15 @@ class RestrictionController:
                     data['functions'] = restr.functions
                 datas.append(data)
             json.dump(datas, file, indent=4)
-
-        # wait for a data in a separate thread
-        threading.Thread(target=self.wait_for_result, args=(self.restrictions,), daemon=True).start()
     
-    def wait_for_result(self, restrictions:list[Restriction]):
-
-        # add pending proof to the proof controller
-        proof = Proof()
-        proof.result = 'Pending'
-        proof.restrictions = restrictions
-        proof.timestamp = datetime.datetime.now()#.strftime('%Y-%m-%d %H:%M')
-        self.proof_controller.add_pending_proof(proof)
-
-        # wait for the incoming data
-        time.sleep(3)
-
+        '''
+        override the code below
+        use it to wait for a response from backend
+        a response should be a Response object (check Response model)
+        '''
         # simulate response from backend
+        # and wait for the incoming data
+        time.sleep(3)
         response = Response(ResponseResult.FAILURE, "")
         if random.randint(0, 1) == 1:
             response.result = ResponseResult.SUCCESS
@@ -99,7 +92,22 @@ class RestrictionController:
                 file.write('B = C\n')
                 file.write('if A = B and B = C, then A = C')
             response.proof_path = os.path.join('proof_data', 'example.txt')
-        print('result is done!')
+
+        return response
+    
+    def send_restriction_data(self):
+        # wait for a data in a separate thread
+        threading.Thread(target=self.wait_for_result, args=(self.restrictions,), daemon=True).start()
+    
+    def wait_for_result(self, restrictions:list[Restriction]):
+        # add pending proof to the proof controller
+        proof = Proof()
+        proof.result = 'Pending'
+        proof.restrictions = restrictions
+        proof.timestamp = datetime.datetime.now()
+        self.proof_controller.add_pending_proof(proof)
+
+        response = self.get_backend_response()
 
         # modify proof
         if response.result == ResponseResult.SUCCESS:
@@ -118,7 +126,6 @@ class RestrictionController:
         # save to history
         proof.save_to_json(PROOF_DATA_PATH, response.proof_path)
         
-
 
     def clear_restrictions(self):
         self.restrictions.clear()

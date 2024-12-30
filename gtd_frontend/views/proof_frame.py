@@ -8,6 +8,7 @@ import customtkinter as ctk
 from sympy import symbols, Add, Rational, Poly, sympify, latex
 import matplotlib.pyplot as plt
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
+import time
 
 class ProofFrame(CTkFrame):
     def __init__(self, master, proof:Proof):
@@ -19,11 +20,11 @@ class ProofFrame(CTkFrame):
         self.left_frame = None
         self.middle_frame = None
         self.right_frame = None
+        self.result_label = None
         self.right_frame_to_destroy = []
         self.display()
         
     def display(self):
-
         parent_frame_height = self.parent_frame_height
         left_width = self.left_width
         right_width = self.right_width
@@ -45,7 +46,6 @@ class ProofFrame(CTkFrame):
 
         left_frame = CTkFrame(
             parent_frame, 
-            #fg_color="red", 
             width=left_width, 
             fg_color="#343638",
             corner_radius=10,
@@ -56,7 +56,6 @@ class ProofFrame(CTkFrame):
 
         middle_frame = CTkScrollableFrame(
             parent_frame, 
-            #fg_color="green", 
             fg_color="#343638",
             corner_radius=10,
             height=parent_frame_height
@@ -66,7 +65,6 @@ class ProofFrame(CTkFrame):
 
         right_frame = CTkFrame(
             parent_frame, 
-            #fg_color="blue",
             fg_color="#343638",
             corner_radius=10,
             width=right_width, 
@@ -80,21 +78,19 @@ class ProofFrame(CTkFrame):
         self.display_result(right_frame)
 
     def display_general_info(self, frame: CTkFrame):
-        # Header Label
         header_label = CTkLabel(
             frame,
             text="Timestamp",
             font=("Roboto", 14, "bold"),
-            text_color="#00BFFF"  # DeepSkyBlue color for headers
+            text_color="#00BFFF"
         )
         header_label.pack(pady=(10, 5))
 
-        # Time Label
         time_label = CTkLabel(
             frame,
-            text='\n'.join(str(self.proof.timestamp).split()),
+            text='\n'.join(self.proof.timestamp.strftime('%Y-%m-%d %H:%M').split()),
             font=("Helvetica", 16, "bold"),
-            text_color="#FFFFFF",  # White text for contrast
+            text_color="#FFFFFF",
             bg_color="transparent"
         )
         time_label.pack(expand=True, fill="both", padx=10, pady=(0, 10))
@@ -104,20 +100,17 @@ class ProofFrame(CTkFrame):
             frame,
             text="Restrictions",
             font=("Roboto", 14, "bold"),
-            text_color="#00BFFF"  # DeepSkyBlue color for headers
+            text_color="#00BFFF"
         )
         header_label.pack(pady=(10, 5))
-        # header_label.grid(row=0, column=0)
 
         for idx, restr in enumerate(self.proof.restrictions):
             self.display_restriction(frame, restr, idx+1)
     
     def display_restriction(self, frame: CTkScrollableFrame, restriction: Restriction, row_idx: int):
         restr_frame = CTkFrame(frame, bg_color='transparent', fg_color='white', height=20, corner_radius=5)
-        # restr_frame.grid(row=row_idx, column=0, sticky='w', padx=5, pady=5)
         restr_frame.pack(fill='both', expand=True, pady=5)
 
-        # display name
         name = restriction.name
         header_label = CTkLabel(
             restr_frame,
@@ -129,7 +122,6 @@ class ProofFrame(CTkFrame):
         header_label.grid(row=0, column=0, sticky='w', padx=10)
         idx = 1
 
-        # display int params
         int_params_values = restriction.int_params_values
         for key, val in [(k, int_params_values[k]) for k in int_params_values]:
             int_frame = CTkFrame(
@@ -159,15 +151,14 @@ class ProofFrame(CTkFrame):
             int_frame.grid(row=idx, column=0, sticky='w')
             idx += 1
         
-        # display function params
         functions = restriction.functions
         for key, val in [(k, functions[k]) for k in functions]:
-            # print(key, val)
             func_frame = CTkFrame(
                 restr_frame,
                 bg_color='transparent',
                 fg_color='transparent'
-                )
+            )
+            func_frame.grid(row=row_idx, column=0, sticky='w')
 
             key_label = CTkLabel(
                 func_frame,
@@ -176,30 +167,38 @@ class ProofFrame(CTkFrame):
                 bg_color='transparent',
                 text_color='black'
             )
-            key_label.grid(row=0, column=0, padx=3, sticky='w')
+            key_label.grid(row=0, column=0, padx=5, pady=0, sticky='w')
 
-            # TODO make proper positioning
             x = symbols('x')
             terms = []
             for n, d, p in val:
                 terms.append(Rational(n, d) * x**p)
-            poly = Poly(Add(*terms), x)
+            
             poly = Add(*terms)
             latex_expr = latex(sympify(poly))
-            fig = plt.Figure(figsize=(5, 1))
+            
+            fig = plt.Figure(figsize=(2, 0.5), dpi=100)
+            ax = fig.add_subplot(111)
+            ax.set_position([0, 0, 1, 1])
+            fig.subplots_adjust(left=0, right=1, top=1, bottom=0)
+            ax.text(
+                0, 0.5,
+                f"${latex_expr}$",
+                ha='left',
+                va='center',
+                transform=ax.transAxes,
+                fontsize=12
+            )
+            ax.axis('off')
             canvas = FigureCanvasTkAgg(fig, master=func_frame)
             canvas_widget = canvas.get_tk_widget()
-            canvas_widget.grid(row=0, column=1, padx=0, sticky='w')
-            fig.clear()
-            ax = fig.add_subplot(111)
-            ax.text(0, 0, f"${latex_expr}$")
-            ax.axis('off')
-
+            canvas_widget.grid(row=0, column=1, padx=(0, 0), pady=0, sticky='w')
+            canvas_widget.configure(height=30, width=150)
+            canvas.draw()
             func_frame.grid(row=idx, column=0, sticky='w')
             idx += 1
 
     def display_result(self, frame: CTkFrame):
-        # Header Label
         header_label = CTkLabel(
             frame,
             text="Result",
@@ -209,38 +208,38 @@ class ProofFrame(CTkFrame):
         header_label.pack(pady=(10, 5))
         self.right_frame_to_destroy.append(header_label)
 
+
+        result_content = CTkLabel(
+            frame,
+            font=("Helvetica", 16, "bold"),
+            justify='center'
+            )
+        self.result_label = result_content
+        result_content.pack(expand=True, fill="both", padx=10, pady=(0, 10))
+        self.redisplay_result()
+
+    
+    def redisplay_result(self):
+
         is_success = self.proof.result.lower() == 'success'
         is_failure = self.proof.result.lower() == 'failure'
 
-        # Result Content (Placeholder)
-        result_content = CTkLabel(
-            frame,
-            text="Success" if is_success else "Failure" if is_failure else "Pending",
-            font=("Helvetica", 16, "bold"),
-            text_color="#32CD32" if is_success else "#FF4500" if is_failure else 'gray',
-            justify="center"
-        )
-        result_content.pack(expand=True, fill="both", padx=10, pady=(0, 10))
-        self.right_frame_to_destroy.append(result_content)
+        text = 'Success' if is_success else 'Failure' if is_failure else 'Pending'
+        text_color="#32CD32" if is_success else "#FF4500" if is_failure else 'gray'
 
+        self.result_label.configure(text=text)
+        self.result_label.configure(text_color=text_color)
         def display_proof_window():
             new_window = ctk.CTkToplevel()
             proof_text_frame = ProofTextFrame(new_window, self.proof)
-            #proof_text_frame.grid(row=0, column=0, sticky='nsew', padx=5, pady=5)
             proof_text_frame.pack(expand=True, fill='both', padx=5, pady=5)
             new_window.title('New window')
             new_window.geometry('300x200')
             
 
         if is_success:
-            proof_button = CTkButton(frame, text='View proof', width=self.right_width-10, command=display_proof_window)
+            proof_button = CTkButton(self.result_label.master, text='View proof', width=self.right_width-10, command=display_proof_window)
             proof_button.pack(padx=0, pady=5, expand=False)
             self.right_frame_to_destroy.append(proof_button)
-    
-    def redisplay_result(self):
-        # for widget in self.right_frame.winfo_children():
-        #     if not isinstance(widget, (ctk.CTkBaseClass,)):
-        #         widget.destroy()
-        for widget in self.right_frame_to_destroy:
-            widget.destroy()
-        self.display_result(self.right_frame)
+
+        

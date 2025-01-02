@@ -54,6 +54,15 @@ uint8_t execute_generative_proof_machine(GenerativeProofMachine *machine)
     while (i < machine->numRestrictions)
     {
         GenerativeRestriction *restriction = machine->restrictions[i];
+        if(get_restriction_block(restriction) == -1)
+        {
+            ++i;
+            continue;
+        }
+        if(get_restriction_block(restriction) == 1)
+        {
+            set_restriction_block(restriction, -1);
+        }
         Graph *graph = machine->graph;
         RestrictionResult *result = validate_restriction(graph, restriction);
 

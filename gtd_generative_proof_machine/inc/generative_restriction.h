@@ -1,9 +1,11 @@
 #ifndef GENERATIVE_RESTRICTION_H
 #define GENERATIVE_RESTRICTION_H
+#ifdef IS_GENERATIVE_MODULE_COMPONENT
 
 #include "common.h"
 #include "physical_graph.h"
 #include "generative_proof_machine.h"
+#include "fact.h"
 
 typedef struct GenerativeRestriction GenerativeRestriction;
 typedef struct intNode intNode;
@@ -40,6 +42,7 @@ RestrictionResult *validate_restriction(Graph *graph, GenerativeRestriction *res
 
 GenerativeRestriction *create_restriction_object(RestrictionResult* (*restriction)(Graph* graph, RestrictionParameters *params), RestrictionParameters *params);
 GenerativeRestriction *create_restriction(FactType restriction_type, RestrictionParameters *params);
+GenerativeRestriction *create_restriction_from_fact(Fact *fact, GenerativeProofMachine *machine);
 
 RestrictionResult *max_degree_restriction_condition(Graph *graph, RestrictionParameters *params);
 RestrictionResult *no_k_cycle_condition(Graph *graph, RestrictionParameters *params);
@@ -52,5 +55,5 @@ RestrictionParameters *deep_copy_restriction_parameters(RestrictionParameters *p
 GenerativeRestriction *deep_copy_restriction(GenerativeRestriction *restriction);
 
 RestrictionParameters *get_parameters_from_restriction(GenerativeRestriction *restriction);
-
+#endif
 #endif

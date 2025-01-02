@@ -1,3 +1,4 @@
+#define IS_GENERATIVE_MODULE_COMPONENT
 #include "physical_graph.h"
 #include "generative_restriction.h"
 #include "generative_proof_machine.h"
@@ -177,7 +178,30 @@ GenerativeRestriction *create_restriction(FactType restriction_type, Restriction
     return result;
 }
 
-
+/**
+ * \brief converter from fact to restriction
+ * \param fact fact from which restriction is created
+ * \param machine machine to whcih restriction will be applied
+ * \returns restriction created based on fact, if it has only constant params, NULL otherwise
+*/
+GenerativeRestriction *create_restriction_from_fact(Fact *fact, GenerativeProofMachine *machine)
+{
+    RestrictionParameters *params = (RestrictionParameters*)gtd_malloc(sizeof(RestrictionParameters));
+    params->machine = machine;
+    params->blockRestriction = 0;
+    params->numIntParams = fact->params_count;
+    params->intParams = (int*)gtd_malloc(fact->params_count * sizeof(int));
+    for(uint32_t i=0;i<fact->params_count;i++)
+    {
+        if(!is_constant(fact->params[i])) 
+        {
+            gtd_free(params->intParams);
+            return NULL;
+        }
+        params->intParams[i] = fact->params[i]->c;
+    }
+    return create_restriction(fact->type, params);
+}
 // =============== max degree restriction ===============
 
 /**

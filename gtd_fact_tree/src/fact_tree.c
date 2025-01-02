@@ -1,3 +1,4 @@
+#define IS_FACT_TREE_COMPONENT
 #include "fact_tree.h"
 #include "common.h"
 #include <stdlib.h>

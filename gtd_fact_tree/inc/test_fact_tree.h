@@ -1,6 +1,6 @@
 #ifndef TEST_FACT_H
 #define TEST_FACT_H
-#define CAN_ACCESS_FACT
+#define IS_FACT_TREE_COMPONENT
 #include <assert.h>
 #include <string.h>
 #include "fact.h"

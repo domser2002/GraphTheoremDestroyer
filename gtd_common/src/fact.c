@@ -1,17 +1,15 @@
-#define CAN_ACCESS_FACT
 #include "fact.h"
 
 /**
  * \brief constructor for Fact class
 */
-Fact *create_fact(FactType type, Function **params, int params_count)
+Fact *create_fact(FactType type, Function **params)
 {
-    if(params_count != get_param_count(type)) 
-        return NULL;
+    uint8_t params_count = get_param_count(type);
     Fact *newFact = (Fact *)gtd_malloc(sizeof(Fact));
     newFact->type = type;
-    newFact->params = (params_count == 0)?NULL:gtd_malloc(params_count * sizeof(Function*));
-    for(int i=0;i<params_count;i++)
+    newFact->params = (params_count == 0)?NULL:(Function**)gtd_malloc(params_count * sizeof(Function*));
+    for(uint8_t i=0;i<params_count;i++)
         newFact->params[i] = params[i];
     newFact->params_count = params_count;
     char *fact_str = get_fact_str(newFact);
@@ -295,8 +293,96 @@ char *get_fact_str(Fact *fact)
         str = get_function_str(fact->params[0]);
         sprintf(result, "Graph does not contain K_%s as a minor", str);
         gtd_free(str);
-        return result;       
+        return result; 
+    case MaxVertexDegreeFact:
+        str = get_function_str(fact->params[0]);
+        sprintf(result, "Max vertex degree in graph is %s", str);
+        gtd_free(str);
+        return result; 
+    case MinVertexDegreeFact:
+        str = get_function_str(fact->params[0]);
+        sprintf(result, "Min vertex degree in graph is %s", str);
+        gtd_free(str);
+        return result;    
+    case HasNoUnknownEdgesFact:
+        sprintf(result, "Graph has no unknown edges");
+        return result; 
     default:
         return "";
     }
+}
+
+/**
+ * \brief function to check how many parameters are required for fact type
+ * \param type fact type
+ * \return number of parameters needed
+*/
+uint8_t get_param_count(FactType type)
+{
+    switch (type)
+    {
+    case IstnaryTreeFact:
+    case IsPartiteFact:
+    case VertexCountFact:
+    case MinVertexCountFact:
+    case MaxVertexCountFact:
+    case EdgeCountFact:
+    case MinEdgeCountFact:
+    case MaxEdgeCountFact:
+    case TreeHeightFact:
+    case MinTreeHeightFact:
+    case MaxTreeHeightFact:
+    case HasCycleFact:
+    case HasNoCycleFact:
+    case HasInducedCycleFact:
+    case HasNoInducedCycleFact:
+    case HasMinorCycleFact:
+    case HasNoMinorCycleFact:
+    case HasPathFact:
+    case HasNoPathFact:
+    case HasInducedPathFact:
+    case HasNoInducedPathFact:
+    case HasMinorPathFact:
+    case HasNoMinorPathFact:
+    case HasCliqueFact:
+    case HasNoCliqueFact:
+    case HasMinorCliqueFact:
+    case HasNoMinorCliqueFact:
+    case MaxVertexDegreeFact:
+    case MinVertexDegreeFact:
+    case HasNoUnknownEdgesFact:
+        return 1;
+    case IsConnectedFact:
+    case IsTreeFact:
+    case IsPlanarFact:
+    case IsCycleFact:
+    case IsCycleComplementFact:
+    case HasNoCyclesFact:
+        return 0;
+    case HasCompletePartiteFact:
+    case HasNoCompletePartiteFact:
+    case HasInducedCompletePartiteFact:
+    case HasNoInducedCompletePartiteFact:
+    case HasMinorCompletePartiteFact:
+    case HasNoMinorCompletePartiteFact:
+        // handle only bipartite for now
+        return 3;
+    default:
+        return 0;
+    }
+}
+
+Fact **deep_copy_fact_array(Fact **fact_array, uint32_t fact_count)
+{
+    Fact **new_fact_array = (Fact **)gtd_malloc(fact_count * sizeof(Fact*));
+    for(uint32_t i=0; i<fact_count; i++)
+    {
+        Function **new_params = (Function **)gtd_malloc(fact_array[i]->params_count * sizeof(Function*));
+        for(uint8_t j=0;j<fact_array[i]->params_count; j++)
+        {
+            new_params[j] = copy_function(fact_array[i]->params[j]);
+        }
+        new_fact_array[i] = create_fact(fact_array[i]->type, new_params);
+    }
+    return new_fact_array;
 }

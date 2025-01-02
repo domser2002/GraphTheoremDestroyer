@@ -1,3 +1,4 @@
+#define IS_FACT_TREE_COMPONENT
 #include "implication.h"
 #define KNOWN_IMPLICATIONS_NUMBER 17
 #define MAX_RIGHT_SIDE_FACTS 2
@@ -7,14 +8,14 @@ typedef bool (*calc_right_side_params_fun)(Function **, Function **);
 typedef struct Implication_Left_Side
 {
     bool types[FACT_TYPE_NUM];
-    int n_facts;
+    uint32_t n_facts;
     int n_params;
     int type_to_param_idx[FACT_TYPE_NUM][MAX_PARAMS_IN_FACT];
 } Implication_Left_Side;
 
 typedef struct Implication_Right_Side
 {
-    int n_facts;
+    uint32_t n_facts;
     int n_params;
     FactType types[MAX_RIGHT_SIDE_FACTS];
 } Implication_Right_Side;
@@ -36,7 +37,8 @@ const Implication EMPTY_IMPLICATION =
         {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
         {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
         {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
-        {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}
+        {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, 
+        {-1}, {-1}
     }
     },
     .right_side = {
@@ -490,7 +492,7 @@ Implication knownImplicationsArray[KNOWN_IMPLICATIONS_NUMBER] = {
  * \param count pointer to return number of elements on the right side
  * \return right side of implication or NULL if there is no implication with that left side defined
  */
-Fact **implies(Fact **factArray, int n_facts, int *count)
+Fact **implies(Fact **factArray, uint32_t n_facts, int *count)
 {
     GTD_LOG("Checking if array of %d facts forms a known implication", n_facts);
     *count = 0;
@@ -508,8 +510,27 @@ Fact **implies(Fact **factArray, int n_facts, int *count)
             continue;
         }
         Function **params = (Function **)gtd_malloc(knownImplicationsArray[i].left_side.n_params * sizeof(Function*));
+        bool types[FACT_TYPE_NUM] = {};
+        for (uint32_t j = 0; j < n_facts; j++)
+        {
+            types[factArray[j]->type] = true;
+        }
         bool fact_types_match = true;
-        for (int j = 0; j < n_facts; j++)
+        for(uint32_t j=0; j<FACT_TYPE_NUM; j++)
+        {
+            if(knownImplicationsArray[i].left_side.types[j] != types[j])
+            {
+                GTD_LOG("Types of facts do not match");
+                fact_types_match = false;
+                break;
+            }
+        }
+        if(!fact_types_match)
+        {
+            gtd_free(params);
+            continue;
+        }
+        for (uint32_t j = 0; j < n_facts; j++)
         {
             if (!knownImplicationsArray[i].left_side.types[factArray[j]->type])
             {
@@ -538,7 +559,7 @@ Fact **implies(Fact **factArray, int n_facts, int *count)
             *count = knownImplicationsArray[i].right_side.n_facts;
             Fact **right_side_facts = (Fact**)gtd_malloc(*count * sizeof(Fact*));
             int counter = 0;
-            for(int k=0;k<knownImplicationsArray[i].right_side.n_facts;k++)
+            for(uint32_t k=0;k<knownImplicationsArray[i].right_side.n_facts;k++)
             {
                 FactType type = knownImplicationsArray[i].right_side.types[k];
                 int n_params = get_param_count(type);
@@ -547,7 +568,7 @@ Fact **implies(Fact **factArray, int n_facts, int *count)
                 {
                     fact_params[s] = right_side_params[counter++];
                 }
-                right_side_facts[k] = create_fact(type,fact_params,n_params);
+                right_side_facts[k] = create_fact(type,fact_params);
                 gtd_free(fact_params);
             }
             gtd_free(params);

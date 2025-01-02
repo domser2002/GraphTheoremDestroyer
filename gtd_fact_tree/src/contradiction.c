@@ -1,3 +1,4 @@
+#define IS_FACT_TREE_COMPONENT
 #include "contradiction.h"
 #define KNOWN_CONTRADICTIONS_NUMBER 9
 
@@ -23,7 +24,8 @@ const Contradiction EMPTY_CONTRADICTION =
     {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
     {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
     {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
-    {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}
+    {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
+    {-1}, {-1}
     }
 };
 

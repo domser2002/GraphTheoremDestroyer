@@ -1,3 +1,4 @@
+#define IS_FACT_TREE_COMPONENT
 #include "fact_tree_machine.h"
 
 typedef enum MachineState 
@@ -139,7 +140,7 @@ void execute(FactTreeMachine *machine)
     machine->state = EXECUTED;
 }
 
-static void write_deduction(FactTree *FactTree, uint32_t idx, FILE *output)
+void write_deduction(FactTree *FactTree, uint32_t idx, FILE *output)
 {
     uint8_t parent_count = FactTree->parent_count[idx];
     uint32_t *parents = FactTree->parents[idx];
@@ -199,4 +200,25 @@ static void log_fact_tree(FactTree *ft)
         GTD_LOG("%s", str);
         free(str);
     }
+}
+
+bool get_contradiction_found(FactTreeMachine *machine)
+{
+    return machine->contradictionFound;
+}
+
+FactTree *get_fact_tree(FactTreeMachine *machine)
+{
+    return machine->FactTree;
+}
+
+Fact **get_contradicting_facts(FactTreeMachine *machine, uint32_t *contradicting_count)
+{
+    *contradicting_count = machine->contradicting_count;
+    Fact **contradicting_facts = (Fact **)gtd_malloc(machine->contradicting_count * sizeof(Fact*));
+    for(uint32_t i=0; i<machine->contradicting_count; i++)
+    {
+        contradicting_facts[i] = machine->FactTree->facts[machine->contradiciting_idxs[i]];
+    }
+    return contradicting_facts;
 }

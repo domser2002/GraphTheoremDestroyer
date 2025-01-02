@@ -557,20 +557,6 @@ void test_erdos_gyarfas_pk_free(int k, int max_vertices, int max_depth, int save
 
     for(int t = k; t >= 5; --t)
     {
-        /*
-        Graph *graph = create_graph(max_vertices, t);
-        for(int i = 0; i < t; ++i)
-        {
-            for(int j = 0; j < t; ++j)
-            {
-                set_edge_not_connected(graph, i, j);
-            }
-        }
-        for(int i = 0; i < t; ++i)
-        {
-            set_edge_connected(graph, i, (i+1) % t);
-        }
-        */
         Graph *graph = create_graph(max_vertices, 0);
         GenerativeProofMachine *machine = create_proof_machine(graph);
 

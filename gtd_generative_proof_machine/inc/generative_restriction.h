@@ -46,6 +46,7 @@ GenerativeRestriction *create_restriction_from_fact(Fact *fact, GenerativeProofM
 void set_restriction_block(GenerativeRestriction *genRestriction, int newBlock);
 int get_restriction_block(GenerativeRestriction *genRestriction);
 
+
 RestrictionResult *max_degree_restriction_condition(Graph *graph, RestrictionParameters *params);
 RestrictionResult *no_k_cycle_condition(Graph *graph, RestrictionParameters *params);
 RestrictionResult *no_induced_path_k_condition(Graph *graph, RestrictionParameters *params);

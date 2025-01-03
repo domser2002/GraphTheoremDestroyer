@@ -557,7 +557,7 @@ void test_erdos_gyarfas_pk_free(int k, int max_vertices, int max_depth, int save
 
     for(int t = k; t >= 5; --t)
     {
-        // create induced cycle with t vertices
+        /*
         Graph *graph = create_graph(max_vertices, t);
         for(int i = 0; i < t; ++i)
         {
@@ -570,8 +570,16 @@ void test_erdos_gyarfas_pk_free(int k, int max_vertices, int max_depth, int save
         {
             set_edge_connected(graph, i, (i+1) % t);
         }
-
+        */
+        Graph *graph = create_graph(max_vertices, 0);
         GenerativeProofMachine *machine = create_proof_machine(graph);
+
+        RestrictionParameters *params0 = initialize_restriction_parameters();
+        params0->numIntParams = 1;
+        params0->intParams = (int *)gtd_malloc(sizeof(int));
+        params0->intParams[0] = t;
+        params0->machine = machine;
+        add_restriction(machine, create_restriction(HasInducedCycleFact, params0));
 
         RestrictionParameters *params1 = initialize_restriction_parameters();
         params1->numIntParams = 1;

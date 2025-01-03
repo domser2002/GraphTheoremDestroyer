@@ -43,6 +43,8 @@ RestrictionResult *validate_restriction(Graph *graph, GenerativeRestriction *res
 GenerativeRestriction *create_restriction_object(RestrictionResult* (*restriction)(Graph* graph, RestrictionParameters *params), RestrictionParameters *params);
 GenerativeRestriction *create_restriction(FactType restriction_type, RestrictionParameters *params);
 GenerativeRestriction *create_restriction_from_fact(Fact *fact, GenerativeProofMachine *machine);
+void set_restriction_block(GenerativeRestriction *genRestriction, int newBlock);
+int get_restriction_block(GenerativeRestriction *genRestriction);
 
 RestrictionResult *max_degree_restriction_condition(Graph *graph, RestrictionParameters *params);
 RestrictionResult *no_k_cycle_condition(Graph *graph, RestrictionParameters *params);
@@ -50,6 +52,7 @@ RestrictionResult *no_induced_path_k_condition(Graph *graph, RestrictionParamete
 RestrictionResult *min_degree_condition(Graph *graph, RestrictionParameters *params);
 RestrictionResult *edge_check_condition(Graph *graph, RestrictionParameters *params);
 RestrictionResult *no_unknown_edges_condition(Graph *graph, RestrictionParameters *params);
+RestrictionResult *has_induced_cycle_condition(Graph *graph, RestrictionParameters *params);
 
 RestrictionParameters *deep_copy_restriction_parameters(RestrictionParameters *params);
 GenerativeRestriction *deep_copy_restriction(GenerativeRestriction *restriction);

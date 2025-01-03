@@ -14,7 +14,7 @@ void *generative_main_loop(void *argument)
         machine = create_proof_machine(args->start_graph);
     else 
     {
-        Graph *start_graph = create_graph(args->max_vertices, 1);
+        Graph *start_graph = create_graph(args->max_vertices, 0);
         machine = create_proof_machine(start_graph);
     }
     for(uint32_t i=0;i<args->fact_count;i++)

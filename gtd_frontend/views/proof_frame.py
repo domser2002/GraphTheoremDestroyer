@@ -21,7 +21,7 @@ class ProofFrame(CTkFrame):
         self.middle_frame = None
         self.right_frame = None
         self.result_label = None
-        self.right_frame_to_destroy = []
+        self.right_frame_to_destroy = [] 
         self.display()
         
     def display(self):

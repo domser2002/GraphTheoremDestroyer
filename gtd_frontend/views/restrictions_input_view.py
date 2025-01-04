@@ -16,7 +16,7 @@ class RestrictionsInputView(CTkScrollableFrame):
         
 
     def add_blank_restriction(self):
-        restr_view = RestrictionView(self, self.restriction_schemas)
+        restr_view = RestrictionView(self, self.restriction_schemas, self)
         restr_view.display()
         self.destroy_new_restriction_button()
         restr_view.pack(fill='x', pady=5)
@@ -28,6 +28,12 @@ class RestrictionsInputView(CTkScrollableFrame):
                                                 text='Add new restriction',
                                                 command=self.add_blank_restriction)
         self.new_restriction_button.pack(pady=10)
+    
+    def kill_view(self, view: RestrictionView):
+        if view not in self.restriction_views:
+            return
+        self.restriction_views.remove(view)
+        view.destroy()
 
     def destroy_new_restriction_button(self):
         self.new_restriction_button.destroy()

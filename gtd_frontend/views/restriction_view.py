@@ -5,7 +5,7 @@ from config import *
 from views.function_input_frame import FunctionInputFrame
 
 class RestrictionView(CTkFrame):
-    def __init__(self, master, restr_schemas: list[RestrictionSchema]):
+    def __init__(self, master, restr_schemas: list[RestrictionSchema], restrictions_input_view):
         super().__init__(master)
         # self.configure(fg_color='blue')
         self.pack_propagate(False)  # Prevent the frame from shrinking to fit its contents
@@ -19,6 +19,7 @@ class RestrictionView(CTkFrame):
         self.left_width = RESTRICTION_COMBO_BOX_WIDTH
         self.left_frame = None
         self.right_frame = None
+        self.restrictions_input_view = restrictions_input_view
 
     def clear_params(self):
         self.restriction_params.restriction_id = None
@@ -37,6 +38,7 @@ class RestrictionView(CTkFrame):
         self.display_combo_box()
         self.display_int_input_fields()
         self.display_function_input_field()
+        self.display_delete_button()
 
     def display_frames(self):
         if self.left_frame is None or self.right_frame is None:
@@ -97,6 +99,25 @@ class RestrictionView(CTkFrame):
                 function_frame = FunctionInputFrame(self.right_frame)
                 self.restriction_params.functions[function_name] = function_frame
                 function_frame.pack(side='left', padx=5)
+    
+
+    def display_delete_button(self):
+        size = 30
+        def suicide():
+            self.restrictions_input_view.kill_view(self)
+        button = CTkButton(
+                    master=self.right_frame,
+                    text="✕",
+                    width=size,
+                    height=size,
+                    font=("Roboto", 20, "bold"),
+                    text_color="white",
+                    fg_color="#e94560",
+                    hover_color="#ff6b81",
+                    corner_radius=5,
+                    command=suicide
+                )
+        button.pack(side='right', padx=10, pady=5)
 
 
     def select_choice(self, choice):

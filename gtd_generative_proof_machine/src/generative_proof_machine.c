@@ -1,3 +1,4 @@
+#define IS_GENERATIVE_MODULE_COMPONENT
 #include "generative_proof_machine.h"
 #include "physical_graph.h"
 #include "generative_restriction.h"
@@ -14,15 +15,14 @@ typedef struct GenerativeProofMachine
 
 /**
  * \brief constructor for GenerativeProofMachine class
- * \param numRestrictions number of generative restrictions
  * \param startGraph start graph
  * \returns pointer to a newly created GenerativeProofMachine
  */
-GenerativeProofMachine *create_proof_machine(int numRestrictions, Graph *startGraph)
+GenerativeProofMachine *create_proof_machine(Graph *startGraph)
 {
     GenerativeProofMachine *machine = gtd_malloc(sizeof(GenerativeProofMachine));
-    machine->restrictions = gtd_malloc(sizeof(GenerativeRestriction *) * numRestrictions);
-    machine->numRestrictions = numRestrictions;
+    machine->restrictions = NULL;
+    machine->numRestrictions = 0;
     machine->graph = startGraph;
     machine->depth = 0;
     machine->proofTree = create_proof_tree();
@@ -54,6 +54,15 @@ uint8_t execute_generative_proof_machine(GenerativeProofMachine *machine)
     while (i < machine->numRestrictions)
     {
         GenerativeRestriction *restriction = machine->restrictions[i];
+        if(get_restriction_block(restriction) == -1)
+        {
+            ++i;
+            continue;
+        }
+        if(get_restriction_block(restriction) == 1)
+        {
+            set_restriction_block(restriction, -1);
+        }
         Graph *graph = machine->graph;
         RestrictionResult *result = validate_restriction(graph, restriction);
 
@@ -115,14 +124,14 @@ GenerativeProofMachine *copy_proof_machine(GenerativeProofMachine *machine)
     Graph *graphCopy = copy_graph(machine->graph);
     int depth = machine->depth;
 
-    GenerativeProofMachine *copy = create_proof_machine(numRestrictions, graphCopy);
+    GenerativeProofMachine *copy = create_proof_machine(graphCopy);
 
     for (int i = 0; i < numRestrictions; ++i)
     {
         GenerativeRestriction *restrictionCopy = deep_copy_restriction(machine->restrictions[i]);
         RestrictionParameters *params = get_parameters_from_restriction(restrictionCopy);
         params->machine = copy;
-        copy->restrictions[i] = restrictionCopy;
+        add_restriction(copy,restrictionCopy);
     }
 
     copy->depth = depth;
@@ -149,6 +158,16 @@ ProofTree *get_machine_proof_tree(GenerativeProofMachine *machine)
 GenerativeRestriction **get_machine_restrictions(GenerativeProofMachine *machine)
 {
     return machine->restrictions;
+}
+
+void add_restriction(GenerativeProofMachine *machine, GenerativeRestriction *restriction)
+{
+    if(restriction == NULL)
+        return;
+    machine->numRestrictions++;
+    machine->restrictions = (GenerativeRestriction**)gtd_realloc(machine->restrictions, machine->numRestrictions * sizeof(GenerativeRestriction*));
+    machine->restrictions[machine->numRestrictions-1] = restriction;
+    return;
 }
 
 /**

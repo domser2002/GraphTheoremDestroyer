@@ -1,3 +1,4 @@
+#define IS_GENERATIVE_MODULE_COMPONENT
 #include <string.h>
 #include "proof_tree.h"
 #include "common.h"

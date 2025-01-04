@@ -1,3 +1,4 @@
+#define IS_GENERATIVE_MODULE_COMPONENT
 #include "physical_graph.h"
 #include "generative_restriction.h"
 #include "generative_proof_machine.h"
@@ -7,6 +8,10 @@ struct GenerativeRestriction
     RestrictionResult* (*restriction)(Graph* graph, RestrictionParameters *params);
     RestrictionParameters *params;
     FactType type;
+    // block = 0 -> restriction can be applied infinitely many times
+    // block = 1 -> restriction can be applied only once, but has not been applied yet
+    // block = -1 -> restriction can be applied only once, but has already been appliedś
+    int block;
 };
 
 typedef struct intNode
@@ -27,8 +32,20 @@ GenerativeRestriction *create_restriction_object(RestrictionResult* (*restrictio
     GenerativeRestriction *genRestriction = gtd_malloc(sizeof(GenerativeRestriction));
     genRestriction->restriction = restriction;
     genRestriction->params = params;
+    genRestriction->block = 0;
     return genRestriction;
 }
+
+void set_restriction_block(GenerativeRestriction *genRestriction, int newBlock)
+{
+    genRestriction->block = newBlock;
+}
+
+int get_restriction_block(GenerativeRestriction *genRestriction)
+{
+    return genRestriction->block;
+}
+
 /*
 */
 
@@ -124,6 +141,7 @@ GenerativeRestriction *deep_copy_restriction(GenerativeRestriction *restriction)
 {
     RestrictionParameters *params = deep_copy_restriction_parameters(restriction->params);
     GenerativeRestriction *result = create_restriction_object(restriction->restriction, params);
+    set_restriction_block(result, get_restriction_block(restriction));
     return result;
 }
 
@@ -163,6 +181,9 @@ GenerativeRestriction *create_restriction(FactType restriction_type, Restriction
         case HasNoUnknownEdgesFact:
             restriction = edge_check_condition;
             break;
+        case HasInducedCycleFact:
+            restriction = has_induced_cycle_condition;
+            break;
         default:
             restriction = NULL;
     }
@@ -174,10 +195,43 @@ GenerativeRestriction *create_restriction(FactType restriction_type, Restriction
 
     GenerativeRestriction *result = create_restriction_object(restriction, params);
     result->type = restriction_type;
+
+    switch (restriction_type)
+    {
+        case HasInducedCycleFact:
+            set_restriction_block(result, 1);
+            break;
+        default:
+            set_restriction_block(result, 0);
+    }
+
     return result;
 }
 
-
+/**
+ * \brief converter from fact to restriction
+ * \param fact fact from which restriction is created
+ * \param machine machine to whcih restriction will be applied
+ * \returns restriction created based on fact, if it has only constant params, NULL otherwise
+*/
+GenerativeRestriction *create_restriction_from_fact(Fact *fact, GenerativeProofMachine *machine)
+{
+    RestrictionParameters *params = (RestrictionParameters*)gtd_malloc(sizeof(RestrictionParameters));
+    params->machine = machine;
+    params->blockRestriction = 0;
+    params->numIntParams = fact->params_count;
+    params->intParams = (int*)gtd_malloc(fact->params_count * sizeof(int));
+    for(uint32_t i=0;i<fact->params_count;i++)
+    {
+        if(!is_constant(fact->params[i])) 
+        {
+            gtd_free(params->intParams);
+            return NULL;
+        }
+        params->intParams[i] = fact->params[i]->c;
+    }
+    return create_restriction(fact->type, params);
+}
 // =============== max degree restriction ===============
 
 /**
@@ -698,3 +752,63 @@ RestrictionResult *edge_check_condition(Graph *graph, RestrictionParameters *par
 }
 
 // =============== check edge restriction ============
+// ========== has induced cycle restriction ==========
+
+/**
+ * \brief function to validate has induced cycle condition
+ * \param machine pointer to the GenerativeProofMachine, for which restriction will be validated
+ * \returns pointer to the RestrictionResult that will store information about result of restriction validation
+ */
+RestrictionResult *has_induced_cycle_condition(Graph *graph, RestrictionParameters *params)
+{
+    RestrictionResult *result = gtd_malloc(sizeof(RestrictionResult));
+    ProofTree *proofTree = get_machine_proof_tree(params->machine);
+    result->contradictionFound = 0;
+    result->modified = 0;
+    int k = params->intParams[0];
+    if(get_graph_max_vertices(graph) - get_graph_num_vertices(graph) < k)
+    {
+        return result;
+    }
+    int nBefore = get_graph_num_vertices(graph);
+    for(int i = 0; i < k; ++i)
+    {
+        add_vertex(graph);
+    }
+    for(int i = 0; i < k; ++i)
+    {
+        for(int j = 0; j < k; ++j)
+        {
+            if(i == j)
+            {
+                continue;
+            }
+            if((i+1) % k == j || (i-1) % k == j)
+            {
+                set_edge_connected(graph, nBefore + i, nBefore + j);
+            }
+            else
+            {
+                set_edge_not_connected(graph, nBefore + i, nBefore + j);
+            }
+        }
+    }
+    result->modified = 1;
+    char tempBuffer[100] = "[ ";
+    for (int i = 0; i < k; i++) {
+        char temp[20];
+        snprintf(temp, sizeof(temp), "%d ", nBefore + i);
+        strncat(tempBuffer, temp, sizeof(tempBuffer) - strlen(tempBuffer) - 1);
+    }
+    strncat(tempBuffer, "]", sizeof(tempBuffer) - strlen(tempBuffer) - 1);
+    char buffer[100];
+    snprintf(buffer, sizeof(buffer), "%s jest cyklem indukowanym", tempBuffer);
+
+    ProofNode *proofNode = create_proof_node();
+    proofNode->message = strdup(buffer);
+    append_proof_node(proofTree, proofNode);
+
+    return result;
+}
+
+// ========== has induced cycle restriction ==========

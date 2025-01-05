@@ -1,0 +1,42 @@
+[
+    {
+        "id": 0,
+        "name": "Has no cycles",
+        "int_params_values": {
+        }
+    },
+    {
+        "id": 1,
+        "name": "Does not contain induced K_(s,t)",
+        "int_params_values": {
+            "s": 1,
+            "t": 4
+        }
+    },
+    {
+        "id": 2,
+        "name": "Does not contain induced P_k",
+        "int_params_values": {
+            "k": 4
+        } 
+    },
+    {
+        "id": 3,
+        "name": "Min vertex count",
+        "functions": {
+            "min vertex count": [
+                [
+                    8,
+                    1,
+                    1
+                ]
+            ]
+        }
+    },
+    {
+        "id": 4,
+        "name": "Is connected",
+        "int_params_values": {
+        }
+    }
+]

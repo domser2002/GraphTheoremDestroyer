@@ -1,3 +1,4 @@
+#define IS_FACT_TREE_COMPONENT
 #include "test_fact_tree.h"
 static uint8_t counter = 1;
 typedef Function* (*function_binary_operation)(const Function *const, const Function *const);
@@ -62,7 +63,7 @@ static Fact **create_fact_array_from_modular(Modular_Fact_Array mfa)
 {
     Fact **factArray = (Fact**)gtd_malloc(mfa.fact_count * sizeof(Fact*));
     for(uint32_t i=0;i<mfa.fact_count;i++)
-        factArray[i] = create_fact(mfa.types[i],mfa.params[i],mfa.params_count[i]);
+        factArray[i] = create_fact(mfa.types[i],mfa.params[i]);
     return factArray;
 }
 
@@ -881,7 +882,7 @@ static void run_get_param_count_test(FactType type, uint8_t expected)
 {
     printf("TEST %d\n", counter++);
     // Act
-    uint8_t ret = get_param_count(type);
+    uint8_t ret = get_params(type, NULL, NULL);
     // Assert
     assert(ret == expected);
 }
@@ -908,7 +909,7 @@ static void create_fact_and_run_get_fact_str_test(char expected[MAX_FACT_STR_LEN
         params[i] = va_arg(args,Function*);
     }
     va_end(args);
-    Fact *fact = create_fact(type, params, param_count);
+    Fact *fact = create_fact(type, params);
     // Act & Assert
     run_get_fact_str_test(fact, expected);
     // Clean
@@ -926,7 +927,7 @@ static Fact *create_fact_wrapper(FactType type, uint8_t param_count, ...)
         params[i] = va_arg(args,Function*);
     }
     va_end(args);
-    Fact *fact = create_fact(type, params, param_count);
+    Fact *fact = create_fact(type, params);
     gtd_free(params);
     return fact;
 }

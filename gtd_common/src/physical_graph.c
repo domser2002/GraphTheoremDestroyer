@@ -49,6 +49,8 @@ Graph *create_graph(int max_vertices, int vertices)
 
 int destroy_graph(Graph *graph)
 {
+    if(graph == NULL)
+        return 1;
     gtd_free(graph->degree);
     for(int i = 0; i < graph->max_vertices; ++i)
     {
@@ -156,6 +158,8 @@ int add_vertex(Graph *graph)
 
 Graph *copy_graph(Graph *graph)
 {
+    if(graph == NULL)
+        return NULL;
     Graph *newGraph = create_graph(graph->max_vertices, graph->vertices);
     newGraph->hash = graph->hash;
     int n = graph->max_vertices;

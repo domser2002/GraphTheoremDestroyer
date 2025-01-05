@@ -1,12 +1,12 @@
 [
     {
         "id": 0,
-        "name": "No k cycle",
+        "name": "No C_k",
         "int_params": ["k"]
     },
     {
         "id": 1,
-        "name": "No induced k path",
+        "name": "No induced P_k",
         "int_params": ["k"]
     },
     {

@@ -1,0 +1,50 @@
+[
+    {
+        "id": 0,
+        "name": "Does not contain C_k",
+        "int_params_values": {
+            "k": 4
+        }
+    },
+    {
+        "id": 1,
+        "name": "Does not contain C_k",
+        "int_params_values": {
+            "k": 8
+        }
+    },
+    {
+        "id": 2,
+        "name": "Does not contain induced P_k",
+        "int_params_values": {
+            "k": 8
+        } 
+    },
+    {
+        "id": 3,
+        "name": "Min vertex degree",
+        "functions": {
+            "min degree": [
+                [
+                    3,
+                    1,
+                    1
+                ]
+            ]
+        }
+    },
+    {
+        "id": 4,
+        "name": "Check cases",
+        "int_params_values": {
+            "max depth": 3
+        }
+    },
+    {
+        "id": 5,
+        "name": "Contains induced C_k",
+        "int_params_values": {
+            "k": 7
+        }
+    }
+]

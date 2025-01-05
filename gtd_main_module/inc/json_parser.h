@@ -2,6 +2,7 @@
 #define JSON_PARSER_H
 #include "common.h"
 #include "module_args.h"
+#include "parson.h"
 
 /**
  * \brief function to parse json received from frontend into ModuleArgs struct

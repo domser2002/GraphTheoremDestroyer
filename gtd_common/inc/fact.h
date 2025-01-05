@@ -53,10 +53,30 @@ typedef enum FactType
     HasNoMinorCliqueFact,
     MaxVertexDegreeFact,
     MinVertexDegreeFact,
-    HasNoUnknownEdgesFact
+    HasNoUnknownEdgesFact,
+    UnknownType = INT32_MAX
 } FactType;
 
-uint8_t get_param_count(FactType type);
+/**
+ * \brief function to check what parameters are required for fact type
+ * \param type fact type
+ * \param params pointer to array of strings to return parameter names if it is not NULL
+ * \param functional pointer to array of booleans to return if parameter can be functional if it is not NULL
+ * \return number of parameters needed
+*/
+uint8_t get_params(FactType type, char ***params, bool **functional);
+
+/**
+ * \brief function to get name of the fact type, to be used by frontend
+ */
+char *get_fact_type_name(FactType type);
+
+/**
+ * \brief function to get fact type by given str name
+ * \note it is the reverse of get_fact_type_name
+ */
+FactType get_fact_type_by_name(const char *name);
+
 typedef struct Fact
 {
     FactType type;

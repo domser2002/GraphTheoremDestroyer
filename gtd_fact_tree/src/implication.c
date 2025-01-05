@@ -562,7 +562,7 @@ Fact **implies(Fact **factArray, uint32_t n_facts, int *count)
             for(uint32_t k=0;k<knownImplicationsArray[i].right_side.n_facts;k++)
             {
                 FactType type = knownImplicationsArray[i].right_side.types[k];
-                int n_params = get_param_count(type);
+                int n_params = get_params(type, NULL, NULL);
                 Function **fact_params = (Function **)gtd_malloc(n_params * sizeof(Function *));
                 for(int s=0;s<n_params;s++)
                 {

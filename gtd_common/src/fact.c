@@ -5,7 +5,7 @@
 */
 Fact *create_fact(FactType type, Function **params)
 {
-    uint8_t params_count = get_param_count(type);
+    uint8_t params_count = get_params(type, NULL, NULL);
     Fact *newFact = (Fact *)gtd_malloc(sizeof(Fact));
     newFact->type = type;
     newFact->params = (params_count == 0)?NULL:(Function**)gtd_malloc(params_count * sizeof(Function*));
@@ -32,11 +32,366 @@ void delete_fact(Fact *fact)
     return;
 }
 
+uint8_t get_params(FactType type, char ***params, bool **functional)
+{
+    if(params != NULL)
+    {
+        switch (type)
+        {
+            case IstnaryTreeFact:
+                *params = (char **)gtd_malloc(1 * sizeof(char*));
+                (*params)[0] = "t";
+                break;
+            case HasCycleFact:
+            case HasNoCycleFact:
+            case HasInducedCycleFact:
+            case HasNoInducedCycleFact:
+            case HasMinorCycleFact:
+            case HasNoMinorCycleFact:
+            case HasPathFact:
+            case HasNoPathFact:
+            case HasInducedPathFact:
+            case HasNoInducedPathFact:
+            case HasMinorPathFact:
+            case HasNoMinorPathFact:
+            case HasCliqueFact:
+            case HasNoCliqueFact:
+            case HasMinorCliqueFact:
+            case HasNoMinorCliqueFact:
+            case IsPartiteFact:
+                *params = (char **)gtd_malloc(1 * sizeof(char*));
+                (*params)[0] = "k";
+                break;
+            case VertexCountFact:
+                *params = (char **)gtd_malloc(1 * sizeof(char*));
+                (*params)[0] = "vertex count";
+                break;
+            case MinVertexCountFact:
+                *params = (char **)gtd_malloc(1 * sizeof(char*));
+                (*params)[0] = "min vertex count";
+                break;
+            case MaxVertexCountFact:
+                *params = (char **)gtd_malloc(1 * sizeof(char*));
+                (*params)[0] = "max vertex count";
+                break;
+            case EdgeCountFact:
+                *params = (char **)gtd_malloc(1 * sizeof(char*));
+                (*params)[0] = "edge count";
+                break;
+            case MinEdgeCountFact:
+                *params = (char **)gtd_malloc(1 * sizeof(char*));
+                (*params)[0] = "min edge count";
+                break;
+            case MaxEdgeCountFact:
+                *params = (char **)gtd_malloc(1 * sizeof(char*));
+                (*params)[0] = "max edge count";
+                break;
+            case TreeHeightFact:
+                *params = (char **)gtd_malloc(1 * sizeof(char*));
+                (*params)[0] = "tree height";
+                break;
+            case MinTreeHeightFact:
+                *params = (char **)gtd_malloc(1 * sizeof(char*));
+                (*params)[0] = "min tree height";
+                break;
+            case MaxTreeHeightFact:
+                *params = (char **)gtd_malloc(1 * sizeof(char*));
+                (*params)[0] = "max tree height";
+                break;
+            case MaxVertexDegreeFact:
+                *params = (char **)gtd_malloc(1 * sizeof(char*));
+                (*params)[0] = "max degree";
+                break;
+            case MinVertexDegreeFact:
+                *params = (char **)gtd_malloc(1 * sizeof(char*));
+                (*params)[0] = "min degree";
+                break;
+            case HasNoUnknownEdgesFact:
+                *params = (char **)gtd_malloc(1 * sizeof(char*));
+                (*params)[0] = "max depth";
+                break;
+            case IsConnectedFact:
+            case IsTreeFact:
+            case IsPlanarFact:
+            case IsCycleFact:
+            case IsCycleComplementFact:
+            case HasNoCyclesFact:
+                *params = NULL;
+                break;
+            case HasCompletePartiteFact:
+            case HasNoCompletePartiteFact:
+            case HasInducedCompletePartiteFact:
+            case HasNoInducedCompletePartiteFact:
+            case HasMinorCompletePartiteFact:
+            case HasNoMinorCompletePartiteFact:
+                *params = (char **)gtd_malloc(2 * sizeof(char*));
+                (*params)[0] = "s";
+                (*params)[1] = "t";
+                break;
+            default:
+                *params = NULL;
+        }
+    }
+    if(functional != NULL)
+    {
+        switch (type)
+        {
+        case MaxVertexDegreeFact:
+        case MinVertexDegreeFact:
+        case VertexCountFact:
+        case MinVertexCountFact:
+        case MaxVertexCountFact:
+        case EdgeCountFact:
+        case MinEdgeCountFact:
+        case MaxEdgeCountFact:
+        case TreeHeightFact:
+        case MinTreeHeightFact:
+        case MaxTreeHeightFact:
+            *functional = (bool *)gtd_calloc(1, sizeof(bool));
+            *functional[0] = true;
+            break;
+        case IstnaryTreeFact:
+        case IsPartiteFact:
+        case HasCycleFact:
+        case HasNoCycleFact:
+        case HasInducedCycleFact:
+        case HasNoInducedCycleFact:
+        case HasMinorCycleFact:
+        case HasNoMinorCycleFact:
+        case HasPathFact:
+        case HasNoPathFact:
+        case HasInducedPathFact:
+        case HasNoInducedPathFact:
+        case HasMinorPathFact:
+        case HasNoMinorPathFact:
+        case HasCliqueFact:
+        case HasNoCliqueFact:
+        case HasMinorCliqueFact:
+        case HasNoMinorCliqueFact:
+        case HasNoUnknownEdgesFact:
+            *functional = (bool *)gtd_calloc(1, sizeof(bool));
+            break;
+        case IsConnectedFact:
+        case IsTreeFact:
+        case IsPlanarFact:
+        case IsCycleFact:
+        case IsCycleComplementFact:
+        case HasNoCyclesFact:
+            *functional = NULL;
+            break;
+        case HasCompletePartiteFact:
+        case HasNoCompletePartiteFact:
+        case HasInducedCompletePartiteFact:
+        case HasNoInducedCompletePartiteFact:
+        case HasMinorCompletePartiteFact:
+        case HasNoMinorCompletePartiteFact:
+            *functional = (bool *)gtd_calloc(3, sizeof(bool));
+            break;
+        default:
+            return 0;
+        }
+    }
+    switch (type)
+    {
+    case IstnaryTreeFact:
+    case IsPartiteFact:
+    case VertexCountFact:
+    case MinVertexCountFact:
+    case MaxVertexCountFact:
+    case EdgeCountFact:
+    case MinEdgeCountFact:
+    case MaxEdgeCountFact:
+    case TreeHeightFact:
+    case MinTreeHeightFact:
+    case MaxTreeHeightFact:
+    case HasCycleFact:
+    case HasNoCycleFact:
+    case HasInducedCycleFact:
+    case HasNoInducedCycleFact:
+    case HasMinorCycleFact:
+    case HasNoMinorCycleFact:
+    case HasPathFact:
+    case HasNoPathFact:
+    case HasInducedPathFact:
+    case HasNoInducedPathFact:
+    case HasMinorPathFact:
+    case HasNoMinorPathFact:
+    case HasCliqueFact:
+    case HasNoCliqueFact:
+    case HasMinorCliqueFact:
+    case HasNoMinorCliqueFact:
+    case MaxVertexDegreeFact:
+    case MinVertexDegreeFact:
+    case HasNoUnknownEdgesFact:
+        return 1;
+    case IsConnectedFact:
+    case IsTreeFact:
+    case IsPlanarFact:
+    case IsCycleFact:
+    case IsCycleComplementFact:
+    case HasNoCyclesFact:
+        return 0;
+    case HasCompletePartiteFact:
+    case HasNoCompletePartiteFact:
+    case HasInducedCompletePartiteFact:
+    case HasNoInducedCompletePartiteFact:
+    case HasMinorCompletePartiteFact:
+    case HasNoMinorCompletePartiteFact:
+        // handle only bipartite for now
+        return 3;
+    default:
+        return 0;
+    }
+}
 
+char *get_fact_type_name(FactType type)
+{
+    char *result = (char *)gtd_malloc(MAX_FACT_STR_LEN * sizeof(char));
+    switch (type)
+    {
+    case IsConnectedFact:
+        sprintf(result, "Is connected");
+        return result;
+    case IsTreeFact:
+        sprintf(result, "Is a tree");
+        return result;
+    case IstnaryTreeFact:
+        sprintf(result, "Is a t-nary tree");
+        return result;
+    case IsPlanarFact:
+        sprintf(result, "Is planar");
+        return result;
+    case IsPartiteFact:
+        sprintf(result, "Is k-partite");
+        return result;
+    case IsCycleFact:
+        sprintf(result, "Is a cycle");
+        return result;
+    case IsCycleComplementFact:
+        sprintf(result, "Is a complement of a cycle");
+        return result;
+    case HasNoCyclesFact:
+        sprintf(result, "Has no cycles");
+        return result;
+    case VertexCountFact:
+        sprintf(result, "Vertex count");
+        return result;
+    case MinVertexCountFact:
+        sprintf(result, "Min vertex count");
+        return result;
+    case MaxVertexCountFact:
+        sprintf(result, "Max vertex count");
+        return result;
+    case EdgeCountFact:
+        sprintf(result, "Edge count");
+        return result;
+    case MinEdgeCountFact:
+        sprintf(result, "Min edge count");
+        return result;
+    case MaxEdgeCountFact:
+        sprintf(result, "Max edge count");
+        return result;
+    case TreeHeightFact:
+        sprintf(result, "Tree height");
+        return result;
+    case MinTreeHeightFact:
+        sprintf(result, "Min tree height");
+        return result;
+    case MaxTreeHeightFact:
+        sprintf(result, "Max tree height");
+        return result;
+    case HasCycleFact:
+        sprintf(result, "Contains C_k");
+        return result;   
+    case HasNoCycleFact:
+        sprintf(result, "Does not contain C_k");
+        return result;  
+    case HasInducedCycleFact:
+        sprintf(result, "Contains induced C_k");
+        return result;    
+    case HasNoInducedCycleFact:
+        sprintf(result, "Does not contain induced C_k");
+        return result;  
+    case HasMinorCycleFact:
+        sprintf(result, "Contains minor C_k");
+        return result;      
+    case HasNoMinorCycleFact:
+        sprintf(result, "Does not contain minor C_k");
+        return result;  
+    case HasPathFact:
+        sprintf(result, "Contains P_k");
+        return result;    
+    case HasNoPathFact:
+        sprintf(result, "Does not contain P_k");
+        return result;    
+    case HasInducedPathFact:
+        sprintf(result, "Contains induced P_k");
+        return result;   
+    case HasNoInducedPathFact:
+        sprintf(result, "Does not contain induced P_k");
+        return result; 
+    case HasMinorPathFact:
+        sprintf(result, "Contains minor P_k");
+        return result;   
+    case HasNoMinorPathFact:
+        sprintf(result, "Does not contain minor P_k");
+        return result; 
+    case HasCompletePartiteFact:
+        sprintf(result, "Contains K_(s,t)");
+        return result;  
+    case HasNoCompletePartiteFact:
+        sprintf(result, "Does not contain K_(s,t)");
+        return result; 
+    case HasInducedCompletePartiteFact:
+        sprintf(result, "Contains induced K_(s,t)");
+        return result;  
+    case HasNoInducedCompletePartiteFact:
+        sprintf(result, "Does not contain induced K_(s,t)");
+        return result;  
+    case HasMinorCompletePartiteFact:
+        sprintf(result, "Contains minor K_(s,t)");
+        return result;  
+    case HasNoMinorCompletePartiteFact:
+        sprintf(result, "Does not contain minor K_(s,t)");
+        return result; 
+    case HasCliqueFact:
+        sprintf(result, "Contains K_k");
+        return result;  
+    case HasNoCliqueFact:
+        sprintf(result, "Does not contain K_k");
+        return result; 
+    case HasMinorCliqueFact:
+        sprintf(result, "Contains minor K_k");
+        return result;  
+    case HasNoMinorCliqueFact:
+        sprintf(result, "Does not contain minor K_k");
+        return result; 
+    case MaxVertexDegreeFact:
+        sprintf(result, "Max vertex degree");
+        return result; 
+    case MinVertexDegreeFact:
+        sprintf(result, "Min vertex degree");
+        return result;    
+    case HasNoUnknownEdgesFact:
+        sprintf(result, "Check cases");
+        return result; 
+    default:
+        return "";
+    }
+}
+
+FactType get_fact_type_by_name(const char *name)
+{
+    for(uint32_t i=0; i<FACT_TYPE_NUM; i++)
+    {
+        if(strcmp(name, get_fact_type_name(i)) == 0)
+            return i;
+    }
+    return UnknownType;
+}
 
 /**
  * \brief function to check if 2 facts are equal
- * \note needed because Fact fields are protected
  * \param fact1 first fact
  * \param fact2 second fact
  * \return true if facts are equal, false otherwise
@@ -309,66 +664,6 @@ char *get_fact_str(Fact *fact)
         return result; 
     default:
         return "";
-    }
-}
-
-/**
- * \brief function to check how many parameters are required for fact type
- * \param type fact type
- * \return number of parameters needed
-*/
-uint8_t get_param_count(FactType type)
-{
-    switch (type)
-    {
-    case IstnaryTreeFact:
-    case IsPartiteFact:
-    case VertexCountFact:
-    case MinVertexCountFact:
-    case MaxVertexCountFact:
-    case EdgeCountFact:
-    case MinEdgeCountFact:
-    case MaxEdgeCountFact:
-    case TreeHeightFact:
-    case MinTreeHeightFact:
-    case MaxTreeHeightFact:
-    case HasCycleFact:
-    case HasNoCycleFact:
-    case HasInducedCycleFact:
-    case HasNoInducedCycleFact:
-    case HasMinorCycleFact:
-    case HasNoMinorCycleFact:
-    case HasPathFact:
-    case HasNoPathFact:
-    case HasInducedPathFact:
-    case HasNoInducedPathFact:
-    case HasMinorPathFact:
-    case HasNoMinorPathFact:
-    case HasCliqueFact:
-    case HasNoCliqueFact:
-    case HasMinorCliqueFact:
-    case HasNoMinorCliqueFact:
-    case MaxVertexDegreeFact:
-    case MinVertexDegreeFact:
-    case HasNoUnknownEdgesFact:
-        return 1;
-    case IsConnectedFact:
-    case IsTreeFact:
-    case IsPlanarFact:
-    case IsCycleFact:
-    case IsCycleComplementFact:
-    case HasNoCyclesFact:
-        return 0;
-    case HasCompletePartiteFact:
-    case HasNoCompletePartiteFact:
-    case HasInducedCompletePartiteFact:
-    case HasNoInducedCompletePartiteFact:
-    case HasMinorCompletePartiteFact:
-    case HasNoMinorCompletePartiteFact:
-        // handle only bipartite for now
-        return 3;
-    default:
-        return 0;
     }
 }
 

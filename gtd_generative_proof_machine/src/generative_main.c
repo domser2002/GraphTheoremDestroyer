@@ -2,6 +2,7 @@
 #include "generative_main.h"
 #include "generative_proof_machine.h"
 #include "generative_restriction.h"
+#define MAX_VERTICES 100
 
 void *generative_main_loop(void *argument)
 {
@@ -10,13 +11,8 @@ void *generative_main_loop(void *argument)
     GenerativeProofMachine *machine;
     Fact **used_facts = (Fact **)gtd_malloc(args->fact_count * sizeof(Fact **));
     uint32_t used_facts_count = 0;
-    if(args->start_graph != NULL)
-        machine = create_proof_machine(args->start_graph);
-    else 
-    {
-        Graph *start_graph = create_graph(args->max_vertices, 0);
-        machine = create_proof_machine(start_graph);
-    }
+    Graph *start_graph = create_graph(MAX_VERTICES, 0);
+    machine = create_proof_machine(start_graph);
     for(uint32_t i=0;i<args->fact_count;i++)
     {
         GenerativeRestriction *restriction = create_restriction_from_fact(args->fact_array[i], machine);

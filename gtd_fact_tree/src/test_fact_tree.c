@@ -882,7 +882,7 @@ static void run_get_param_count_test(FactType type, uint8_t expected)
 {
     printf("TEST %d\n", counter++);
     // Act
-    uint8_t ret = get_param_count(type);
+    uint8_t ret = get_params(type, NULL, NULL);
     // Assert
     assert(ret == expected);
 }

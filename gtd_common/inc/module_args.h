@@ -7,10 +7,6 @@ typedef struct ModuleArgs {
     // required theorem parameters
     Fact **fact_array;
     uint32_t fact_count;
-    uint32_t max_vertices;
-    // optional theorem parameters, NULL if not present
-    Graph *start_graph;
-    uint32_t *min_vertices;
     // communication parameters
     int write_fd; // must be int, defined by POSIX
     int read_fd;

@@ -9,7 +9,7 @@ CFLAGS = -std=c99 -fstrict-aliasing -fstack-protector -ftrack-macro-expansion=0 
 LFLAGS = -lm -pthread
 
 # Paths
-C_INCLUDE_PATH = gtd_fact_tree/inc:gtd_common/inc:gtd_generative_proof_machine/inc:gtd_main_module/inc
+C_INCLUDE_PATH = external/parson:gtd_fact_tree/inc:gtd_common/inc:gtd_generative_proof_machine/inc:gtd_main_module/inc
 BIN_PATH = build/bin
 OBJ_PATH = build/obj
 
@@ -47,6 +47,8 @@ SRC_TEST = \
 	gtd_generative_proof_machine/src/test_physical_graph.c \
 	gtd_generative_proof_machine/src/test_generative_proof_machine.c
 
+SRC_PARSON = external/parson/parson.c
+
 # Object files
 OBJ_MAIN = $(OBJ_PATH)/main.o
 
@@ -72,6 +74,8 @@ OBJ_GTD_MAIN = \
 	$(OBJ_PATH)/json_parser.o \
 	$(OBJ_PATH)/module.o
 
+OBJ_PARSON = $(OBJ_PATH)/parson.o
+
 OBJ_TEST = $(OBJ_PATH)/unit_test.o \
            $(OBJ_PATH)/test_fact_tree.o \
            $(OBJ_PATH)/test_physical_graph.o \
@@ -79,7 +83,7 @@ OBJ_TEST = $(OBJ_PATH)/unit_test.o \
 
 # All object files for main and test
 MAIN_OBJ_FILES = $(OBJ_MAIN) $(OBJ_GTD_FACT_TREE) $(OBJ_GTD_COMMON) \
-                 $(OBJ_GTD_GENERATIVE_PROOF_MACHINE) $(OBJ_GTD_MAIN)
+                 $(OBJ_GTD_GENERATIVE_PROOF_MACHINE) $(OBJ_GTD_MAIN) $(OBJ_PARSON)
 
 TEST_OBJ_FILES = $(OBJ_TEST) $(OBJ_GTD_FACT_TREE) $(OBJ_GTD_COMMON) \
                  $(OBJ_GTD_GENERATIVE_PROOF_MACHINE)
@@ -153,6 +157,10 @@ $(OBJ_PATH)/json_parser.o: gtd_main_module/src/json_parser.c
 
 $(OBJ_PATH)/module.o: gtd_main_module/src/module.c
 	C_INCLUDE_PATH=$(C_INCLUDE_PATH) $(CC) $(CFLAGS) -c $< -o $@
+
+# Compile external
+$(OBJ_PATH)/parson.o: external/parson/parson.c | mkdir_dirs
+	$(CC) $(CFLAGS) -c $< -o $@
 
 # Test target
 test: $(BIN_PATH)/test

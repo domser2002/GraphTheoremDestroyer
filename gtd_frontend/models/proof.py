@@ -10,6 +10,7 @@ class Proof:
         self.text:list[str] = None
         self.restrictions:list[Restriction] = None
         self.timestamp:datetime.datetime = None
+        self.json_path:str = None
     
     def save_to_json(self, folder_path: str, proof_path: str):
         idx = 0
@@ -20,12 +21,21 @@ class Proof:
         result = {}
         result['result'] = self.result
         result['proof_path'] = proof_path
-        result['timestamp'] = self.timestamp.strftime('%Y-%m-%dT%H:%M')
+        result['timestamp'] = self.timestamp.strftime('%Y-%m-%dT%H:%M:%S.%f')
         result['restrictions'] = []
         for restr in self.restrictions:
             result['restrictions'].append(restr.to_dictionary())
         with open(file_path, 'w') as file:
             json.dump([result], file, indent=4, ensure_ascii=False, sort_keys=False)
+        self.json_path = file_path
+    
+    def destroy_json_file(self):
+        if self.json_path is not None and os.path.isfile(self.json_path):
+            try:
+                os.remove(self.json_path)
+            except:
+                pass
+        
     
     @staticmethod
     def from_dictionary(dictionary: dict):
@@ -39,7 +49,7 @@ class Proof:
         restrictions = []
         restrictions_raw = dictionary['restrictions']
         timestamp = dictionary['timestamp']
-        timestamp = datetime.datetime.strptime(timestamp, "%Y-%m-%dT%H:%M")
+        timestamp = datetime.datetime.strptime(timestamp, "%Y-%m-%dT%H:%M:%S.%f")
         for restriction in restrictions_raw:
             restr = Restriction.from_dictionary(restriction)
             restrictions.append(restr)

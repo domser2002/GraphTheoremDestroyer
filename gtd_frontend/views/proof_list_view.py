@@ -15,14 +15,21 @@ class ProofListView(CTkScrollableFrame):
         self.init_proofs()
 
     def init_proofs(self):
-        proofs = self.proof_controller.get_proofs()
+        proofs = self.proof_controller.get_proofs()[::-1]
         for proof in proofs:
             self.add_proof_frame(proof)
 
-    def add_proof_frame(self, proof: Proof):
+    def add_proof_frame(self, proof: Proof, initial_setup=False):
         proof_frame = ProofFrame(self, proof)
-        self.proof_views.append(proof_frame)
-        proof_frame.grid(row=len(self.proof_views) - 1, column=0, sticky="ew", pady=10)
+        
+        if initial_setup:
+            self.proof_views.append(proof_frame)
+            proof_frame.grid(row=len(self.proof_views) - 1, column=0, sticky="ew", pady=10)
+        else:
+            self.proof_views.insert(0, proof_frame)
+            proof_frame.grid(row=0, column=0, sticky="ew", pady=10)
+            for index, frame in enumerate(self.proof_views[1:], start=1):
+                frame.grid_configure(row=index)
 
     def update_proof_result(self, proof: Proof):
         for proof_view in self.proof_views:

@@ -4,10 +4,11 @@ class RunMachineView(CTkFrame):
     def __init__(self, master, 
                 restrictions_input_view,
                 restriction_controller,
-                proof_controller):
+                main_view):
         super().__init__(master)
         self.restrictions_input_view = restrictions_input_view
         self.restriction_controller = restriction_controller
+        self.main_view = main_view
 
         self.run_button = CTkButton(self, 
                                     text='RUN', 
@@ -16,6 +17,7 @@ class RunMachineView(CTkFrame):
         self.run_button.pack(side='right')
 
     def send_restrictions(self):
+        self.main_view.switch_to_proofs()
         restrictions = self.restrictions_input_view.get_restriction_objects()
         self.restriction_controller.clear_restrictions()
         for restr in restrictions:

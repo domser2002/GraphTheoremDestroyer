@@ -21,11 +21,12 @@ class ProofController:
             with open(file_path, 'r') as file:
                 data = json.load(file)[0]
                 proof = Proof.from_dictionary(data)
+                proof.json_path = file_path
                 self.add_proof(proof)
         
     def add_proof(self, proof:Proof):
         self.proofs.append(proof)
-        self.proofs.sort(key=lambda x:x.timestamp, reverse=False)
+        self.proofs.sort(key=lambda x:x.timestamp, reverse=True)
     
     def add_pending_proof(self, proof:Proof):
         self.add_proof(proof)

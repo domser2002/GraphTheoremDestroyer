@@ -71,11 +71,29 @@ class ProofFrame(CTkFrame):
             height=parent_frame_height
         )
         right_frame.grid(row=0, column=2, sticky="nsew", padx=5, pady=5)
-        self.right_frame = right_frame
+        # self.right_frame = right_frame
+        right_top_frame = CTkFrame(
+            right_frame,
+            height=1,
+            width = right_width,
+            fg_color='transparent'
+        )
+        right_top_frame.grid(row=0, column=0, sticky='nsew')
+
+        right_bottom_grame = CTkFrame(
+            right_frame,
+            width=right_width,
+            fg_color='transparent'
+        )
+        right_bottom_grame.grid(row=1, column=0, sticky='nsew')
+        self.right_frame = right_bottom_grame
+        right_frame.grid_rowconfigure(1, weight=1)
+        right_frame.grid_columnconfigure(0, weight=1)
+        self.right_top_frame = right_top_frame
 
         self.display_general_info(left_frame)
         self.display_restrictions(middle_frame)
-        self.display_result(right_frame)
+        self.display_result(self.right_frame)
 
     def display_general_info(self, frame: CTkFrame):
         header_label = CTkLabel(
@@ -242,4 +260,24 @@ class ProofFrame(CTkFrame):
             proof_button.pack(padx=0, pady=5, expand=False)
             self.right_frame_to_destroy.append(proof_button)
 
-        
+        if is_success or is_failure:
+            size = 15
+            def suicide():
+                self.destroy_proof_frame()
+            button = CTkButton(
+                        master=self.right_top_frame,
+                        text="✕",
+                        width=size,
+                        height=size,
+                        font=("Roboto", max(size, size // 2), "bold"),
+                        text_color="white",
+                        fg_color="#e94560",
+                        hover_color="#ff6b81",
+                        corner_radius=2,
+                        command=suicide
+                    )
+            button.pack(side='right', padx=10, pady=5)
+
+    def destroy_proof_frame(self):
+        self.proof.destroy_json_file()
+        self.destroy()

@@ -26,19 +26,19 @@ Graph *create_graph(int max_vertices, int vertices)
     newGraph->is_maximal = 0;
     newGraph->max_vertices = max_vertices;
     newGraph->vertices = vertices;
-    newGraph->degree = (int *)gtd_malloc(sizeof(int) * max_vertices);
-    newGraph->adjacency_matrix = (char **)gtd_malloc(sizeof(int*) * max_vertices);
+    newGraph->degree = (int *)gtd_malloc(sizeof(int) * vertices);
+    newGraph->adjacency_matrix = (char **)gtd_malloc(sizeof(int*) * vertices);
 
-    for(int i = 0; i < max_vertices; ++i)
+    for(int i = 0; i < vertices; ++i)
     {
         newGraph->degree[i] = 0;
-        newGraph->adjacency_matrix[i] = (char *)gtd_malloc(sizeof(char) * max_vertices);
-        memset(newGraph->adjacency_matrix[i], 0, sizeof(char) * max_vertices);
+        newGraph->adjacency_matrix[i] = (char *)gtd_malloc(sizeof(char) * vertices);
+        memset(newGraph->adjacency_matrix[i], 0, sizeof(char) * vertices);
     }
 
-    for(int r = 0; r < max_vertices; ++r)
+    for(int r = 0; r < vertices; ++r)
     {
-        for(int c = 0; c < max_vertices; ++c)
+        for(int c = 0; c < vertices; ++c)
         {
             newGraph->adjacency_matrix[r][c] = UNKNOWN_SYMBOL;
         }
@@ -52,7 +52,7 @@ int destroy_graph(Graph *graph)
     if(graph == NULL)
         return 1;
     gtd_free(graph->degree);
-    for(int i = 0; i < graph->max_vertices; ++i)
+    for(int i = 0; i < graph->vertices; ++i)
     {
         gtd_free(graph->adjacency_matrix[i]);
     }
@@ -152,6 +152,28 @@ int add_vertex(Graph *graph)
     }
 
     graph->vertices++;
+    char **newMatrix = gtd_realloc(
+        graph->adjacency_matrix,
+        sizeof(char*) * graph->vertices
+        );
+    graph->adjacency_matrix = newMatrix;
+    
+    for(int i = 0; i < (graph->vertices)-1; ++i)
+    {
+        char *newRow = gtd_realloc(graph->adjacency_matrix[i], sizeof(char) * graph->vertices);
+        graph->adjacency_matrix[i] = newRow;
+    }
+    graph->adjacency_matrix[(graph->vertices) - 1] = gtd_malloc(sizeof(char) * (graph->vertices));
+
+    for(int i = 0; i < graph->vertices; ++i)
+    {
+        graph->adjacency_matrix[i][(graph->vertices) - 1] = UNKNOWN_SYMBOL;
+        graph->adjacency_matrix[(graph->vertices) - 1][i] = UNKNOWN_SYMBOL;
+    }
+
+    int *newDegree = gtd_realloc(graph->degree, sizeof(int) * (graph->vertices));
+    newDegree[(graph->vertices) - 1] = 0;
+    graph->degree = newDegree;
 
     return 1;
 }
@@ -162,7 +184,7 @@ Graph *copy_graph(Graph *graph)
         return NULL;
     Graph *newGraph = create_graph(graph->max_vertices, graph->vertices);
     newGraph->hash = graph->hash;
-    int n = graph->max_vertices;
+    int n = graph->vertices;
     for(int r = 0; r < n; ++r)
     {
         newGraph->degree[r] = graph->degree[r];

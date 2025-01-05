@@ -766,7 +766,7 @@ RestrictionResult *has_induced_cycle_condition(Graph *graph, RestrictionParamete
     result->contradictionFound = 0;
     result->modified = 0;
     int k = params->intParams[0];
-    if(get_graph_max_vertices(graph) - get_graph_num_vertices(graph) < k)
+    if((get_graph_max_vertices(graph) - get_graph_num_vertices(graph) < k) && get_graph_max_vertices(graph) > 0)
     {
         return result;
     }

@@ -19,6 +19,7 @@ void test_graph_creation_and_deletion(void)
 
 void test_adding_vertices(void)
 {
+    // ===== TEST 1 =====
     Graph *graph = create_graph(10, 0);
 
     for(int i = 0; i < 5; ++i)
@@ -30,6 +31,36 @@ void test_adding_vertices(void)
     assert(num_vertices == 5);
 
     destroy_graph(graph);
+
+    // ===== TEST 2 =====
+    Graph *graph2 = create_graph(5, 3);
+    int canAdd1 = add_vertex(graph2);
+    int size1 = get_graph_num_vertices(graph2);
+    int canAdd2 = add_vertex(graph2);
+    int size2 = get_graph_num_vertices(graph2);
+    int canAdd3 = add_vertex(graph2);
+    int size3 = get_graph_num_vertices(graph2);
+
+    assert(canAdd1 == 1);
+    assert(size1 == 4);
+    assert(canAdd2 == 1);
+    assert(size2 == 5);
+    assert(canAdd3 == -1);
+    assert(size3 == 5);
+
+    destroy_graph(graph2);
+
+    // ===== TEST 3 =====
+    Graph *graph3 = create_graph(-1, 1);
+    for(int i = 2; i < 100; ++i)
+    {
+        int canAdd = add_vertex(graph3);
+        int size = get_graph_num_vertices(graph3);
+        assert(canAdd == 1);
+        assert(size == i);
+    }
+
+    destroy_graph(graph3);
 }
 
 void test_adding_edges(void)

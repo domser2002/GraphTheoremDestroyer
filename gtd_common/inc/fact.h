@@ -4,9 +4,11 @@
 #include <stdbool.h>
 #include <math.h>
 #include <string.h>
+#include <unistd.h>
 #include "log.h"
 #include "common.h"
 #include "function.h"
+#include "parson.h"
 #define FACT_TYPE_NUM 42
 #define MAX_PARAMS_IN_FACT 3
 #define MAX_FACT_STR_LEN 128
@@ -92,4 +94,10 @@ char *get_fact_str(Fact *fact);
 bool equal_facts(Fact *fact1, Fact *fact2);
 Fact **deep_copy_fact_array(Fact **fact_array, uint32_t fact_count);
 
+/**
+ * \brief function to create a json file with a list of supported restriction/fact types with parameters
+ * \param pathname_len length of file name
+ * \returns path to the created file
+ */
+char *create_restrictions_file(size_t *pathname_len);
 #endif

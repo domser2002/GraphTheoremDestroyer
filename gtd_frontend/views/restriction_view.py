@@ -127,7 +127,16 @@ class RestrictionView(CTkFrame):
         self.chosen_schema = [x for x in self.restriction_schemas if x.name == choice][0]
         self.restriction_params.restriction_id = self.chosen_schema.id
         self.restriction_params.restriction_name = self.chosen_schema.name
-        self.display()
+        self.update_input_fields()
+    
+    def update_input_fields(self):
+        for widget in self.right_frame.winfo_children():
+            widget.destroy()
+
+        self.display_int_input_fields()
+        self.display_function_input_field()
+        self.display_delete_button()
+
 
     def get_restriction_object(self):
         id = self.restriction_params.restriction_id

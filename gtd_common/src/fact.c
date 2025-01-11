@@ -681,3 +681,73 @@ Fact **deep_copy_fact_array(Fact **fact_array, uint32_t fact_count)
     }
     return new_fact_array;
 }
+
+char *create_restrictions_file(size_t *pathname_len)
+{
+    char *pathname = (char *)gtd_malloc(MAX_PATHNAME_LEN * sizeof(char));
+    char time_str[20];
+    char cwd[MAX_PATHNAME_LEN];
+    time_t rawtime;
+    struct tm *timeinfo;
+
+    if (getcwd(cwd, sizeof(cwd)) != NULL)
+    {
+        time(&rawtime);
+        timeinfo = localtime(&rawtime);
+        strftime(time_str, sizeof(time_str), "%Y%m%d%H%M%S", timeinfo);
+        sprintf(pathname, "%s/metadata/restrictions_%s.json", cwd, time_str);
+        *pathname_len = strlen(pathname);
+    }
+    else
+    {
+        GTD_LOG("getcwd() error");
+        exit(EXIT_FAILURE);
+    }
+
+    JSON_Value *root_value = json_value_init_array();
+    JSON_Array *root_array = json_value_get_array(root_value);
+    for(uint32_t i=0; i < FACT_TYPE_NUM; i++)
+    {
+        JSON_Value *item_value;
+        JSON_Object *item_object;
+        JSON_Value *int_params_value;
+        JSON_Array *int_params_array;
+        JSON_Value *functions_value;
+        JSON_Array *functions_array;
+        bool any_int = false;
+        bool any_functional = false;
+        item_value = json_value_init_object();
+        item_object = json_value_get_object(item_value);
+        json_object_set_number(item_object, "id", i);
+        json_object_set_string(item_object, "name", get_fact_type_name(i));
+        char **param_names;
+        bool *functional;
+        uint8_t param_count = get_params(i, &param_names, &functional);
+        int_params_value = json_value_init_array();
+        int_params_array = json_value_get_array(int_params_value);
+        functions_value = json_value_init_array();
+        functions_array = json_value_get_array(functions_value);
+        for(uint8_t j=0; j<param_count; j++)
+        {
+            if(functional[j])
+            {
+                any_functional = true;
+                json_array_append_string(functions_array, param_names[j]);
+            }
+            else
+            {
+                any_int = true;
+                json_array_append_string(int_params_array, param_names[j]);
+            }
+        }
+        if(any_int)
+            json_object_set_value(item_object, "int_params", int_params_value);
+        if(any_functional)
+            json_object_set_value(item_object, "functions", functions_value);
+        json_array_append_value(root_array, item_value);
+    }
+    json_serialize_to_file_pretty(root_value, pathname);
+
+    json_value_free(root_value);
+    return pathname;
+}

@@ -68,7 +68,6 @@ void run_modules(ModuleArgs *args)
         pthread_create(&threads[i], NULL, modules[i], (void *)args_copy);
         pthread_setname_np(threads[i], module_names[i]);
     }
-    free_module_args(args);
     while(true)
     {
         bool continue_loop = true;
@@ -109,6 +108,9 @@ void run_modules(ModuleArgs *args)
                         stop_module_msg.body = NULL;
                         broadcast(&stop_module_msg, -1);
                         continue_loop = false;
+                        FILE *out_file = fopen(args->out_file_path, "a");
+                        fprintf(out_file, "Contradiction not found");
+                        fclose(out_file);
                     }
                     break;
                 case FactsFoundMessage:
@@ -117,7 +119,7 @@ void run_modules(ModuleArgs *args)
                     add_facts_msg.type = AddFactsMessage;
                     FactsFoundMessageBody *facts_found_msg_body = (FactsFoundMessageBody*)(msg.body);
                     add_facts_msg_body.fact_count = facts_found_msg_body->facts_found_number;
-                    add_facts_msg_body.fact_array = facts_found_msg_body->facts_found;
+                    add_facts_msg_body.fact_array = deep_copy_fact_array(facts_found_msg_body->facts_found, add_facts_msg_body.fact_count);
                     add_facts_msg.body = (void*)&add_facts_msg_body;
                     broadcast(&add_facts_msg, i);
                     break;

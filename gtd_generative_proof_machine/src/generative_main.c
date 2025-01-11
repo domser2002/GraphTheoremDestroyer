@@ -54,13 +54,18 @@ void *generative_main_loop(void *argument)
                 exit(EXIT_FAILURE);
             }
             GTD_LOG("Generative module got response of type %d", response.type);
+            FILE *out_file;
             switch (response.type)
             {
             case WriteProofMessage:
-                write_proof_tree(get_machine_proof_tree(machine), stdout);
+                out_file = fopen(args->out_file_path, "a");
+                write_proof_tree(get_machine_proof_tree(machine), out_file);
+                fclose(out_file);
                 break;
             case WriteDeductionMessage:
-                write_proof_tree(get_machine_proof_tree(machine), stdout);
+                out_file = fopen(args->out_file_path, "a");
+                write_proof_tree(get_machine_proof_tree(machine), out_file);
+                fclose(out_file);
                 break;
             case AddFactsMessage:
                 wait_for_another_response = true;

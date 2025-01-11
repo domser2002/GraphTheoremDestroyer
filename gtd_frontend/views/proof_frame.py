@@ -189,8 +189,9 @@ class ProofFrame(CTkFrame):
 
             x = symbols('x')
             terms = []
-            for n, d, p in val:
-                terms.append(Rational(n, d) * x**p)
+            if val != None:
+                for n, d, p in val:
+                    terms.append(Rational(n, d) * x**p)
             
             poly = Add(*terms)
             latex_expr = latex(sympify(poly))

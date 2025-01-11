@@ -20,6 +20,7 @@ void *fact_tree_main_loop(void *argument)
             msg->type = ContradictionFoundMessage;
             ContradictionFoundMessageBody* body = (ContradictionFoundMessageBody*)gtd_malloc(sizeof(ContradictionFoundMessageBody));
             body->contradicting_facts = get_contradicting_facts(machine, &body->contradicting_facts_number);
+            msg->body = body;
         }
         else
         {
@@ -30,6 +31,7 @@ void *fact_tree_main_loop(void *argument)
                 FactsFoundMessageBody *body = (FactsFoundMessageBody*)gtd_malloc(sizeof(FactsFoundMessageBody));
                 body->facts_found_number = fact_tree->fact_count - args->fact_count;
                 body->facts_found = (fact_tree->facts + body->facts_found_number * sizeof(Fact*));
+                msg->body = body;
             }
             else
             {
@@ -57,7 +59,9 @@ void *fact_tree_main_loop(void *argument)
             switch (response.type)
             {
             case WriteProofMessage:
-                write_proof(machine, stdout);
+                FILE *out_file = fopen(args->out_file_path, "a");
+                write_proof(machine, out_file);
+                fclose(out_file);
                 break;
             case WriteDeductionMessage:
                 wait_for_another_response = true;
@@ -65,7 +69,11 @@ void *fact_tree_main_loop(void *argument)
                 for(uint32_t i=0;i<ft->fact_count;i++)
                 {
                     if(equal_facts(ft->facts[i], write_deduction_msg_body->fact))
+                    {
+                        FILE *out_file = fopen(args->out_file_path, "a");
                         write_deduction(ft, i, stdout);
+                        fclose(out_file);
+                    }
                 }
                 break;
             case AddFactsMessage:

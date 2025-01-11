@@ -1,5 +1,6 @@
 #ifndef COMMON_H
 #define COMMON_H
+#define MAX_PATHNAME_LEN 1024
 #include <stdlib.h>
 #include "log.h"
 #include <stdint.h>

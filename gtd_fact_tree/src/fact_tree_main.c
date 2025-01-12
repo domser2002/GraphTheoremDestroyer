@@ -30,7 +30,12 @@ void *fact_tree_main_loop(void *argument)
                 msg->type = FactsFoundMessage;
                 FactsFoundMessageBody *body = (FactsFoundMessageBody*)gtd_malloc(sizeof(FactsFoundMessageBody));
                 body->facts_found_number = fact_tree->fact_count - args->fact_count;
-                body->facts_found = (fact_tree->facts + body->facts_found_number * sizeof(Fact*));
+                body->facts_found = (Fact**)gtd_malloc(body->facts_found_number * sizeof(Fact*));
+                for(uint32_t i=0;i<body->facts_found_number;i++)
+                {
+                    body->facts_found[i] = deep_copy_fact(fact_tree->facts[i+args->fact_count]);
+                }
+                // body->facts_found = (fact_tree->facts + body->facts_found_number * sizeof(Fact*));
                 msg->body = body;
             }
             else
@@ -45,6 +50,8 @@ void *fact_tree_main_loop(void *argument)
             exit(EXIT_FAILURE);
         }
         GTD_LOG("Fact tree module sent a message of type %d, waiting for response", msg->type);
+        // gtd_free(msg->body);
+        // gtd_free(msg);
         while(true)
         {
             bool wait_for_another_response = false;
@@ -101,6 +108,7 @@ void *fact_tree_main_loop(void *argument)
     }
     delete_machine(machine);
     destruct(fact_tree);
+    gtd_free(args);
     GTD_LOG("Fact tree module terminating");
     return NULL;
 }

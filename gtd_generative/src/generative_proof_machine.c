@@ -38,8 +38,12 @@ GenerativeProofMachine *create_proof_machine(Graph *startGraph)
 int destroy_generative_proof_machine(GenerativeProofMachine *machine)
 {
     destroy_graph(machine->graph);
+    for(int i=0;i<machine->numRestrictions;i++)
+    {
+        delete_restriction_object(machine->restrictions[i]);
+    }
+    delete_proof_tree(machine->proofTree);
     gtd_free(machine);
-
     return 1;
 }
 

@@ -1,3 +1,7 @@
+/**
+ * \file fact.h
+ * \brief header containing FactType enum, Fact struct and API to manage Fact objects
+ */
 #ifndef FACT_H
 #define FACT_H
 #include <stdint.h>
@@ -8,7 +12,6 @@
 #include "log.h"
 #include "common.h"
 #include "function.h"
-#include "parson.h"
 #define FACT_TYPE_NUM 42
 #define MAX_PARAMS_IN_FACT 3
 #define MAX_FACT_STR_LEN 128
@@ -86,18 +89,40 @@ typedef struct Fact
     uint8_t params_count;
 } Fact;
 
+/**
+ * \brief constructor for Fact class
+*/
 Fact *create_fact(FactType type, Function **params);
-void delete_fact(Fact *fact);
-
-char *get_fact_str(Fact *fact);
-
-bool equal_facts(Fact *fact1, Fact *fact2);
-Fact **deep_copy_fact_array(Fact **fact_array, uint32_t fact_count);
 
 /**
- * \brief function to create a json file with a list of supported restriction/fact types with parameters
- * \param pathname_len length of file name
- * \returns path to the created file
+ * \brief destructor for Fact class
+*/
+void delete_fact(Fact *fact);
+
+/**
+ * \brief function to get a string from Fact object
+ * \note used for writting the proof
+ * \param fact Fact object
+ * \return string description of Fact
+*/
+char *get_fact_str(Fact *fact);
+
+/**
+ * \brief function to check if 2 facts are equal
+ * \param fact1 first fact
+ * \param fact2 second fact
+ * \return true if facts are equal, false otherwise
+*/
+bool equal_facts(Fact *fact1, Fact *fact2);
+
+/**
+ * \brief function to create a deep copy of Fact object
  */
-char *create_restrictions_file(size_t *pathname_len);
+Fact *deep_copy_fact(Fact *fact);
+
+/**
+ * \brief function to create a deep copy of the array of Fact objects
+ */
+Fact **deep_copy_fact_array(Fact **fact_array, uint32_t fact_count);
+
 #endif

@@ -223,12 +223,6 @@ const Contradiction knownContradictionsArray[KNOWN_CONTRADICTIONS_NUMBER] = {
     [8].type_to_param_idx[HasCycleFact] = {1}
     };
 
-/**
- * \brief Function which checks if facts from factArray are in one of the predefined contradictions
- * \param factArray array of n_facts Fact objects, fact types should not duplicate, if they do the behaviour is undefined
- * \param n_facts number of facts in array, should be <= MAX_CONTRADICTING_FACTS
- * \return true if facts are in one of the predefined contradictions, false otherwise
- */
 bool contradict(Fact **factArray, uint32_t n_facts)
 {
     GTD_LOG("Checking if array of %d facts forms a known contradiction",n_facts);

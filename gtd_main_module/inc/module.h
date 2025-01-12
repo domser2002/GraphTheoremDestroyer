@@ -1,3 +1,7 @@
+/**
+ * \file module.h
+ * \brief header containing a function to run all modules
+ */
 #ifndef MODULE_H
 #define MODULE_H
 #define _GNU_SOURCE

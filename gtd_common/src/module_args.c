@@ -1,27 +1,5 @@
 #include "module_args.h"
 
-void set_out_file_path(ModuleArgs *args, size_t *pathname_len)
-{
-    char time_str[20];
-    char cwd[MAX_PATHNAME_LEN];
-    time_t rawtime;
-    struct tm *timeinfo;
-
-    if (getcwd(cwd, sizeof(cwd)) != NULL)
-    {
-        time(&rawtime);
-        timeinfo = localtime(&rawtime);
-        strftime(time_str, sizeof(time_str), "%Y%m%d%H%M%S", timeinfo);
-        snprintf(args->out_file_path, MAX_PATHNAME_LEN, "%s/metadata/proof_details_%s.txt", cwd, time_str);
-        *pathname_len = strlen(args->out_file_path);
-    }
-    else
-    {
-        GTD_LOG("getcwd() error");
-        exit(EXIT_FAILURE);
-    }
-}
-
 ModuleArgs *deep_copy_module_args(ModuleArgs *args)
 {
     ModuleArgs *new_args = (ModuleArgs*)gtd_malloc(sizeof(ModuleArgs));

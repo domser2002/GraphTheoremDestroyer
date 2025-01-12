@@ -1,8 +1,5 @@
 #include "fact.h"
 
-/**
- * \brief constructor for Fact class
-*/
 Fact *create_fact(FactType type, Function **params)
 {
     uint8_t params_count = get_params(type, NULL, NULL);
@@ -14,13 +11,10 @@ Fact *create_fact(FactType type, Function **params)
     newFact->params_count = params_count;
     char *fact_str = get_fact_str(newFact);
     GTD_LOG("Created: %s", fact_str);
-    free(fact_str);
+    gtd_free(fact_str);
     return newFact;
 }
 
-/**
- * \brief destructor for Fact class
-*/
 void delete_fact(Fact *fact)
 {
     if(fact == NULL) 
@@ -384,18 +378,17 @@ FactType get_fact_type_by_name(const char *name)
 {
     for(uint32_t i=0; i<FACT_TYPE_NUM; i++)
     {
-        if(strcmp(name, get_fact_type_name(i)) == 0)
+        char *type_name = get_fact_type_name(i);
+        if(strcmp(name, type_name) == 0)
+        {  
+            gtd_free(type_name);
             return i;
+        }
+        gtd_free(type_name);
     }
     return UnknownType;
 }
 
-/**
- * \brief function to check if 2 facts are equal
- * \param fact1 first fact
- * \param fact2 second fact
- * \return true if facts are equal, false otherwise
-*/
 bool equal_facts(Fact *fact1, Fact *fact2)
 {
     if(fact1->type != fact2->type) return false;
@@ -407,12 +400,6 @@ bool equal_facts(Fact *fact1, Fact *fact2)
     return true;
 }
 
-/**
- * \brief function to get a string from Fact object
- * \note used for writting the proof
- * \param fact Fact object
- * \return string description of Fact
-*/
 char *get_fact_str(Fact *fact)
 {
     char *result = (char *)gtd_malloc(MAX_FACT_STR_LEN * sizeof(char));
@@ -667,6 +654,16 @@ char *get_fact_str(Fact *fact)
     }
 }
 
+Fact *deep_copy_fact(Fact *fact)
+{
+    Function **new_params = (Function **)gtd_malloc(fact->params_count * sizeof(Function*));
+    for(uint8_t j=0;j<fact->params_count; j++)
+    {
+        new_params[j] = copy_function(fact->params[j]);
+    }
+    return create_fact(fact->type, new_params);
+}
+
 Fact **deep_copy_fact_array(Fact **fact_array, uint32_t fact_count)
 {
     Fact **new_fact_array = (Fact **)gtd_malloc(fact_count * sizeof(Fact*));
@@ -680,74 +677,4 @@ Fact **deep_copy_fact_array(Fact **fact_array, uint32_t fact_count)
         new_fact_array[i] = create_fact(fact_array[i]->type, new_params);
     }
     return new_fact_array;
-}
-
-char *create_restrictions_file(size_t *pathname_len)
-{
-    char *pathname = (char *)gtd_malloc(MAX_PATHNAME_LEN * sizeof(char));
-    char time_str[20];
-    char cwd[MAX_PATHNAME_LEN];
-    time_t rawtime;
-    struct tm *timeinfo;
-
-    if (getcwd(cwd, sizeof(cwd)) != NULL)
-    {
-        time(&rawtime);
-        timeinfo = localtime(&rawtime);
-        strftime(time_str, sizeof(time_str), "%Y%m%d%H%M%S", timeinfo);
-        sprintf(pathname, "%s/metadata/restrictions_%s.json", cwd, time_str);
-        *pathname_len = strlen(pathname);
-    }
-    else
-    {
-        GTD_LOG("getcwd() error");
-        exit(EXIT_FAILURE);
-    }
-
-    JSON_Value *root_value = json_value_init_array();
-    JSON_Array *root_array = json_value_get_array(root_value);
-    for(uint32_t i=0; i < FACT_TYPE_NUM; i++)
-    {
-        JSON_Value *item_value;
-        JSON_Object *item_object;
-        JSON_Value *int_params_value;
-        JSON_Array *int_params_array;
-        JSON_Value *functions_value;
-        JSON_Array *functions_array;
-        bool any_int = false;
-        bool any_functional = false;
-        item_value = json_value_init_object();
-        item_object = json_value_get_object(item_value);
-        json_object_set_number(item_object, "id", i);
-        json_object_set_string(item_object, "name", get_fact_type_name(i));
-        char **param_names;
-        bool *functional;
-        uint8_t param_count = get_params(i, &param_names, &functional);
-        int_params_value = json_value_init_array();
-        int_params_array = json_value_get_array(int_params_value);
-        functions_value = json_value_init_array();
-        functions_array = json_value_get_array(functions_value);
-        for(uint8_t j=0; j<param_count; j++)
-        {
-            if(functional[j])
-            {
-                any_functional = true;
-                json_array_append_string(functions_array, param_names[j]);
-            }
-            else
-            {
-                any_int = true;
-                json_array_append_string(int_params_array, param_names[j]);
-            }
-        }
-        if(any_int)
-            json_object_set_value(item_object, "int_params", int_params_value);
-        if(any_functional)
-            json_object_set_value(item_object, "functions", functions_value);
-        json_array_append_value(root_array, item_value);
-    }
-    json_serialize_to_file_pretty(root_value, pathname);
-
-    json_value_free(root_value);
-    return pathname;
 }

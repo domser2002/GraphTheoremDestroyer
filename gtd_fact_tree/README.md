@@ -1,6 +1,9 @@
-# Fact Tree logic documentation
-## Known types of facts:
-### general
+# GTD_FACT_TREE
+## Short description 
+This directory contains header and source files for FactTree module of Graph Theorem Destroyer. Its function is to attempt to prove a theorem by constructing a sequence of logical implications leading to a contradiction.
+## Detailed logic
+### Known types of facts:
+#### general
 1) IsConnectedFact (no parameters)
 2) IsTreeFact (no parameters)
 3) IstnaryTreeFact (one parameter - t)
@@ -9,7 +12,7 @@
 6) IsCycleFact (no parameters)
 7) IsCycleComplementFact (no parameters)
 8) HasNoCyclesFact (no parameters)
-### numeric
+#### numeric
 9) VertexCountFact (one parameter - v, function meaning |V(G)|)
 10) MinVertexCountFact (one parameter - v, function meaning min |V(G)|)
 11) MaxVertexCountFact (one parameter - v, function meaning max |V(G)|)
@@ -19,7 +22,7 @@
 15) TreeHeightFact (one parameter - h, function meaning height of tree, fact is valid only if IsTreeFact occurs)
 16) MinTreeHeightFact (one parameter - h, function meaning min height of tree, fact is valid only if IsTreeFact occurs)
 17) MaxTreeHeightFact (one parameter - h, function meaning max height of tree, fact is valid only if IsTreeFact occurs)
-### structural
+#### structural
 18) HasCycleFact (one parameter - k, meaning graph has C_k) 
 19) HasNoCycleFact (one parameter - k, meaning graph has no C_k)
 20) HasInducedCycleFact (one parameter - k, meaning graph has induced C_k)
@@ -43,7 +46,7 @@
 38) HasMinorCliqueFact (one parameter - k, meaning graph has K_k as minor)
 39) HasNoMinorCliqueFact (one parameter - k, meaning graph has no K_k as minor)
 
-## Known contradictions:
+### Known contradictions:
 1) MaxVertexCountFact (with v), MinEdgeCountFact (with e) contradict if (v*(v-1)) / 2 > e
 2) MinEdgeCountFact (with e1), MaxEdgeCountFact (with e2) contradict if e1 > e2
 3) MinVertexCountFact (with v1), MaxVertexCountFact (with v2) contradict if v1 > v2
@@ -54,7 +57,7 @@
 8) IsPlanarFact, MinEdgeCountFact (with e) contradict if e is a function of n (|V(G)|) and e > 3n - 6
 9) IsPartiteFact (with k1), HasCycleFact (with k2) contradict if k1 = 2, k2 % 2 == 1
 
-## Known implications:
+### Known implications:
 1) EdgeCountFact (with e) implies MinEdgeCountFact (with e), MaxEdgeCountFact (with e)
 2) VertexCountFact (with v) implies MinVertexCountFact (with v), MaxVertexCountFact (with v)
 3) MinEdgeCountFact (with e) implies MinVertexCountFact (with v = ceil((1+sqrt(1+8*e))/2)) 
@@ -72,3 +75,5 @@
 15) IsCycleComplementFact, VertexCountFact (with v) implies HasMinorCompletePartiteFact (if v = 7, with k = 2, A = {3,3})
 16) IsCycleFact implies MinVertexCountFact (with v = 3), EdgeCountFact (with e = n, where n means |V(G)|)
 17) IsTreeFact implies EdgeCountFact (with e = n - 1, where n means |V(G)|)
+## Integration
+Only fact_tree_main_loop function should be used by external callers. It accepts ModuleArgs as a parameter. It is strongly recommended to run it in a separate thread.

@@ -1,3 +1,8 @@
+/**
+ * \file json_parser.h
+ * \brief header containing a function to parse JSON file with details of the theorem to prove
+ *  into ModuleArgs
+ */
 #ifndef JSON_PARSER_H
 #define JSON_PARSER_H
 #include "common.h"

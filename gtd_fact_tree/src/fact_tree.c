@@ -3,12 +3,6 @@
 #include "common.h"
 #include <stdlib.h>
 
-/**
- * \brief function to create an initial FactTree with isolated facts
- * \param fact_count number of facts
- * \param facts array of pointers to facts
- * \returns pointer to a newly created FactTree
-*/
 FactTree *construct(uint32_t fact_count, Fact **facts)
 {
     GTD_LOG("Constructing FactTree with %d facts", fact_count);
@@ -25,10 +19,6 @@ FactTree *construct(uint32_t fact_count, Fact **facts)
     return ft;
 }
 
-/**
- * \brief function to destruct FactTree
- * \param ft FactTree to destruct
-*/
 void destruct(FactTree* ft)
 {
     GTD_LOG("Destructing FactTree with %d facts", ft->fact_count);
@@ -41,12 +31,6 @@ void destruct(FactTree* ft)
     gtd_free(ft);
 }
 
-/**
- * \brief function to check if fact with the same type and params already exists in fact tree 
- * \param ft fact tree
- * \param new_fact fact to be added
- * \returns true if fact with the same type and params already exists, false otherwise
-*/
 static bool exists(FactTree *ft,Fact *new_fact)
 {
     for(uint32_t i=0;i<ft->fact_count;i++)
@@ -57,13 +41,6 @@ static bool exists(FactTree *ft,Fact *new_fact)
     return false;
 }
 
-/**
- * \brief function to add new fact to the FactTree, unless it already exists
- * \param ft - fact tree
- * \param parent_idxs - array of parents of the new Fact
- * \param parent_count - number of parents of the new Fact
- * \param new_fact - fact to be added
-*/
 bool add_fact(FactTree *ft, uint32_t *parent_idxs, uint8_t parent_count, Fact *new_fact)
 {
     char *fact_str = get_fact_str(new_fact);

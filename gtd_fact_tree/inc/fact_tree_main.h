@@ -1,3 +1,7 @@
+/**
+ * \file fact_tree_main.h
+ * \brief main header for a fact tree module, contains its main loop
+ */
 #ifndef FACT_TREE_MAIN_H
 #define FACT_TREE_MAIN_H
 #include "fact.h"

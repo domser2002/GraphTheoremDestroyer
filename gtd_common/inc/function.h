@@ -108,12 +108,4 @@ char *get_function_str(const Function *const f);
  * \brief create a deep copy of Function object
 */
 Function *copy_function(const Function *const f);
-
-/**
- * \brief function to convert constant function array to int32_t array
- * \param func_array array of functions
- * \param array_size number of functions
- * \returns array of int32_t or NULL if functions are not constant 
-*/
-int32_t *flatten(Function **func_array, uint32_t array_size);
 #endif

@@ -21,6 +21,7 @@ typedef struct ProofNode
 
 ProofNode *create_proof_node(void);
 ProofTree *create_proof_tree(void);
+void delete_proof_tree(ProofTree *tree);
 void append_proof_node(ProofTree *tree, ProofNode *node);
 void write_proof_node(ProofNode *node, FILE *outFile, int depth);
 void write_proof_tree(ProofTree *tree, FILE *outFile);

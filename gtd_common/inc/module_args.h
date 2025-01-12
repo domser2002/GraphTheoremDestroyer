@@ -1,3 +1,7 @@
+/**
+ * \file module_args.h
+ * \brief header containing struct to be passed as an argument to modules main loop and functions to deep copy and delete it
+ */
 #ifndef MODULE_ARGS_H
 #define MODULE_ARGS_H
 #include "fact.h"
@@ -15,7 +19,13 @@ typedef struct ModuleArgs {
     int read_fd;
 } ModuleArgs;
 
-void set_out_file_path(ModuleArgs *args, size_t *pathname_len);
+/**
+ * \brief function to create a deep copy of ModuleArgs
+ */
 ModuleArgs *deep_copy_module_args(ModuleArgs *args);
+
+/**
+ * \brief function to delete (free) ModuleArgs
+ */
 void free_module_args(ModuleArgs *args);
 #endif

@@ -21,11 +21,6 @@ struct FactTreeMachine
 
 static void log_fact_tree(FactTree *ft);
 
-/**
- * \brief initialize new proof machine based on initial fact tree
- * \param FactTree initial fact tree
- * \returns newly created machine
-*/
 FactTreeMachine *init_machine(FactTree *FactTree)
 {
     GTD_LOG("Initiating proof machine");
@@ -39,10 +34,6 @@ FactTreeMachine *init_machine(FactTree *FactTree)
     return newMachine;
 }
 
-/**
- * \brief delete proof machine
- * \param machine machine to delete
-*/
 void delete_machine(FactTreeMachine *machine)
 {
     GTD_LOG("Deleting proof machine");
@@ -51,15 +42,6 @@ void delete_machine(FactTreeMachine *machine)
     gtd_free(machine);
 }
 
-/**
- * \brief perform proof machine execution
- * \details machine tries to find predefined contradiciton in the given tree of facts, 
- * if it is not found, it looks for one of the predefined implications, adds new facts to a tree
- * and executes recursively until contradiction is found or no more facts can be added 
- * \param machine machine to be executed
- * \note function does not return, it only updates fields in machine class, proof can be written
- *  using write_proof function
-*/
 void execute(FactTreeMachine *machine)
 {
     GTD_LOG("Executing proof machine with fact tree:");

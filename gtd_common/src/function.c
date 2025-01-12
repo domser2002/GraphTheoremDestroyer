@@ -108,18 +108,3 @@ char *get_function_str(const Function *const f)
 Function *copy_function(const Function *const f) {
     return create_function(f->c);
 }
-
-int32_t *flatten(Function **func_array, uint32_t array_size)
-{
-    int32_t *int_array = (int32_t*)gtd_malloc(array_size * sizeof(int32_t));
-    for(uint32_t i=0;i<array_size;i++)
-    {
-        if(!is_constant(func_array[i]))
-        {
-            gtd_free(int_array);
-            return NULL;
-        }
-        int_array[i] = func_array[i]->c;
-    }
-    return int_array;
-}

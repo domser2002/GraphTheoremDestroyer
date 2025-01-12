@@ -484,14 +484,6 @@ Implication knownImplicationsArray[KNOWN_IMPLICATIONS_NUMBER] = {
     // only with functions, will be added later
 };
 
-/**
- * \brief function that checks if array of facts is the left side of a known implication
- *  and returns right side of it in that case
- * \param factArray array of facts (potential left side)
- * \param n_facts number of elements in factArray
- * \param count pointer to return number of elements on the right side
- * \return right side of implication or NULL if there is no implication with that left side defined
- */
 Fact **implies(Fact **factArray, uint32_t n_facts, int *count)
 {
     GTD_LOG("Checking if array of %d facts forms a known implication", n_facts);

@@ -23,6 +23,30 @@ ProofTree *create_proof_tree(void)
     return tree;
 }
 
+void delete_proof_tree(ProofTree *tree)
+{
+    if (tree == NULL)
+    {
+        return;
+    }
+
+    ProofNode *current = tree->head;
+    ProofNode *next;
+
+    while (current != NULL)
+    {
+        next = current->next;
+        if (current->subtree != NULL)
+        {
+            delete_proof_tree(current->subtree);
+        }
+        free(current);
+        current = next;
+    }
+
+    free(tree);
+}
+
 
 void append_proof_node(ProofTree *tree, ProofNode *node)
 {

@@ -50,6 +50,7 @@ void run_modules(ModuleArgs *args)
 {
     pthread_t threads[MODULES_COUNT];
     int modules_running = MODULES_COUNT;
+    // bool module_running[MODULES_COUNT];
     for(uint8_t i=0;i<MODULES_COUNT;i++)
     {
         if(pipe(write_pipes[i]) != 0)
@@ -67,6 +68,7 @@ void run_modules(ModuleArgs *args)
         args_copy->write_fd = read_pipes[i][1];
         pthread_create(&threads[i], NULL, modules[i], (void *)args_copy);
         pthread_setname_np(threads[i], module_names[i]);
+        // module_running[i] = true;
     }
     while(true)
     {
@@ -81,7 +83,7 @@ void run_modules(ModuleArgs *args)
                 max_fd = read_pipes[i][0];
         }
         int ret = select(max_fd+1, &readfds, NULL, NULL, NULL);
-        if(ret != 1)
+        if(ret < 1)
         {
             GTD_LOG("error in select, ret is %d", ret);
             exit(EXIT_FAILURE);
@@ -96,11 +98,12 @@ void run_modules(ModuleArgs *args)
                     GTD_LOG("error in read");
                     exit(EXIT_FAILURE);
                 }
-                GTD_LOG("Received message of type %d", msg.type);
+                GTD_LOG("Received message of type %d, modules_running = %d", msg.type, modules_running);
                 switch (msg.type)
                 {
                 case NothingFoundMessage:
                     modules_running--;
+                    // module_running[i] = false;
                     if(modules_running == 0)
                     {
                         MessageStruct stop_module_msg;
@@ -122,6 +125,7 @@ void run_modules(ModuleArgs *args)
                     add_facts_msg_body.fact_array = deep_copy_fact_array(facts_found_msg_body->facts_found, add_facts_msg_body.fact_count);
                     add_facts_msg.body = (void*)&add_facts_msg_body;
                     broadcast(&add_facts_msg, i);
+                    modules_running = MODULES_COUNT - 1;
                     break;
                 case ContradictionFoundMessage:
                     MessageStruct stop_module_msg;

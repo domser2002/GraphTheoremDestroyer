@@ -44,6 +44,8 @@ void *generative_main_loop(void *argument)
             exit(EXIT_FAILURE);
         }
         GTD_LOG("Generative module sent a message of type %d, waiting for response", msg->type);
+        // gtd_free(msg->body);
+        // gtd_free(msg);
         while(true)
         {
             bool wait_for_another_response = false;
@@ -68,7 +70,7 @@ void *generative_main_loop(void *argument)
                 fclose(out_file);
                 break;
             case AddFactsMessage:
-                wait_for_another_response = true;
+                wait_for_another_response = false;
                 reexecute_machine = true;
                 AddFactsMessageBody *add_facts_msg_body = (AddFactsMessageBody*)response.body;
                 used_facts = (Fact **)gtd_realloc(used_facts, (used_facts_count + add_facts_msg_body->fact_count) * sizeof(Fact *));
@@ -94,6 +96,7 @@ void *generative_main_loop(void *argument)
         if(!reexecute_machine)
             break;
     }
+    destroy_generative_proof_machine(machine);
     free_module_args(args);
     GTD_LOG("Generative module terminating");
     return NULL;

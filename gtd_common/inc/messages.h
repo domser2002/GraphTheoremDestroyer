@@ -1,3 +1,7 @@
+/**
+ * \file messages.h
+ * \brief header containing supported message types and structs, necessary for communication between modules
+ */
 #ifndef MESSAGES_H
 #define MESSAGES_H
 #include "fact.h"

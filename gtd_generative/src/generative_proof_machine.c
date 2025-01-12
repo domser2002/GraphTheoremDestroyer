@@ -13,11 +13,7 @@ typedef struct GenerativeProofMachine
     ProofTree *proofTree;
 } GenerativeProofMachine;
 
-/**
- * \brief constructor for GenerativeProofMachine class
- * \param startGraph start graph
- * \returns pointer to a newly created GenerativeProofMachine
- */
+
 GenerativeProofMachine *create_proof_machine(Graph *startGraph)
 {
     GenerativeProofMachine *machine = gtd_malloc(sizeof(GenerativeProofMachine));
@@ -30,11 +26,6 @@ GenerativeProofMachine *create_proof_machine(Graph *startGraph)
     return machine;
 }
 
-/**
- * \brief function to destruct GenerativeProofMachine
- * \param machine pointer to the GenerativeProofMachine to destroy
- * \returns 1 if suceeded, otherwise raises fault
- */
 int destroy_generative_proof_machine(GenerativeProofMachine *machine)
 {
     destroy_graph(machine->graph);
@@ -47,11 +38,6 @@ int destroy_generative_proof_machine(GenerativeProofMachine *machine)
     return 1;
 }
 
-/**
- * \brief function for executing generative proof machine
- * \param machine pointer to the GenerativeProofMachine to execute
- * \returns 1 if contradictionw was found, 0 otherwise
- */
 uint8_t execute_generative_proof_machine(GenerativeProofMachine *machine)
 {
     int i = 0;
@@ -87,31 +73,16 @@ uint8_t execute_generative_proof_machine(GenerativeProofMachine *machine)
     return 0;
 }
 
-/**
- * \brief function to set depth parameter of GenerativeProofMachine class
- * \param machine pointer to the GenerativeProofMachine, which depth will be set
- * \param depth new depth value
- */
 void set_machine_depth(GenerativeProofMachine *machine, int depth)
 {
     machine->depth = depth;
 }
 
-/**
- * \brief function to get machine depth
- * \param machine pointer to the GenerativeProofMachine for which depth will be returned
- * \returns depth of a machine
- */
 int get_machine_depth(GenerativeProofMachine *machine)
 {
     return machine->depth;
 }
 
-/**
- * \brief function to get machine graph
- * \param machine pointer to the GenerativeProofMachine for which start graph will be returned
- * \returns start graph of a machine
- */
 Graph *get_machine_graph(GenerativeProofMachine *machine)
 {
     return machine->graph;
@@ -154,32 +125,11 @@ ProofTree *get_machine_proof_tree(GenerativeProofMachine *machine)
     return machine->proofTree;
 }
 
-/**
- * \brief function to get restrictions of a graph
- * \param machine pointer to the GenerativeProofMachine for which restrictions tree will be returned
- * \return restrictions of a machine
- */
 GenerativeRestriction **get_machine_restrictions(GenerativeProofMachine *machine)
 {
     return machine->restrictions;
 }
 
-void add_restriction(GenerativeProofMachine *machine, GenerativeRestriction *restriction)
-{
-    if(restriction == NULL)
-        return;
-    machine->numRestrictions++;
-    machine->restrictions = (GenerativeRestriction**)gtd_realloc(machine->restrictions, machine->numRestrictions * sizeof(GenerativeRestriction*));
-    machine->restrictions[machine->numRestrictions-1] = restriction;
-    return;
-}
-
-/**
- * \brief function to load everything from GenerativeProofMachine m2(except proof tree) into m1
- * \brief Warning: the copy will be shallow!
- * \param m1 GenerativeProofMachine that data will be loaded into
- * \param m2 GenerativeProofMachine from data will be loaded from
- */
 void load_machine(GenerativeProofMachine *m1, GenerativeProofMachine *m2)
 {
     destroy_graph(m1->graph);
@@ -194,4 +144,14 @@ void load_machine(GenerativeProofMachine *m1, GenerativeProofMachine *m2)
     m1->restrictions = m2->restrictions;
     m1->numRestrictions = m2->numRestrictions;
     gtd_free(restrictions);
+}
+
+void add_restriction(GenerativeProofMachine *machine, GenerativeRestriction *restriction)
+{
+    if(restriction == NULL)
+        return;
+    machine->numRestrictions++;
+    machine->restrictions = (GenerativeRestriction**)gtd_realloc(machine->restrictions, machine->numRestrictions * sizeof(GenerativeRestriction*));
+    machine->restrictions[machine->numRestrictions-1] = restriction;
+    return;
 }

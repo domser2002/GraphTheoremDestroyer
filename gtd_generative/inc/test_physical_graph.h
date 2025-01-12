@@ -8,7 +8,8 @@ void test_physical_graph(void);
 void test_graph_creation_and_deletion(void);
 void test_adding_vertices(void);
 void test_adding_edges(void);
-void test_isomorpic_pass(void);
-void test_isomorpic_fail(void);
+void test_get_graph_max_vertices(void);
+void test_get_graph_num_vertices(void);
+void test_get_graph_adjacency_matrix(void);
 
 #endif

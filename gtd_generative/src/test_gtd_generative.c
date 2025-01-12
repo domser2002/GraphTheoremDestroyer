@@ -2,7 +2,7 @@
 
 void gtd_generative_unit_tests(void)
 {
-    test_physical_graph();
+    test_physical_graph(); 
 }
 
 void gtd_generative_integration_tests(void)

@@ -7,13 +7,17 @@ void test_physical_graph(void)
     test_graph_creation_and_deletion();
     test_adding_vertices();
     test_adding_edges();
-    test_isomorpic_pass();
-    test_isomorpic_fail();
+    test_get_graph_max_vertices();
+    test_get_graph_num_vertices();
+    test_get_graph_adjacency_matrix();
 }
 
 void test_graph_creation_and_deletion(void)
 {
+    // Arrange
     Graph *graph = create_graph(20, 10);
+
+    // Act
     destroy_graph(graph);
 }
 
@@ -111,13 +115,136 @@ void test_adding_edges(void)
     destroy_graph(graph);
 }
 
-void test_isomorpic_pass(void)
+void test_get_graph_max_vertices(void)
 {
-    
+    // test 1
+    // Arrange
+    Graph *g1 = create_graph(15, 9);
+    int test_1_max_1;
+    int test_1_max_2;
+    int test_1_max_3;
+    int test_1_max_4;
+    int test_1_max_5;
+
+    // Act
+    test_1_max_1 = get_graph_max_vertices(g1);
+    add_vertex(g1);
+    add_vertex(g1);
+    add_vertex(g1);
+    test_1_max_2 = get_graph_max_vertices(g1);
+    add_vertex(g1);
+    add_vertex(g1);
+    add_vertex(g1);
+    test_1_max_3 = get_graph_max_vertices(g1);
+    add_vertex(g1);
+    test_1_max_4 = get_graph_max_vertices(g1);
+    add_vertex(g1);
+    add_vertex(g1);
+    add_vertex(g1);
+    test_1_max_5 = get_graph_max_vertices(g1);
+
+    // Assert
+    assert(test_1_max_1 == 15);
+    assert(test_1_max_2 == 15);
+    assert(test_1_max_3 == 15);
+    assert(test_1_max_4 == 15);
+    assert(test_1_max_5 == 15);
+
+
+    // test 2
+    // Arrange
+    Graph *g2 = create_graph(-1, 5);
+    int test_2_max_1;
+    int test_2_max_2;
+
+    // Act
+    test_2_max_1 = get_graph_max_vertices(g2);
+    for(int i = 0; i < 100; ++i)
+    {
+        add_vertex(g2);
+    }
+    test_2_max_2 = get_graph_max_vertices(g2);
+
+    // Assert
+    assert(test_2_max_1 == -1);
+    assert(test_2_max_2 == -1);
 }
 
-void test_isomorpic_fail(void)
+void test_get_graph_num_vertices(void)
 {
-    
+    // test 1
+    // Arrange
+    Graph *g1 = create_graph(15, 9);
+    int test_1_num_1;
+    int test_1_num_2;
+    int test_1_num_3;
+    int test_1_num_4;
+    int test_1_num_5;
 
+    // Act
+    test_1_num_1 = get_graph_num_vertices(g1);
+    add_vertex(g1);
+    add_vertex(g1);
+    add_vertex(g1);
+    test_1_num_2 = get_graph_num_vertices(g1);
+    add_vertex(g1);
+    add_vertex(g1);
+    add_vertex(g1);
+    test_1_num_3 = get_graph_num_vertices(g1);
+    add_vertex(g1);
+    test_1_num_4 = get_graph_num_vertices(g1);
+    add_vertex(g1);
+    add_vertex(g1);
+    add_vertex(g1);
+    test_1_num_5 = get_graph_num_vertices(g1);
+
+    // Assert
+    assert(test_1_num_1 == 9);
+    assert(test_1_num_2 == 12);
+    assert(test_1_num_3 == 15);
+    assert(test_1_num_4 == 15);
+    assert(test_1_num_5 == 15);
+
+
+    // test 2
+    // Arrange
+    Graph *g2 = create_graph(-1, 5);
+    int test_2_num_1;
+    int test_2_num_2;
+
+    // Act
+    test_2_num_1 = get_graph_num_vertices(g2);
+    for(int i = 0; i < 100; ++i)
+    {
+        add_vertex(g2);
+    }
+    test_2_num_2 = get_graph_num_vertices(g2);
+
+    // Assert
+    assert(test_2_num_1 == 5);
+    assert(test_2_num_2 == 105);
+}
+
+void test_get_graph_adjacency_matrix(void)
+{
+    // test 1
+    // Arrange
+    Graph *g1 = create_graph(5, 5);
+    char **adjMatrix1 = get_graph_adjacency_matrix(g1);
+
+    // Act/Assert
+    for(int i = 0; i < 5; ++i)
+    {
+        for(int j = 0; j < 5; ++j)
+        {
+            assert(adjMatrix1[i][j] == UNKNOWN_SYMBOL);
+        }
+    }
+
+    set_edge_connected(g1, 0, 3);
+    set_edge_connected(g1, 3, 2);
+    set_edge_not_connected(g1, 4, 0);
+    assert(adjMatrix1[0][3] == CONNECTED_SYMBOL);
+    assert(adjMatrix1[3][2] == CONNECTED_SYMBOL);
+    assert(adjMatrix1[0][4] == NOT_CONNECTED_SYMBOL);
 }

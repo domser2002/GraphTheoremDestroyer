@@ -57,6 +57,7 @@ int destroy_graph(Graph *graph)
         gtd_free(graph->adjacency_matrix[i]);
     }
     gtd_free(graph->adjacency_matrix);
+    gtd_free(graph);
 
     return 1;
 }

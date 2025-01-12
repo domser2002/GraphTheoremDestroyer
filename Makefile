@@ -9,7 +9,7 @@ CFLAGS = -std=c99 -fstrict-aliasing -fstack-protector -ftrack-macro-expansion=0 
 LFLAGS = -lm -pthread
 
 # Paths
-C_INCLUDE_PATH = external/parson:gtd_fact_tree/inc:gtd_common/inc:gtd_generative/inc:gtd_main_module/inc
+C_INCLUDE_PATH = external/parson:gtd_fact_tree/inc:gtd_common/inc:gtd_generative/inc:gtd_main/inc
 BIN_PATH = build/bin
 OBJ_PATH = build/obj
 
@@ -38,12 +38,15 @@ SRC_GTD_GENERATIVE = \
 	gtd_generative/src/generative_main.c
 
 SRC_GTD_MAIN = \
-	gtd_main_module/src/json_parser.c \
-	gtd_main_module/src/module.c
+	gtd_main/src/json_parser.c \
+	gtd_main/src/module.c
 
 SRC_TEST = \
-	gtd_test/unit_test.c \
-	gtd_fact_tree/src/test_fact_tree.c \
+	gtd_test/test_main.c \
+	gtd_common/src/test_gtd_common.c \
+	gtd_main/src/test_gtd_main.c \
+	gtd_fact_tree/src/test_gtd_fact_tree.c \
+	gtd_generative/src/test_gtd_generative.c \
 	gtd_generative/src/test_physical_graph.c \
 	gtd_generative/src/test_generative_proof_machine.c
 
@@ -76,8 +79,11 @@ OBJ_GTD_MAIN = \
 
 OBJ_PARSON = $(OBJ_PATH)/parson.o
 
-OBJ_TEST = $(OBJ_PATH)/unit_test.o \
-           $(OBJ_PATH)/test_fact_tree.o \
+OBJ_TEST = $(OBJ_PATH)/test_main.o \
+           $(OBJ_PATH)/test_gtd_common.o \
+           $(OBJ_PATH)/test_gtd_main.o \
+           $(OBJ_PATH)/test_gtd_fact_tree.o \
+           $(OBJ_PATH)/test_gtd_generative.o \
            $(OBJ_PATH)/test_physical_graph.o \
            $(OBJ_PATH)/test_generative_proof_machine.o 
 
@@ -151,11 +157,11 @@ $(OBJ_PATH)/physical_graph.o: gtd_generative/src/physical_graph.c
 $(OBJ_PATH)/generative_main.o: gtd_generative/src/generative_main.c
 	C_INCLUDE_PATH=$(C_INCLUDE_PATH) $(CC) $(CFLAGS) -c $< -o $@
 
-# Compile gtd_main_module sources
-$(OBJ_PATH)/json_parser.o: gtd_main_module/src/json_parser.c
+# Compile gtd_main sources
+$(OBJ_PATH)/json_parser.o: gtd_main/src/json_parser.c
 	C_INCLUDE_PATH=$(C_INCLUDE_PATH) $(CC) $(CFLAGS) -c $< -o $@
 
-$(OBJ_PATH)/module.o: gtd_main_module/src/module.c
+$(OBJ_PATH)/module.o: gtd_main/src/module.c
 	C_INCLUDE_PATH=$(C_INCLUDE_PATH) $(CC) $(CFLAGS) -c $< -o $@
 
 # Compile external
@@ -170,10 +176,19 @@ $(BIN_PATH)/test: $(TEST_OBJ_FILES) | mkdir_dirs
 	-./$@
 
 # Compile test sources
-$(OBJ_PATH)/unit_test.o: gtd_test/unit_test.c
+$(OBJ_PATH)/test_main.o: gtd_test/test_main.c
 	C_INCLUDE_PATH=$(C_INCLUDE_PATH) $(CC) $(CFLAGS) -c $< -o $@
 
-$(OBJ_PATH)/test_fact_tree.o: gtd_fact_tree/src/test_fact_tree.c
+$(OBJ_PATH)/test_gtd_common.o: gtd_common/src/test_gtd_common.c
+	C_INCLUDE_PATH=$(C_INCLUDE_PATH) $(CC) $(CFLAGS) -c $< -o $@
+
+$(OBJ_PATH)/test_gtd_main.o: gtd_main/src/test_gtd_main.c
+	C_INCLUDE_PATH=$(C_INCLUDE_PATH) $(CC) $(CFLAGS) -c $< -o $@
+
+$(OBJ_PATH)/test_gtd_fact_tree.o: gtd_fact_tree/src/test_gtd_fact_tree.c
+	C_INCLUDE_PATH=$(C_INCLUDE_PATH) $(CC) $(CFLAGS) -c $< -o $@
+
+$(OBJ_PATH)/test_gtd_generative.o: gtd_generative/src/test_gtd_generative.c
 	C_INCLUDE_PATH=$(C_INCLUDE_PATH) $(CC) $(CFLAGS) -c $< -o $@
 
 $(OBJ_PATH)/test_physical_graph.o: gtd_generative/src/test_physical_graph.c

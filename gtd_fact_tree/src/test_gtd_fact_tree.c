@@ -1,5 +1,5 @@
 #define IS_FACT_TREE_COMPONENT
-#include "test_fact_tree.h"
+#include "test_gtd_fact_tree.h"
 static uint8_t counter = 1;
 typedef Function* (*function_binary_operation)(const Function *const, const Function *const);
 typedef void (*function_constant_operation)(Function *, const int32_t);
@@ -1081,10 +1081,15 @@ static void test_fact(void)
 /**
  * \brief function to run all required tests for gtd_fact_tree module
  */
-void test_fact_tree(void)
+void gtd_fact_tree_unit_tests(void)
 {
     test_function();
     test_fact();
     test_contradiction();
     test_implication();
+}
+
+void gtd_fact_tree_integration_tests(void)
+{
+    
 }

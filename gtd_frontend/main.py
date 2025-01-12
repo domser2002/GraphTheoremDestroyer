@@ -4,6 +4,7 @@ from controllers.restriction_controller import RestrictionController
 from controllers.proof_controller import ProofController
 import os
 import matplotlib.pyplot as plt
+import customtkinter
 
 class App(CTk):
     def __init__(self):
@@ -21,7 +22,9 @@ class App(CTk):
 
 if __name__ == '__main__':
 
+    customtkinter.set_appearance_mode("Dark")
     app = App()
+
     def on_close():
         plt.close('all')
         if hasattr(app, 'function_input_frame') and app.function_input_frame:

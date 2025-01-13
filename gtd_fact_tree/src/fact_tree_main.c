@@ -7,7 +7,7 @@ void *fact_tree_main_loop(void *argument)
 {
     GTD_LOG("Entered fact tree module main loop");
     ModuleArgs *args = (ModuleArgs*)argument;
-    FactTree *fact_tree = construct(args->fact_count, args->fact_array);
+    FactTree *fact_tree = construct(args->fact_count, &args->fact_array);
     FactTreeMachine *machine = init_machine(fact_tree);
     while(true)
     {

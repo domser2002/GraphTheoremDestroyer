@@ -1,7 +1,9 @@
 #ifndef TEST_GTD_COMMON_H
 #define TEST_GTD_COMMON_H
+#define _GNU_SOURCE
 #include <assert.h>
 #include <string.h>
+#include <unistd.h>
 #include "common.h"
 #include "fact.h"
 #include "module_args.h"

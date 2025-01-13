@@ -498,7 +498,7 @@ void test_erdos_gyarfas_case(void)
 
     // Act
     int contr1 = execute_generative_proof_machine(machine1);
-    write_proof_tree(get_machine_proof_tree(machine1), stdout);
+    write_proof_tree(get_machine_proof_tree(machine1), stdout, 0);
 
     // Assert
     assert(contr1 == 1);
@@ -619,7 +619,7 @@ void test_erdos_gyarfas_pk_free(int k, int max_vertices, int max_depth, int save
             char filename[100];
             sprintf(filename, "out-data/p%d_free_with_c%d.txt", k, t);
             FILE *file = fopen(filename, "w");
-            write_proof_tree(get_machine_proof_tree(machine), file);
+            write_proof_tree(get_machine_proof_tree(machine), file, 0);
             fclose(file);
         }
     }

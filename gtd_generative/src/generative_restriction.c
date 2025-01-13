@@ -597,31 +597,17 @@ RestrictionResult *edge_check_condition(Graph *graph, RestrictionParameters *par
             Graph *connGraph = get_machine_graph(connMachine);
             set_edge_connected(connGraph, i, j);
             set_machine_depth(connMachine, get_machine_depth(connMachine) + 1);
-            get_machine_proof_tree(connMachine)->depth = get_machine_depth(connMachine);
 
             GenerativeProofMachine *notConnMachine = copy_proof_machine(params->machine);
             Graph *notConnGraph = get_machine_graph(notConnMachine);
             set_edge_not_connected(notConnGraph, i, j);
             set_machine_depth(notConnMachine, get_machine_depth(notConnMachine) + 1);
-            get_machine_proof_tree(notConnMachine)->depth = get_machine_depth(notConnMachine);
 
             int contrConn = execute_generative_proof_machine(connMachine);
-
             int contrNotConn = execute_generative_proof_machine(notConnMachine);
 
-            params->machine = originMachine;
-
-            // todo destroy machines
-
-            if(!contrConn && !contrNotConn)
+            if(contrConn)
             {
-                continue;
-            }
-
-            if(contrConn || contrNotConn)
-            {
-                result->modified = 1;
-
                 char buffer1[100];
                 snprintf(buffer1, sizeof(buffer1), 
                     "Zalozmy, ze krawedz (%d %d) istnieje:", 
@@ -630,37 +616,63 @@ RestrictionResult *edge_check_condition(Graph *graph, RestrictionParameters *par
                 proofNode1->message = strdup(buffer1);
                 proofNode1->subtree = get_machine_proof_tree(connMachine);
                 append_proof_node(get_machine_proof_tree(originMachine), proofNode1);
-
-                char buffer2[100];
-                snprintf(buffer2, sizeof(buffer2), 
-                    "Zalozmy, ze krawedz (%d %d) nie istnieje:", 
+                
+                char buffer1_1[100];
+                snprintf(buffer1_1, sizeof(buffer1_1),
+                    "Istnienie krawedzi (%d %d) prowadzi do sprzecznosci, czyli nie moze ona istniec",
                     i, j);
+                ProofNode *proofNode1_1 = create_proof_node();
+                proofNode1_1->message = strdup(buffer1_1);
+                append_proof_node(get_machine_proof_tree(originMachine), proofNode1_1);
+                
+            }
+            if(contrNotConn)
+            {
                 ProofNode *proofNode2 = create_proof_node();
+                char buffer2[100];
+                snprintf(buffer2, sizeof(buffer2),
+                    "Zalozmy, ze krawedz (%d %d) nie istnieje:",
+                    i, j);
                 proofNode2->message = strdup(buffer2);
                 proofNode2->subtree = get_machine_proof_tree(notConnMachine);
                 append_proof_node(get_machine_proof_tree(originMachine), proofNode2);
+                
+                char buffer2_1[100];
+                snprintf(buffer2_1, sizeof(buffer2_1),
+                    "Brak krawedzi (%d %d) prowadzi do sprzecznosci, czyli musi ona istniec",
+                    i, j);
+                ProofNode *proofNode2_1 = create_proof_node();
+                proofNode2_1->message = strdup(buffer2_1);
+                append_proof_node(get_machine_proof_tree(originMachine), proofNode2_1);
             }
+            
+
             if(contrConn && contrNotConn)
             {
                 result->contradictionFound = 1;
+                char buffer[100];
+                snprintf(buffer, sizeof(buffer),
+                    "Krawedz (%d %d) jednoczesnie musi i nie moze istniec - sprzecznosc",
+                    i, j);
+                ProofNode *proofNode = create_proof_node();
+                proofNode->message = strdup(buffer);
+                append_proof_node(get_machine_proof_tree(originMachine), proofNode);
                 return result;
             }
 
             if(contrConn)
             {
-                int depth = get_machine_depth(originMachine);
-                load_machine(originMachine, connMachine);
-                set_machine_depth(originMachine, depth);
+                load_machine(originMachine, notConnMachine);
             }
+
             if(contrNotConn)
             {
-                int depth = get_machine_depth(originMachine);
-                load_machine(originMachine, notConnMachine);
-                set_machine_depth(originMachine, depth);
+                load_machine(originMachine, connMachine);
             }
 
             if(contrConn || contrNotConn)
             {
+                result->modified = 1;
                 return result;
             }
         }

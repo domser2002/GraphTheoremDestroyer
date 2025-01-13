@@ -89,5 +89,7 @@ void load_machine(GenerativeProofMachine *m1, GenerativeProofMachine *m2);
  * \param restriction GenerativeRestriction that will be added at the end of the restriction array in machine
  */
 void add_restriction(GenerativeProofMachine *machine, GenerativeRestriction *restriction);
+
+void load_machine(GenerativeProofMachine *m1, GenerativeProofMachine *m2);
 #endif
 #endif

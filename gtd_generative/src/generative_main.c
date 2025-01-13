@@ -61,12 +61,12 @@ void *generative_main_loop(void *argument)
             {
             case WriteProofMessage:
                 out_file = fopen(args->out_file_path, "a");
-                write_proof_tree(get_machine_proof_tree(machine), out_file);
+                write_proof_tree(get_machine_proof_tree(machine), out_file, 0);
                 fclose(out_file);
                 break;
             case WriteDeductionMessage:
                 out_file = fopen(args->out_file_path, "a");
-                write_proof_tree(get_machine_proof_tree(machine), out_file);
+                write_proof_tree(get_machine_proof_tree(machine), out_file, 0);
                 fclose(out_file);
                 break;
             case AddFactsMessage:

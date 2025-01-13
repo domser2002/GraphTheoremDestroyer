@@ -3,12 +3,13 @@
 #include "common.h"
 #include <stdlib.h>
 
-FactTree *construct(uint32_t fact_count, Fact **facts)
+FactTree *construct(uint32_t fact_count, Fact ***facts)
 {
     GTD_LOG("Constructing FactTree with %d facts", fact_count);
     FactTree* ft = (FactTree*)gtd_malloc(sizeof(FactTree));
     ft->fact_count = fact_count;
-    ft->facts = facts;
+    ft->facts = *facts;
+    ft->original_facts = facts;
     ft->parents = (uint32_t**)gtd_malloc(fact_count*sizeof(uint32_t*));
     ft->parent_count = (uint8_t*)gtd_malloc(fact_count*sizeof(uint8_t));
     for(uint32_t i=0;i<fact_count;i++)
@@ -52,7 +53,9 @@ bool add_fact(FactTree *ft, uint32_t *parent_idxs, uint8_t parent_count, Fact *n
         return false;
     }
     ft->fact_count++;
-    ft->facts = (Fact**)gtd_realloc(ft->facts,ft->fact_count * sizeof(Fact*));
+    Fact **new_facts = (Fact**)gtd_realloc(ft->facts, ft->fact_count * sizeof(Fact*));
+    ft->facts = new_facts;
+    *(ft->original_facts) = ft->facts; 
     ft->facts[ft->fact_count-1] = new_fact;
     ft->parents = (uint32_t**)gtd_realloc(ft->parents,ft->fact_count*sizeof(uint32_t*));
     ft->parents[ft->fact_count-1] = parent_idxs;

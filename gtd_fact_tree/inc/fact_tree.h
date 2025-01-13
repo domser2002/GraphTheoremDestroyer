@@ -16,15 +16,16 @@ typedef struct FactTree
     uint32_t **parents; 
     uint8_t *parent_count;
     Fact **facts;
+    Fact ***original_facts;
 } FactTree;
 
 /**
  * \brief function to create an initial FactTree with isolated facts
  * \param fact_count number of facts
- * \param facts array of pointers to facts
+ * \param facts pointer to the array of pointers to facts
  * \returns pointer to a newly created FactTree
 */
-FactTree *construct(uint32_t fact_count, Fact **facts);
+FactTree *construct(uint32_t fact_count, Fact ***facts);
 
 /**
  * \brief function to destruct FactTree

@@ -7,6 +7,8 @@
 #include "contradiction.h"
 #include "implication.h"
 #include "function.h"
+#include "fact_tree.h"
+#include "fact_tree_machine.h"
 void gtd_fact_tree_unit_tests(void);
 void gtd_fact_tree_integration_tests(void);
 #endif

@@ -1,0 +1,13 @@
+Graph is connected
+Graph has no cycles
+Graph is connected, Graph has no cycles => Graph is a tree
+Graph does not contain K_1,4 as a induced subgraph
+Graph is a tree, Graph does not contain K_1,4 as a induced subgraph => Graph is a 2-nary tree
+Graph is connected
+Graph has no cycles
+Graph is connected, Graph has no cycles => Graph is a tree
+Graph does not contain P_4 as an induced subgraph
+Graph is a tree, Graph does not contain P_4 as an induced subgraph => Graph is a tree with height at most 3
+Graph is a 2-nary tree, Graph is a tree with height at most 3 => Graph has at most 7 vertices
+Graph has at least 8 vertices
+Graph has at most 7 vertices, Graph has at least 8 vertices contradict

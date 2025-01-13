@@ -32,6 +32,7 @@ jobs:
         run: |
           cd gtd_frontend
           pip install -r requirements.txt
+          sudo apt-get install gnome-screenshot
 
       - name: E2E test
         run: |

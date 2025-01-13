@@ -19,16 +19,21 @@ jobs:
       - name: Install from apt
         run: sudo apt-get update && sudo apt-get install -y gcc make python3-pip python3-tk python3-dev gnome-screenshot xvfb
 
-      - name: Install Python packages
+      - name: Install Python Packages and Required Libraries
         run: |
+          sudo apt-get update
+          sudo apt-get install -y python3-pip python3-tk python3-dev gnome-screenshot xvfb
           cd gtd_frontend
           pip install -r requirements.txt
-
+      
       - name: Build the Project
         run: make all
 
       - name: Run Backend Tests
         run: make test
+
+      - name: Clean up
+        run: make clean
 
       - name: Run E2E Test with Virtual Display
         run: |

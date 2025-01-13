@@ -58,3 +58,46 @@ def test_button_click():
 
     result_1_pos = look_for_image('expected_result_1.png', confidence_threshold=0.95)
     assert result_1_pos is not None
+
+
+def test_proof_remove():
+    time.sleep(1)
+
+    while look_for_image('close.png', 0.95) != None:
+        click_image('close.png')
+        time.sleep(1)
+    
+    close_button = look_for_image('close.png', 0.7)
+    assert close_button == None
+
+
+def test_function_input():
+    time.sleep(1)
+
+    click_image('proof_details.png')
+    time.sleep(1)
+
+    while look_for_image('remove_fact.png') != None:
+        click_image('remove_fact.png')
+        time.sleep(1)
+    
+    click_image('choose_restriction.png', width_point=0.9)
+    time.sleep(1)
+
+    click_image('add_new_restriction.png')
+    time.sleep(1)
+
+    click_image('choose_restriction.png', width_point=0.9)
+    time.sleep(1)
+
+    click_image('vertex_count.png')
+    time.sleep(1)
+
+    click_image('empty_input.png')
+    time.sleep(1)
+
+    pyautogui.write('12 * x - 5 / 8 * x ^ 6 - 14 / 9 * x**3')
+    time.sleep(5)
+
+    equation = look_for_image('equation.png', 0.1)
+    assert equation is not None

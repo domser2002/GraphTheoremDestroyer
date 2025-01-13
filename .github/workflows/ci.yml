@@ -33,13 +33,14 @@ jobs:
       - name: Clean up
         run: make clean
       
-      - name: Install Python Packages
+      - name: Install Python Packages and Required Libraries
         run: |
+          sudo apt-get update
+          sudo apt-get install -y python3-pip python3-tk python3-dev gnome-screenshot xvfb
           cd gtd_frontend
           pip install -r requirements.txt
-          sudo apt-get install gnome-screenshot
 
-      - name: E2E test
+      - name: Run E2E Test with Virtual Display
         run: |
           Xvfb :99 -screen 0 1920x1080x24 &
           export DISPLAY=:99

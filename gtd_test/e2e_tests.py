@@ -75,26 +75,26 @@ def test_function_input():
     time.sleep(1)
 
     click_image('proof_details.png')
-    time.sleep(2)
+    time.sleep(1)
 
     while look_for_image('remove_fact.png') != None:
         click_image('remove_fact.png')
-        time.sleep(2)
+        time.sleep(1)
     
     click_image('choose_restriction.png', width_point=0.9)
-    time.sleep(2)
+    time.sleep(1)
 
     click_image('add_new_restriction.png')
-    time.sleep(2)
+    time.sleep(1)
 
     click_image('choose_restriction.png', width_point=0.9)
-    time.sleep(2)
+    time.sleep(1)
 
-    click_image('min_vertex_degree.png')
-    time.sleep(2)
+    click_image('vertex_count.png')
+    time.sleep(1)
 
     click_image('empty_input.png')
-    time.sleep(2)
+    time.sleep(1)
 
     pyautogui.write('12 * x - 5 / 8 * x ^ 6 - 14 / 9 * x**3')
     time.sleep(5)

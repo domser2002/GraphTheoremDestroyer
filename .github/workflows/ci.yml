@@ -33,7 +33,9 @@ jobs:
           cd gtd_frontend
           pip install -r requirements.txt
 
-      - name: E2E Test
+      - name: E2E test
         run: |
+          Xvfb :99 -screen 0 1920x1080x24 &
+          export DISPLAY=:99
           cd gtd_test
           ./run_e2e.sh

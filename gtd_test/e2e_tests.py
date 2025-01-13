@@ -99,5 +99,5 @@ def test_function_input():
     pyautogui.write('12 * x - 5 / 8 * x ^ 6 - 14 / 9 * x**3')
     time.sleep(5)
 
-    equation = look_for_image('equation.png')
+    equation = look_for_image('equation.png', 0.1)
     assert equation is not None

@@ -57,6 +57,6 @@ void write_proof_node(ProofNode *node, FILE *outFile, int depth);
  * \param tree - pointer to the ProofTree structure from which proof should be extracted
  * \param outFile - pointer to the FILE, an output stream to which proof will be written
  */
-void write_proof_tree(ProofTree *tree, FILE *outFile);
+void write_proof_tree(ProofTree *tree, FILE *outFile, int depth);
 #endif
 #endif

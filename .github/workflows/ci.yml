@@ -27,3 +27,9 @@ jobs:
 
       - name: Clean up
         run: make clean
+      
+      -name: Install python packages
+        run: cd gtd_frontend & pip install -r requirements.tst
+
+      - name: E2E test
+        run: cd gtd_test & ./run_e2e.sh

@@ -26,7 +26,7 @@ ModuleArgs *get_module_args_from_json(const char *pathname)
         type == HasInducedCompletePartiteFact || type == HasNoInducedCompletePartiteFact ||
         type == HasMinorCompletePartiteFact || type == HasNoMinorCompletePartiteFact)
         {
-            params[0] = create_function(2);
+            params[0] = create_constant_integer_function(2);
             loop_start = 1;
         }
         for (uint8_t j = loop_start; j < params_count; j++) {
@@ -55,7 +55,7 @@ ModuleArgs *get_module_args_from_json(const char *pathname)
                     val = nominator/denominator;
                 }
                 if(val != -1)
-                    params[j] = create_function(val);
+                    params[j] = create_constant_integer_function(val);
             }
             if(!functional[j - loop_start])
             {
@@ -71,7 +71,7 @@ ModuleArgs *get_module_args_from_json(const char *pathname)
                     GTD_LOG("Unexpected type for parameter %s\n", param_name);
                     exit(EXIT_FAILURE);
                 }
-                params[j] = create_function(param);
+                params[j] = create_constant_integer_function(param);
             }
         }
         args->fact_array[i] = create_fact(type, params);

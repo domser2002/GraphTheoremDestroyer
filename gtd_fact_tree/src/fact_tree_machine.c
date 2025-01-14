@@ -50,7 +50,7 @@ void execute(FactTreeMachine *machine)
     uint32_t n = machine->FactTree->fact_count;
     // find contradiction
     uint64_t max_number = 1ULL << n;
-    for (uint64_t mask = machine->checked; mask < max_number; mask++)
+    for (uint64_t mask = 0; mask < max_number; mask++)
     {
         Fact **subArray = (Fact **)gtd_malloc(MAX_CONTRADICTING_FACTS * sizeof(Fact *));
         uint8_t elements[MAX_CONTRADICTING_FACTS];
@@ -80,7 +80,7 @@ void execute(FactTreeMachine *machine)
     }
     // add facts
     bool added_facts = false;
-    for (uint64_t mask = machine->checked; mask < max_number; mask++)
+    for (uint64_t mask = 0; mask < max_number; mask++)
     {
         Fact **subArray = (Fact **)gtd_malloc(MAX_LEFT_SIDE_FACTS * sizeof(Fact *));
         uint8_t elements[MAX_LEFT_SIDE_FACTS];
@@ -104,10 +104,10 @@ void execute(FactTreeMachine *machine)
                 {
                     parents[j] = elements[j];
                 }
-                add_fact(machine->FactTree, parents, number_of_ones, newFacts[i]);
-                added_facts = true;
+                if(add_fact(machine->FactTree, parents, number_of_ones, newFacts[i]))
+                    added_facts = true;
+                GTD_LOG("Implication found at subarray (hex format): %x", mask);
             }
-            GTD_LOG("Implication found at subarray (hex format): %x", mask);
             gtd_free(subArray);
             continue;
         }

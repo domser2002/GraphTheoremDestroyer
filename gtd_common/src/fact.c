@@ -546,72 +546,72 @@ char *get_fact_str(Fact *fact)
         return result;
     case HasCompletePartiteFact:
         sprintf(result, "Graph contains K_");
-        for(int32_t i=0;i<fact->params[0]->c;i++)
+        for(int32_t i=0;i<fact->params[0]->coef[0];i++)
         {
             str = get_function_str(fact->params[i+1]);
             sprintf(result + strlen(result),"%s", str);
             gtd_free(str);
-            if(i != fact->params[0]->c - 1) 
+            if(i != fact->params[0]->coef[0] - 1) 
                 sprintf(result + strlen(result),",");
         }
         sprintf(result + strlen(result), " as a subgraph");
         return result;   
     case HasNoCompletePartiteFact:
         sprintf(result, "Graph does not contain K_");
-        for(int32_t i=0;i<fact->params[0]->c;i++)
+        for(int32_t i=0;i<fact->params[0]->coef[0];i++)
         {
             str = get_function_str(fact->params[i+1]);
             sprintf(result + strlen(result),"%s", str);
             gtd_free(str);
-            if(i != fact->params[0]->c - 1) 
+            if(i != fact->params[0]->coef[0] - 1) 
                 sprintf(result + strlen(result),",");
         }
         sprintf(result + strlen(result), " as a subgraph");
         return result;  
     case HasInducedCompletePartiteFact:
         sprintf(result + strlen(result), "Graph contains K_");
-        for(int32_t i=0;i<fact->params[0]->c;i++)
+        for(int32_t i=0;i<fact->params[0]->coef[0];i++)
         {
             str = get_function_str(fact->params[i+1]);
             sprintf(result + strlen(result),"%s", str);
             gtd_free(str);
-            if(i != fact->params[0]->c - 1) 
+            if(i != fact->params[0]->coef[0] - 1) 
                 sprintf(result + strlen(result),",");
         }
         sprintf(result + strlen(result), " as a induced subgraph");
         return result;   
     case HasNoInducedCompletePartiteFact:
         sprintf(result, "Graph does not contain K_");
-        for(int32_t i=0;i<fact->params[0]->c;i++)
+        for(int32_t i=0;i<fact->params[0]->coef[0];i++)
         {
             str = get_function_str(fact->params[i+1]);
             sprintf(result + strlen(result),"%s", str);
             gtd_free(str);
-            if(i != fact->params[0]->c - 1) 
+            if(i != fact->params[0]->coef[0] - 1) 
                 sprintf(result + strlen(result),",");
         }
         sprintf(result + strlen(result), " as a induced subgraph");
         return result;  
     case HasMinorCompletePartiteFact:
         sprintf(result, "Graph contains K_");
-        for(int32_t i=0;i<fact->params[0]->c;i++)
+        for(int32_t i=0;i<fact->params[0]->coef[0];i++)
         {
             str = get_function_str(fact->params[i+1]);
             sprintf(result,"%s", str);
             gtd_free(str);
-            if(i != fact->params[0]->c - 1) 
+            if(i != fact->params[0]->coef[0] - 1) 
                 sprintf(result,",");
         }
         sprintf(result, " as a minor");
         return result;   
     case HasNoMinorCompletePartiteFact:
         sprintf(result, "Graph does not contain K_");
-        for(int32_t i=0;i<fact->params[0]->c;i++)
+        for(int32_t i=0;i<fact->params[0]->coef[0];i++)
         {
             str = get_function_str(fact->params[i+1]);
             sprintf(result,"%s", str);
             gtd_free(str);
-            if(i != fact->params[0]->c - 1) 
+            if(i != fact->params[0]->coef[0] - 1) 
                 sprintf(result,",");
         }
         sprintf(result, " as a minor");

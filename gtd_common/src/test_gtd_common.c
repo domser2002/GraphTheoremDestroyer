@@ -4,8 +4,8 @@ static uint8_t integration_test_counter = 0;
 #define COMMON_UNIT_TEST_NUM 90
 #define COMMON_INTEGRATION_TEST_NUM 0
 typedef Function* (*function_binary_operation)(const Function *const, const Function *const);
-typedef void (*function_constant_operation)(Function *, const int32_t);
-typedef int8_t (*modifying_function_constant_operation_with_ret)(Function *, const int32_t);
+typedef void (*function_constant_operation)(Function *, const double);
+typedef int8_t (*modifying_function_constant_operation_with_ret)(Function *, const double);
 typedef int32_t (*const_function_constant_operation_with_ret)(const Function *const, const int32_t);
 typedef Function* (*function_unary_operation)(const Function *const);
 
@@ -18,14 +18,14 @@ typedef struct Function_Binary_Operation_Test_Case {
 
 typedef struct Function_Constant_Operation_Test_Case {
     Function *f;
-    int32_t c;
+    double c;
     Function *expected;
     function_constant_operation op;
 } Function_Constant_Operation_Test_Case;
 
 typedef struct Modifying_Function_Constant_Operation_With_Ret_Test_Case {
     Function *f;
-    int32_t c;
+    double c;
     Function *expected;
     int8_t expected_ret;
     modifying_function_constant_operation_with_ret op;
@@ -194,43 +194,43 @@ static void create_and_run_function_unary_operation_test_case(Function *f, Funct
 static void test_function(void)
 {
     // add_functions
-    create_and_run_function_binary_operation_test_case(create_function(0), create_function(0), create_function(0), add_functions);
-    create_and_run_function_binary_operation_test_case(create_function(1), create_function(2), create_function(3), add_functions);
+    create_and_run_function_binary_operation_test_case(create_constant_integer_function(0), create_constant_integer_function(0), create_constant_integer_function(0), add_functions);
+    create_and_run_function_binary_operation_test_case(create_constant_integer_function(1), create_constant_integer_function(2), create_constant_integer_function(3), add_functions);
     // subtract_functions
-    create_and_run_function_binary_operation_test_case(create_function(0), create_function(0), create_function(0), subtract_functions);
-    create_and_run_function_binary_operation_test_case(create_function(2), create_function(1), create_function(1), subtract_functions);
+    create_and_run_function_binary_operation_test_case(create_constant_integer_function(0), create_constant_integer_function(0), create_constant_integer_function(0), subtract_functions);
+    create_and_run_function_binary_operation_test_case(create_constant_integer_function(2), create_constant_integer_function(1), create_constant_integer_function(1), subtract_functions);
     // multiply_functions
-    create_and_run_function_binary_operation_test_case(create_function(0), create_function(0), create_function(0), multiply_functions);
-    create_and_run_function_binary_operation_test_case(create_function(1), create_function(0), create_function(0), multiply_functions);    
-    create_and_run_function_binary_operation_test_case(create_function(0), create_function(1), create_function(0), multiply_functions);
-    create_and_run_function_binary_operation_test_case(create_function(2), create_function(1), create_function(2), multiply_functions);
+    create_and_run_function_binary_operation_test_case(create_constant_integer_function(0), create_constant_integer_function(0), create_constant_integer_function(0), multiply_functions);
+    create_and_run_function_binary_operation_test_case(create_constant_integer_function(1), create_constant_integer_function(0), create_constant_integer_function(0), multiply_functions);    
+    create_and_run_function_binary_operation_test_case(create_constant_integer_function(0), create_constant_integer_function(1), create_constant_integer_function(0), multiply_functions);
+    create_and_run_function_binary_operation_test_case(create_constant_integer_function(2), create_constant_integer_function(1), create_constant_integer_function(2), multiply_functions);
     // divide_functions
-    create_and_run_function_binary_operation_test_case(create_function(0), create_function(0), NULL, divide_functions);
-    create_and_run_function_binary_operation_test_case(create_function(1), create_function(0), NULL, divide_functions);    
-    create_and_run_function_binary_operation_test_case(create_function(0), create_function(1), create_function(0), divide_functions);
-    create_and_run_function_binary_operation_test_case(create_function(2), create_function(1), create_function(2), divide_functions);
+    create_and_run_function_binary_operation_test_case(create_constant_integer_function(0), create_constant_integer_function(0), NULL, divide_functions);
+    create_and_run_function_binary_operation_test_case(create_constant_integer_function(1), create_constant_integer_function(0), NULL, divide_functions);    
+    create_and_run_function_binary_operation_test_case(create_constant_integer_function(0), create_constant_integer_function(1), create_constant_integer_function(0), divide_functions);
+    create_and_run_function_binary_operation_test_case(create_constant_integer_function(2), create_constant_integer_function(1), create_constant_integer_function(2), divide_functions);
     // add_constant
-    create_and_run_function_constant_operation_test_case(create_function(0), 0, create_function(0), add_constant);
-    create_and_run_function_constant_operation_test_case(create_function(1), 2, create_function(3), add_constant);
+    create_and_run_function_constant_operation_test_case(create_constant_integer_function(0), 0, create_constant_integer_function(0), add_constant);
+    create_and_run_function_constant_operation_test_case(create_constant_integer_function(1), 2, create_constant_integer_function(3), add_constant);
     // subtract_constant
-    create_and_run_function_constant_operation_test_case(create_function(0), 0, create_function(0), subtract_constant);
-    create_and_run_function_constant_operation_test_case(create_function(2), 1, create_function(1), subtract_constant);
+    create_and_run_function_constant_operation_test_case(create_constant_integer_function(0), 0, create_constant_integer_function(0), subtract_constant);
+    create_and_run_function_constant_operation_test_case(create_constant_integer_function(2), 1, create_constant_integer_function(1), subtract_constant);
     // multiply_constant
-    create_and_run_function_constant_operation_test_case(create_function(0), 0, create_function(0), multiply_constant);
-    create_and_run_function_constant_operation_test_case(create_function(1), 0, create_function(0), multiply_constant);    
-    create_and_run_function_constant_operation_test_case(create_function(0), 0, create_function(0), multiply_constant);
-    create_and_run_function_constant_operation_test_case(create_function(2), 1, create_function(2), multiply_constant);
+    create_and_run_function_constant_operation_test_case(create_constant_integer_function(0), 0, create_constant_integer_function(0), multiply_constant);
+    create_and_run_function_constant_operation_test_case(create_constant_integer_function(1), 0, create_constant_integer_function(0), multiply_constant);    
+    create_and_run_function_constant_operation_test_case(create_constant_integer_function(0), 0, create_constant_integer_function(0), multiply_constant);
+    create_and_run_function_constant_operation_test_case(create_constant_integer_function(2), 1, create_constant_integer_function(2), multiply_constant);
     // divide_constant
-    create_and_run_modifying_function_constant_operation_with_ret_test_case(create_function(0), 0, NULL, OP_NOT_POSSIBLE, divide_constant);
-    create_and_run_modifying_function_constant_operation_with_ret_test_case(create_function(1), 0, NULL, OP_NOT_POSSIBLE, divide_constant);    
-    create_and_run_modifying_function_constant_operation_with_ret_test_case(create_function(0), 1, create_function(0), 0, divide_constant);
-    create_and_run_modifying_function_constant_operation_with_ret_test_case(create_function(2), 1, create_function(2), 0, divide_constant);
+    create_and_run_modifying_function_constant_operation_with_ret_test_case(create_constant_integer_function(0), 0, NULL, OP_NOT_POSSIBLE, divide_constant);
+    create_and_run_modifying_function_constant_operation_with_ret_test_case(create_constant_integer_function(1), 0, NULL, OP_NOT_POSSIBLE, divide_constant);    
+    create_and_run_modifying_function_constant_operation_with_ret_test_case(create_constant_integer_function(0), 1, create_constant_integer_function(0), 0, divide_constant);
+    create_and_run_modifying_function_constant_operation_with_ret_test_case(create_constant_integer_function(2), 1, create_constant_integer_function(2), 0, divide_constant);
     // mod_function
-    create_and_run_const_function_constant_operation_with_ret_test_case(create_function(0), 2, 0, mod_function);
-    create_and_run_const_function_constant_operation_with_ret_test_case(create_function(5), 2, 1, mod_function);
+    create_and_run_const_function_constant_operation_with_ret_test_case(create_constant_integer_function(0), 2, 0, mod_function);
+    create_and_run_const_function_constant_operation_with_ret_test_case(create_constant_integer_function(5), 2, 1, mod_function);
     // sqrt_function
-    create_and_run_function_unary_operation_test_case(create_function(0),create_function(0),sqrt_function);
-    create_and_run_function_unary_operation_test_case(create_function(4),create_function(2),sqrt_function);
+    create_and_run_function_unary_operation_test_case(create_constant_integer_function(0),create_constant_integer_function(0),sqrt_function);
+    create_and_run_function_unary_operation_test_case(create_constant_integer_function(4),create_constant_integer_function(2),sqrt_function);
 }
 
 static void run_get_param_count_test(FactType type, uint8_t expected)
@@ -355,20 +355,20 @@ static void test_fact(void)
     create_fact_and_run_get_fact_str_test(str, IsCycleComplementFact, 0);
     sprintf(str, "Graph has no cycles");
     create_fact_and_run_get_fact_str_test(str, HasNoCyclesFact, 0);
-    sprintf(str, "Graph is a 2-nary tree");
-    create_fact_and_run_get_fact_str_test(str, IstnaryTreeFact, 1, create_function(2));
+    sprintf(str, "Graph is a (2)-nary tree");
+    create_fact_and_run_get_fact_str_test(str, IstnaryTreeFact, 1, create_constant_integer_function(2));
     sprintf(str, "Graph is a path");
-    create_fact_and_run_get_fact_str_test(str, IstnaryTreeFact, 1, create_function(1));
-    sprintf(str, "Graph is 2-partite");
-    create_fact_and_run_get_fact_str_test(str, IsPartiteFact, 1, create_function(2));
-    sprintf(str, "Graph is 3-partite");
-    create_fact_and_run_get_fact_str_test(str, IsPartiteFact, 1, create_function(3));
-    sprintf(str, "Graph has 2 vertices");
-    create_fact_and_run_get_fact_str_test(str, VertexCountFact, 1, create_function(2));
-    sprintf(str, "Graph has 3 vertices");
-    create_fact_and_run_get_fact_str_test(str, VertexCountFact, 1, create_function(3));
-    sprintf(str, "Graph contains K_1,1 as a subgraph");
-    create_fact_and_run_get_fact_str_test(str, HasCompletePartiteFact, 3, create_function(2), create_function(1), create_function(1));
+    create_fact_and_run_get_fact_str_test(str, IstnaryTreeFact, 1, create_constant_integer_function(1));
+    sprintf(str, "Graph is (2)-partite");
+    create_fact_and_run_get_fact_str_test(str, IsPartiteFact, 1, create_constant_integer_function(2));
+    sprintf(str, "Graph is (3)-partite");
+    create_fact_and_run_get_fact_str_test(str, IsPartiteFact, 1, create_constant_integer_function(3));
+    sprintf(str, "Graph has (2) vertices");
+    create_fact_and_run_get_fact_str_test(str, VertexCountFact, 1, create_constant_integer_function(2));
+    sprintf(str, "Graph has (3) vertices");
+    create_fact_and_run_get_fact_str_test(str, VertexCountFact, 1, create_constant_integer_function(3));
+    sprintf(str, "Graph contains K_(1),(1) as a subgraph");
+    create_fact_and_run_get_fact_str_test(str, HasCompletePartiteFact, 3, create_constant_integer_function(2), create_constant_integer_function(1), create_constant_integer_function(1));
     // TODO: cover the rest of types
     // equal_facts
     // 0 params, equal types
@@ -384,50 +384,50 @@ static void test_fact(void)
     delete_fact(fact1);
     delete_fact(fact2);
     // 1 param, equal types and param
-    fact1 = create_fact_wrapper(MaxVertexCountFact, 1, create_function(1));
-    fact2 = create_fact_wrapper(MaxVertexCountFact, 1, create_function(1));
+    fact1 = create_fact_wrapper(MaxVertexCountFact, 1, create_constant_integer_function(1));
+    fact2 = create_fact_wrapper(MaxVertexCountFact, 1, create_constant_integer_function(1));
     run_equal_facts_test(fact1, fact2, true);
     delete_fact(fact1);
     delete_fact(fact2);
     // 1 param, not equal types, equal param
-    fact1 = create_fact_wrapper(MaxVertexCountFact, 1, create_function(1));
-    fact2 = create_fact_wrapper(VertexCountFact, 1, create_function(1));
+    fact1 = create_fact_wrapper(MaxVertexCountFact, 1, create_constant_integer_function(1));
+    fact2 = create_fact_wrapper(VertexCountFact, 1, create_constant_integer_function(1));
     run_equal_facts_test(fact1, fact2, false);
     delete_fact(fact1);
     delete_fact(fact2);
     // 1 param, equal types, not equal param
-    fact1 = create_fact_wrapper(MaxVertexCountFact, 1, create_function(1));
-    fact2 = create_fact_wrapper(MaxVertexCountFact, 1, create_function(2));
+    fact1 = create_fact_wrapper(MaxVertexCountFact, 1, create_constant_integer_function(1));
+    fact2 = create_fact_wrapper(MaxVertexCountFact, 1, create_constant_integer_function(2));
     run_equal_facts_test(fact1, fact2, false);
     delete_fact(fact1);
     delete_fact(fact2);
     // 1 param, not equal types, not equal param
-    fact1 = create_fact_wrapper(MaxVertexCountFact, 1, create_function(1));
-    fact2 = create_fact_wrapper(VertexCountFact, 1, create_function(2));
+    fact1 = create_fact_wrapper(MaxVertexCountFact, 1, create_constant_integer_function(1));
+    fact2 = create_fact_wrapper(VertexCountFact, 1, create_constant_integer_function(2));
     run_equal_facts_test(fact1, fact2, false);
     delete_fact(fact1);
     delete_fact(fact2);
     // 3 params, equal types, equal params
-    fact1 = create_fact_wrapper(HasCompletePartiteFact, 3, create_function(2), create_function(1), create_function(1));
-    fact2 = create_fact_wrapper(HasCompletePartiteFact, 3, create_function(2), create_function(1), create_function(1));
+    fact1 = create_fact_wrapper(HasCompletePartiteFact, 3, create_constant_integer_function(2), create_constant_integer_function(1), create_constant_integer_function(1));
+    fact2 = create_fact_wrapper(HasCompletePartiteFact, 3, create_constant_integer_function(2), create_constant_integer_function(1), create_constant_integer_function(1));
     run_equal_facts_test(fact1, fact2, true);
     delete_fact(fact1);
     delete_fact(fact2);
     // 3 params, not equal types, equal params
-    fact1 = create_fact_wrapper(HasCompletePartiteFact, 3, create_function(2), create_function(1), create_function(1));
-    fact2 = create_fact_wrapper(HasNoCompletePartiteFact, 3, create_function(2), create_function(1), create_function(1));
+    fact1 = create_fact_wrapper(HasCompletePartiteFact, 3, create_constant_integer_function(2), create_constant_integer_function(1), create_constant_integer_function(1));
+    fact2 = create_fact_wrapper(HasNoCompletePartiteFact, 3, create_constant_integer_function(2), create_constant_integer_function(1), create_constant_integer_function(1));
     run_equal_facts_test(fact1, fact2, false);
     delete_fact(fact1);
     delete_fact(fact2);
     // 3 params, equal types, not equal params
-    fact1 = create_fact_wrapper(HasCompletePartiteFact, 3, create_function(2), create_function(2), create_function(1));
-    fact2 = create_fact_wrapper(HasCompletePartiteFact, 3, create_function(2), create_function(1), create_function(1));
+    fact1 = create_fact_wrapper(HasCompletePartiteFact, 3, create_constant_integer_function(2), create_constant_integer_function(2), create_constant_integer_function(1));
+    fact2 = create_fact_wrapper(HasCompletePartiteFact, 3, create_constant_integer_function(2), create_constant_integer_function(1), create_constant_integer_function(1));
     run_equal_facts_test(fact1, fact2, false);
     delete_fact(fact1);
     delete_fact(fact2);
     // 3 params, not equal types, not equal params
-    fact1 = create_fact_wrapper(HasCompletePartiteFact, 3, create_function(2), create_function(2), create_function(1));
-    fact2 = create_fact_wrapper(HasNoCompletePartiteFact, 3, create_function(2), create_function(1), create_function(1));
+    fact1 = create_fact_wrapper(HasCompletePartiteFact, 3, create_constant_integer_function(2), create_constant_integer_function(2), create_constant_integer_function(1));
+    fact2 = create_fact_wrapper(HasNoCompletePartiteFact, 3, create_constant_integer_function(2), create_constant_integer_function(1), create_constant_integer_function(1));
     run_equal_facts_test(fact1, fact2, false);
     delete_fact(fact1);
     delete_fact(fact2);

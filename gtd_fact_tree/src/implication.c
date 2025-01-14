@@ -97,13 +97,17 @@ bool implication_type_2_calculate_right_side_params(Function **left_side_params,
 bool implication_type_3_calculate_right_side_params(Function **left_side_params, Function **right_side_params)
 {
     if (is_equal_constant_function(left_side_params[0], 0)) {
-        right_side_params[0] = create_function(0);
+        right_side_params[0] = create_constant_integer_function(0);
     } else {
         Function *result;
         result = copy_function(left_side_params[0]);
         multiply_constant(result, 8);
         add_constant(result, 1);           
-        result = sqrt_function(result);            
+        result = sqrt_function(result); 
+        if(result == NULL)
+        {
+            return false;
+        }           
         add_constant(result, 1);           
         divide_constant(result, 2);
         right_side_params[0] = copy_function(result);
@@ -174,8 +178,8 @@ bool implication_type_6_calculate_right_side_params(Function **left_side_params,
 bool implication_type_8_calculate_right_side_params(Function **left_side_params, Function **right_side_params)
 {
     Function *two, *one;
-    one = create_function(1);
-    two = create_function(2);
+    one = create_constant_integer_function(1);
+    two = create_constant_integer_function(2);
 
     int8_t res1 = compare_functions(left_side_params[0], two);
     int8_t res2 = compare_functions(left_side_params[1], one);
@@ -230,21 +234,18 @@ bool implication_type_10_calculate_right_side_params(Function **left_side_params
     else
     {
         Function *th_minus_one, *t_minus_one;
-
         // t^h
-        th_minus_one = create_function(1);
+        th_minus_one = create_constant_integer_function(1);
         Function *i = NULL;
         i = copy_function(left_side_params[1]);
         for (; !is_equal_constant_function(i, 0); subtract_constant(i, 1))
         {
             th_minus_one = multiply_functions(th_minus_one, left_side_params[0]);
         }
-
         t_minus_one = copy_function(left_side_params[0]);
-        subtract_constant(t_minus_one, 1);                        // t - 1
+        subtract_constant(t_minus_one, 1);                      // t - 1
         subtract_constant(th_minus_one, 1);                       // t^h - 1
         right_side_params[0] = divide_functions(th_minus_one, t_minus_one); // (t^h - 1) / (t - 1)
-
         delete_function(th_minus_one);
         delete_function(t_minus_one);
     }
@@ -269,9 +270,9 @@ bool implication_type_11_calculate_right_side_params(Function **left_side_params
     GTD_UNUSED(right_side_params);
 
     Function *two, *three, *five;
-    two = create_function(2);
-    three = create_function(3);
-    five = create_function(5);
+    two = create_constant_integer_function(2);
+    three = create_constant_integer_function(3);
+    five = create_constant_integer_function(5);
 
     int8_t res1 = compare_functions(left_side_params[0], two);
     int8_t res2 = compare_functions(left_side_params[1], three);
@@ -296,6 +297,30 @@ bool implication_type_11_calculate_right_side_params(Function **left_side_params
 }
 
 /**
+ * \brief implication type 12 - is cycle complement implies has (n^2-3n)/2 edges
+ * \param left_side_params - 0 element array
+ * \param right_side_params - 1 element array, number of edges
+ */
+bool implication_type_12_calculate_right_side_params(Function **left_side_params, Function **right_side_params)
+{
+    GTD_UNUSED(left_side_params);
+    right_side_params[0] = create_function_by_va_args('n', 3, 0.5, -1.5, 0.0);
+    return true;
+}
+
+/**
+ * \brief implication type 13 - is planar implies has at most 3n-6 edges
+ * \param left_side_params - 0 element array
+ * \param right_side_params - 1 element array, number of edges
+ */
+bool implication_type_13_calculate_right_side_params(Function **left_side_params, Function **right_side_params)
+{
+    GTD_UNUSED(left_side_params);
+    right_side_params[0] = create_function_by_va_args('n', 2, 3.0, -6.0);
+    return true;
+}
+
+/**
  * \brief implication type 14 - cycle complement graphs with n <= 6 are planar
  * \param left_side_params - 1 element array, max vertex count
  * \param right_side_params - 0 element array
@@ -305,7 +330,7 @@ bool implication_type_14_calculate_right_side_params(Function **left_side_params
     GTD_UNUSED(right_side_params);
 
     Function *six;
-    six = create_function(6);
+    six = create_constant_integer_function(6);
 
     int8_t res = compare_functions(left_side_params[0], six);
 
@@ -329,9 +354,9 @@ bool implication_type_15_calculate_right_side_params(Function **left_side_params
     if (!is_equal_constant_function(left_side_params[0], 7)) // n != 7
         return false;
 
-    right_side_params[0] = create_function(2);
-    right_side_params[1] = create_function(3);
-    right_side_params[2] = create_function(3);
+    right_side_params[0] = create_constant_integer_function(2);
+    right_side_params[1] = create_constant_integer_function(3);
+    right_side_params[2] = create_constant_integer_function(3);
 
     GTD_LOG("Cycle complement graph with 7 vertices contains K_{3,3}");
     return true;
@@ -455,8 +480,21 @@ Implication knownImplicationsArray[KNOWN_IMPLICATIONS_NUMBER] = {
     [10].right_side.types = {IsPlanarFact},
     [10].calculate_params = &implication_type_11_calculate_right_side_params,
     // type 12
-    // only with functions, will be added later
+    [11].left_side.types[IsCycleComplementFact] = true,
+    [11].left_side.n_facts = 1,
+    [11].left_side.n_params = 0,
+    [11].right_side.n_facts = 1,
+    [11].right_side.n_params = 1,
+    [11].right_side.types = {EdgeCountFact},
+    [11].calculate_params = &implication_type_12_calculate_right_side_params,
     // type 13
+    [12].left_side.types[IsPlanarFact] = true,
+    [12].left_side.n_facts = 1,
+    [12].left_side.n_params = 0,
+    [12].right_side.n_facts = 1,
+    [12].right_side.n_params = 1,
+    [12].right_side.types = {MaxEdgeCountFact},
+    [12].calculate_params = &implication_type_13_calculate_right_side_params,
     // only with functions, will be added later
     // type 14
     [13].left_side.types[IsCycleComplementFact] = true,
@@ -487,6 +525,11 @@ Implication knownImplicationsArray[KNOWN_IMPLICATIONS_NUMBER] = {
 Fact **implies(Fact **factArray, uint32_t n_facts, int *count)
 {
     GTD_LOG("Checking if array of %d facts forms a known implication", n_facts);
+    GTD_LOG("Array is:");
+    for(uint32_t i=0; i<n_facts; i++)
+    {
+        GTD_LOG("%s", get_fact_str(factArray[i]));
+    }
     *count = 0;
     if (n_facts > MAX_LEFT_SIDE_FACTS)
     {
@@ -512,7 +555,7 @@ Fact **implies(Fact **factArray, uint32_t n_facts, int *count)
         {
             if(knownImplicationsArray[i].left_side.types[j] != types[j])
             {
-                GTD_LOG("Types of facts do not match");
+                GTD_LOG("Types of facts do not match for type %d", j);
                 fact_types_match = false;
                 break;
             }
@@ -547,24 +590,26 @@ Fact **implies(Fact **factArray, uint32_t n_facts, int *count)
             Function **right_side_params = (Function **)gtd_malloc(knownImplicationsArray[i].right_side.n_params * sizeof(Function *));
             for(uint8_t i=0; i<knownImplicationsArray[i].right_side.n_params; i++)
                 right_side_params[i] = (Function*)gtd_malloc(sizeof(Function));
-            knownImplicationsArray[i].calculate_params(params,right_side_params);
-            *count = knownImplicationsArray[i].right_side.n_facts;
-            Fact **right_side_facts = (Fact**)gtd_malloc(*count * sizeof(Fact*));
-            int counter = 0;
-            for(uint32_t k=0;k<knownImplicationsArray[i].right_side.n_facts;k++)
+            if(knownImplicationsArray[i].calculate_params(params,right_side_params))
             {
-                FactType type = knownImplicationsArray[i].right_side.types[k];
-                int n_params = get_params(type, NULL, NULL);
-                Function **fact_params = (Function **)gtd_malloc(n_params * sizeof(Function *));
-                for(int s=0;s<n_params;s++)
+                *count = knownImplicationsArray[i].right_side.n_facts;
+                Fact **right_side_facts = (Fact**)gtd_malloc(*count * sizeof(Fact*));
+                int counter = 0;
+                for(uint32_t k=0;k<knownImplicationsArray[i].right_side.n_facts;k++)
                 {
-                    fact_params[s] = right_side_params[counter++];
+                    FactType type = knownImplicationsArray[i].right_side.types[k];
+                    int n_params = get_params(type, NULL, NULL);
+                    Function **fact_params = (Function **)gtd_malloc(n_params * sizeof(Function *));
+                    for(int s=0;s<n_params;s++)
+                    {
+                        fact_params[s] = right_side_params[counter++];
+                    }
+                    right_side_facts[k] = create_fact(type,fact_params);
+                    gtd_free(fact_params);
                 }
-                right_side_facts[k] = create_fact(type,fact_params);
-                gtd_free(fact_params);
+                gtd_free(params);
+                return right_side_facts;
             }
-            gtd_free(params);
-            return right_side_facts;
         }
         gtd_free(params);
     }

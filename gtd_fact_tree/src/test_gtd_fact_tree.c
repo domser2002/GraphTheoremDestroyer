@@ -122,8 +122,8 @@ static void test_contradict(void)
     // Case 3 - contradiction type 1 should occur
     types2[0] = MaxVertexCountFact;
     types2[1] = MinEdgeCountFact;
-    params1_1[0] = create_function(1);
-    params2_1[0] = create_function(1);
+    params1_1[0] = create_constant_integer_function(1);
+    params2_1[0] = create_constant_integer_function(1);
     params2[0] = params1_1;
     params2[1] = params2_1;
     param_count2[0] = 1;
@@ -132,8 +132,8 @@ static void test_contradict(void)
     // Case 4 - contradiction type 1 should not occur due to params
     types2[0] = MaxVertexCountFact;
     types2[1] = MinEdgeCountFact;
-    params1_1[0] = create_function(0);
-    params2_1[0] = create_function(0);
+    params1_1[0] = create_constant_integer_function(0);
+    params2_1[0] = create_constant_integer_function(0);
     params2[0] = params1_1;
     params2[1] = params2_1;
     param_count2[0] = 1;
@@ -142,8 +142,8 @@ static void test_contradict(void)
     // Case 5 - contradiction type 1 should not occur due to types
     types2[0] = MaxVertexCountFact;
     types2[1] = MinTreeHeightFact;
-    params1_1[0] = create_function(1);
-    params2_1[0] = create_function(1);
+    params1_1[0] = create_constant_integer_function(1);
+    params2_1[0] = create_constant_integer_function(1);
     params2[0] = params1_1;
     params2[1] = params2_1;
     param_count2[0] = 1;
@@ -152,8 +152,8 @@ static void test_contradict(void)
     // Case 6 - contradiction type 2 should occur
     types2[0] = MinVertexCountFact;
     types2[1] = MaxVertexCountFact;
-    params1_1[0] = create_function(2);
-    params2_1[0] = create_function(1);
+    params1_1[0] = create_constant_integer_function(2);
+    params2_1[0] = create_constant_integer_function(1);
     params2[0] = params1_1;
     params2[1] = params2_1;
     param_count2[0] = 1;
@@ -162,8 +162,8 @@ static void test_contradict(void)
     // Case 7 - contradiction type 2 should not occur due to params
     types2[0] = MinVertexCountFact;
     types2[1] = MaxVertexCountFact;
-    params1_1[0] = create_function(1);
-    params2_1[0] = create_function(1);
+    params1_1[0] = create_constant_integer_function(1);
+    params2_1[0] = create_constant_integer_function(1);
     params2[0] = params1_1;
     params2[1] = params2_1;
     param_count2[0] = 1;
@@ -172,8 +172,8 @@ static void test_contradict(void)
     // Case 8 - contradiction type 2 should not occur due to types
     types2[0] = MinVertexCountFact;
     types2[1] = MaxTreeHeightFact;
-    params1_1[0] = create_function(2);
-    params2_1[0] = create_function(1);
+    params1_1[0] = create_constant_integer_function(2);
+    params2_1[0] = create_constant_integer_function(1);
     params2[0] = params1_1;
     params2[1] = params2_1;
     param_count2[0] = 1;
@@ -182,8 +182,8 @@ static void test_contradict(void)
     // Case 9 - contradiction type 3 should occur
     types2[0] = MinEdgeCountFact;
     types2[1] = MaxEdgeCountFact;
-    params1_1[0] = create_function(2);
-    params2_1[0] = create_function(1);
+    params1_1[0] = create_constant_integer_function(2);
+    params2_1[0] = create_constant_integer_function(1);
     params2[0] = params1_1;
     params2[1] = params2_1;
     param_count2[0] = 1;
@@ -192,8 +192,8 @@ static void test_contradict(void)
     // Case 10 - contradiction type 3 should not occur due to params
     types2[0] = MinEdgeCountFact;
     types2[1] = MaxEdgeCountFact;
-    params1_1[0] = create_function(1);
-    params2_1[0] = create_function(1);
+    params1_1[0] = create_constant_integer_function(1);
+    params2_1[0] = create_constant_integer_function(1);
     params2[0] = params1_1;
     params2[1] = params2_1;
     param_count2[0] = 1;
@@ -202,8 +202,8 @@ static void test_contradict(void)
     // Case 11 - contradiction type 3 should not occur due to types
     types2[0] = MinEdgeCountFact;
     types2[1] = MaxTreeHeightFact;
-    params1_1[0] = create_function(2);
-    params2_1[0] = create_function(1);
+    params1_1[0] = create_constant_integer_function(2);
+    params2_1[0] = create_constant_integer_function(1);
     params2[0] = params1_1;
     params2[1] = params2_1;
     param_count2[0] = 1;
@@ -216,9 +216,9 @@ static void test_contradict(void)
     // Case 15 - contradiction type 5 should occur
     types2[0] = IsPlanarFact;
     types2[1] = HasMinorCompletePartiteFact;
-    params2_3[0] = create_function(2);
-    params2_3[1] = create_function(3);
-    params2_3[2] = create_function(3);
+    params2_3[0] = create_constant_integer_function(2);
+    params2_3[1] = create_constant_integer_function(3);
+    params2_3[2] = create_constant_integer_function(3);
     params2[0] = NULL;
     params2[1] = params2_3;
     param_count2[0] = 0;
@@ -227,9 +227,9 @@ static void test_contradict(void)
     // Case 16 - contradiction type 5 should not occur due to params
     types2[0] = IsPlanarFact;
     types2[1] = HasMinorCompletePartiteFact;
-    params2_3[0] = create_function(2);
-    params2_3[1] = create_function(2);
-    params2_3[2] = create_function(3);
+    params2_3[0] = create_constant_integer_function(2);
+    params2_3[1] = create_constant_integer_function(2);
+    params2_3[2] = create_constant_integer_function(3);
     params2[0] = NULL;
     params2[1] = params2_3;
     param_count2[0] = 0;
@@ -238,9 +238,9 @@ static void test_contradict(void)
     // Case 17 - contradiction type 5 should not occur due to types
     types2[0] = IsConnectedFact;
     types2[1] = HasMinorCompletePartiteFact;
-    params2_3[0] = create_function(2);
-    params2_3[1] = create_function(3);
-    params2_3[2] = create_function(3);
+    params2_3[0] = create_constant_integer_function(2);
+    params2_3[1] = create_constant_integer_function(3);
+    params2_3[2] = create_constant_integer_function(3);
     params2[0] = NULL;
     params2[1] = params2_3;
     param_count2[0] = 0;
@@ -249,7 +249,7 @@ static void test_contradict(void)
     // Case 18 - contradiction type 6 should occur
     types2[0] = IsPlanarFact;
     types2[1] = HasMinorCliqueFact;
-    params2_1[0] = create_function(5);
+    params2_1[0] = create_constant_integer_function(5);
     params2[0] = NULL;
     params2[1] = params2_1;
     param_count2[0] = 0;
@@ -258,7 +258,7 @@ static void test_contradict(void)
     // Case 19 - contradiction type 6 should not occur due to params
     types2[0] = IsPlanarFact;
     types2[1] = HasMinorCliqueFact;
-    params2_1[0] = create_function(4);
+    params2_1[0] = create_constant_integer_function(4);
     params2[0] = NULL;
     params2[1] = params2_1;
     param_count2[0] = 0;
@@ -267,7 +267,7 @@ static void test_contradict(void)
     // Case 20 - contradiction type 6 should not occur due to types
     types2[0] = IsConnectedFact;
     types2[1] = HasMinorCliqueFact;
-    params2_1[0] = create_function(5);
+    params2_1[0] = create_constant_integer_function(5);
     params2[0] = NULL;
     params2[1] = params2_1;
     param_count2[0] = 0;
@@ -276,7 +276,7 @@ static void test_contradict(void)
     // Case 21 - contradiction type 7 should occur
     types2[0] = HasNoCyclesFact;
     types2[1] = HasCycleFact;
-    params2_1[0] = create_function(3);
+    params2_1[0] = create_constant_integer_function(3);
     params2[0] = NULL;
     params2[1] = params2_1;
     param_count2[0] = 0;
@@ -285,7 +285,7 @@ static void test_contradict(void)
     // Case 22 - contradiction type 7 should not occur due to types
     types2[0] = IsConnectedFact;
     types2[1] = HasCycleFact;
-    params2_1[0] = create_function(3);
+    params2_1[0] = create_constant_integer_function(3);
     params2[0] = NULL;
     params2[1] = params2_1;
     param_count2[0] = 0;
@@ -298,8 +298,8 @@ static void test_contradict(void)
     // Case 26 - contradiction type 9 should occur
     types2[0] = IsPartiteFact;
     types2[1] = HasCycleFact;
-    params1_1[0] = create_function(2);
-    params2_1[0] = create_function(3);
+    params1_1[0] = create_constant_integer_function(2);
+    params2_1[0] = create_constant_integer_function(3);
     params2[0] = params1_1;
     params2[1] = params2_1;
     param_count2[0] = 1;
@@ -308,8 +308,8 @@ static void test_contradict(void)
     // Case 27 - contradiction type 9 should not occur due to params
     types2[0] = IsPartiteFact;
     types2[1] = HasCycleFact;
-    params1_1[0] = create_function(3);
-    params2_1[0] = create_function(3);
+    params1_1[0] = create_constant_integer_function(3);
+    params2_1[0] = create_constant_integer_function(3);
     params2[0] = params1_1;
     params2[1] = params2_1;
     param_count2[0] = 1;
@@ -318,8 +318,8 @@ static void test_contradict(void)
     // Case 28 - contradiction type 9 should not occur due to types
     types2[0] = IsPartiteFact;
     types2[1] = HasPathFact;
-    params1_1[0] = create_function(2);
-    params2_1[0] = create_function(3);
+    params1_1[0] = create_constant_integer_function(2);
+    params2_1[0] = create_constant_integer_function(3);
     params2[0] = params1_1;
     params2[1] = params2_1;
     param_count2[0] = 1;
@@ -480,13 +480,13 @@ static void test_implies(void)
     create_and_run_implies_test_case(NULL,NULL,NULL,0,NULL,NULL,NULL,0);
     // Case 2 - implication type 1
     left_types1[0] = EdgeCountFact;
-    left_params1_1[0] = create_function(1);
+    left_params1_1[0] = create_constant_integer_function(1);
     left_params1[0] = left_params1_1;
     left_param_count1[0] = 1;
     right_types2[0] = MinEdgeCountFact;
     right_types2[1] = MaxEdgeCountFact; 
-    right_params1_1[0] = create_function(1);
-    right_params2_1[0] = create_function(1);
+    right_params1_1[0] = create_constant_integer_function(1);
+    right_params2_1[0] = create_constant_integer_function(1);
     right_params2[0] = right_params1_1;
     right_params2[1] = right_params2_1;
     right_param_count2[0] = 1;
@@ -494,13 +494,13 @@ static void test_implies(void)
     create_and_run_implies_test_case(left_types1, left_params1, left_param_count1, 1, right_types2, right_params2, right_param_count2, 2);
     // Case 3 - implication type 2
     left_types1[0] = VertexCountFact;
-    left_params1_1[0] = create_function(1);
+    left_params1_1[0] = create_constant_integer_function(1);
     left_params1[0] = left_params1_1;
     left_param_count1[0] = 1;
     right_types2[0] = MinVertexCountFact;
     right_types2[1] = MaxVertexCountFact; 
-    right_params1_1[0] = create_function(1);
-    right_params2_1[0] = create_function(1);
+    right_params1_1[0] = create_constant_integer_function(1);
+    right_params2_1[0] = create_constant_integer_function(1);
     right_params2[0] = right_params1_1;
     right_params2[1] = right_params2_1;
     right_param_count2[0] = 1;
@@ -508,31 +508,31 @@ static void test_implies(void)
     create_and_run_implies_test_case(left_types1, left_params1, left_param_count1, 1, right_types2, right_params2, right_param_count2, 2);
     // Case 4 - implication type 3
     left_types1[0] = MinEdgeCountFact;
-    left_params1_1[0] = create_function(1);
+    left_params1_1[0] = create_constant_integer_function(1);
     left_params1[0] = left_params1_1;
     left_param_count1[0] = 1;
     right_types1[0] = MinVertexCountFact;
-    right_params1_1[0] = create_function(2);
+    right_params1_1[0] = create_constant_integer_function(2);
     right_params1[0] = right_params1_1;
     right_param_count1[0] = 1;
     create_and_run_implies_test_case(left_types1, left_params1, left_param_count1, 1, right_types1, right_params1, right_param_count1, 1);
     // Case 5 - implication type 3 edge case
     left_types1[0] = MinEdgeCountFact;
-    left_params1_1[0] = create_function(0);
+    left_params1_1[0] = create_constant_integer_function(0);
     left_params1[0] = left_params1_1;
     left_param_count1[0] = 1;
     right_types1[0] = MinVertexCountFact;
-    right_params1_1[0] = create_function(0);
+    right_params1_1[0] = create_constant_integer_function(0);
     right_params1[0] = right_params1_1;
     right_param_count1[0] = 1;
     create_and_run_implies_test_case(left_types1, left_params1, left_param_count1, 1, right_types1, right_params1, right_param_count1, 1);
     // Case 6 - implication type 4
     left_types1[0] = MaxVertexCountFact;
-    left_params1_1[0] = create_function(2);
+    left_params1_1[0] = create_constant_integer_function(2);
     left_params1[0] = left_params1_1;
     left_param_count1[0] = 1;
     right_types1[0] = MaxEdgeCountFact;
-    right_params1_1[0] = create_function(1);
+    right_params1_1[0] = create_constant_integer_function(1);
     right_params1[0] = right_params1_1;
     right_param_count1[0] = 1;
     create_and_run_implies_test_case(left_types1, left_params1, left_param_count1, 1, right_types1, right_params1, right_param_count1, 1);
@@ -563,67 +563,67 @@ static void test_implies(void)
     // Case 10 - implication type 8
     left_types2[0] = IsTreeFact;
     left_types2[1] = HasNoInducedCompletePartiteFact; 
-    left_params2_3[0] = create_function(2);
-    left_params2_3[1] = create_function(1);
-    left_params2_3[2] = create_function(3);
+    left_params2_3[0] = create_constant_integer_function(2);
+    left_params2_3[1] = create_constant_integer_function(1);
+    left_params2_3[2] = create_constant_integer_function(3);
     left_params2[0] = NULL;
     left_params2[1] = left_params2_3;
     left_param_count2[0] = 0;
     left_param_count2[1] = 3;
     right_types1[0] = IstnaryTreeFact;
-    right_params1_1[0] = create_function(1);
+    right_params1_1[0] = create_constant_integer_function(1);
     right_params1[0] = right_params1_1;
     right_param_count1[0] = 1;
     create_and_run_implies_test_case(left_types2, left_params2, left_param_count2, 2, right_types1, right_params1, right_param_count1, 1);
     // Case 11 - implication type 9
     left_types2[0] = IsTreeFact;
     left_types2[1] = HasNoInducedPathFact; 
-    left_params2_1[0] = create_function(2);
+    left_params2_1[0] = create_constant_integer_function(2);
     left_params2[0] = NULL;
     left_params2[1] = left_params2_1;
     left_param_count2[0] = 0;
     left_param_count2[1] = 1;
     right_types1[0] = MaxTreeHeightFact;
-    right_params1_1[0] = create_function(1);
+    right_params1_1[0] = create_constant_integer_function(1);
     right_params1[0] = right_params1_1;
     right_param_count1[0] = 1;
     create_and_run_implies_test_case(left_types2, left_params2, left_param_count2, 2, right_types1, right_params1, right_param_count1, 1);
     // Case - implication type 10
     left_types2[0] = IstnaryTreeFact;
     left_types2[1] = MaxTreeHeightFact; 
-    left_params1_1[0] = create_function(2);
+    left_params1_1[0] = create_constant_integer_function(2);
     left_params2[0] = left_params1_1;
-    left_params2_1[0] = create_function(2);
+    left_params2_1[0] = create_constant_integer_function(2);
     left_params2[1] = left_params2_1;
     left_param_count2[0] = 1;
     left_param_count2[1] = 1;
     right_types1[0] = MaxVertexCountFact;
-    right_params1_1[0] = create_function(3);
+    right_params1_1[0] = create_constant_integer_function(3);
     right_params1[0] = right_params1_1;
     right_param_count1[0] = 1;
     create_and_run_implies_test_case(left_types2, left_params2, left_param_count2, 2, right_types1, right_params1, right_param_count1, 1);
     // Case - implication type 10 edge case
     left_types2[0] = IstnaryTreeFact;
     left_types2[1] = MaxTreeHeightFact; 
-    left_params1_1[0] = create_function(1);
+    left_params1_1[0] = create_constant_integer_function(1);
     left_params2[0] = left_params1_1;
-    left_params2_1[0] = create_function(2);
+    left_params2_1[0] = create_constant_integer_function(2);
     left_params2[1] = left_params2_1;
     left_param_count2[0] = 1;
     left_param_count2[1] = 1;
     right_types1[0] = MaxVertexCountFact;
-    right_params1_1[0] = create_function(2);
+    right_params1_1[0] = create_constant_integer_function(2);
     right_params1[0] = right_params1_1;
     right_param_count1[0] = 1;
     create_and_run_implies_test_case(left_types2, left_params2, left_param_count2, 2, right_types1, right_params1, right_param_count1, 1);
     // Case 13 - impliction type 11
     left_types2[0] = HasNoMinorCompletePartiteFact;
     left_types2[1] = HasNoMinorCliqueFact; 
-    left_params1_3[0] = create_function(2);
-    left_params1_3[1] = create_function(3);
-    left_params1_3[2] = create_function(3);
+    left_params1_3[0] = create_constant_integer_function(2);
+    left_params1_3[1] = create_constant_integer_function(3);
+    left_params1_3[2] = create_constant_integer_function(3);
     left_params2[0] = left_params1_3;
-    left_params2_1[0] = create_function(5);
+    left_params2_1[0] = create_constant_integer_function(5);
     left_params2[1] = left_params2_1;
     left_param_count2[0] = 3;
     left_param_count2[1] = 1;
@@ -639,7 +639,7 @@ static void test_implies(void)
     left_types2[0] = IsCycleComplementFact;
     left_types2[1] = MaxVertexCountFact; 
     left_params2[0] = NULL;
-    left_params2_1[0] = create_function(6);
+    left_params2_1[0] = create_constant_integer_function(6);
     left_params2[1] = left_params2_1;
     left_param_count2[0] = 0;
     left_param_count2[1] = 1;
@@ -651,14 +651,14 @@ static void test_implies(void)
     left_types2[0] = IsCycleComplementFact;
     left_types2[1] = VertexCountFact; 
     left_params2[0] = NULL;
-    left_params2_1[0] = create_function(7);
+    left_params2_1[0] = create_constant_integer_function(7);
     left_params2[1] = left_params2_1;
     left_param_count2[0] = 0;
     left_param_count2[1] = 1;
     right_types1[0] = HasMinorCompletePartiteFact;
-    right_params1_3[0] = create_function(2);
-    right_params1_3[1] = create_function(3);
-    right_params1_3[2] = create_function(3);
+    right_params1_3[0] = create_constant_integer_function(2);
+    right_params1_3[1] = create_constant_integer_function(3);
+    right_params1_3[2] = create_constant_integer_function(3);
     right_params1[0] = right_params1_3;
     right_param_count1[0] = 3;
     create_and_run_implies_test_case(left_types2, left_params2, left_param_count2, 2, right_types1, right_params1, right_param_count1, 1);
@@ -728,7 +728,7 @@ static void test_fact_tree_machine(void)
     test_case.fact_count = 2;
     test_case.fact_array = (Fact **)gtd_malloc(2 * sizeof(Fact*));
     test_case.fact_array[0] = create_fact(HasNoCyclesFact, NULL);
-    params1[0] = create_function(3);
+    params1[0] = create_constant_integer_function(3);
     test_case.fact_array[1] = create_fact(HasCycleFact, params1);
     test_case.expected = true;
     run_fact_tree_machine_test_case(test_case);
@@ -739,7 +739,7 @@ static void test_fact_tree_machine(void)
     test_case.fact_count = 3;
     test_case.fact_array = (Fact **)gtd_malloc(3 * sizeof(Fact*));
     test_case.fact_array[0] = create_fact(HasNoCyclesFact, NULL);
-    params1[0] = create_function(3);
+    params1[0] = create_constant_integer_function(3);
     test_case.fact_array[1] = create_fact(HasCycleFact, params1);
     test_case.fact_array[2] = create_fact(IsConnectedFact, NULL);
     test_case.expected = true;
@@ -752,7 +752,7 @@ static void test_fact_tree_machine(void)
     test_case.fact_count = 2;
     test_case.fact_array = (Fact **)gtd_malloc(2 * sizeof(Fact*));
     test_case.fact_array[0] = create_fact(IsTreeFact, NULL);
-    params1[0] = create_function(3);
+    params1[0] = create_constant_integer_function(3);
     test_case.fact_array[1] = create_fact(HasCycleFact, params1);
     test_case.expected = true;
     run_fact_tree_machine_test_case(test_case);
@@ -760,13 +760,13 @@ static void test_fact_tree_machine(void)
     test_case.fact_count = 5;
     test_case.fact_array = (Fact **)gtd_malloc(5 * sizeof(Fact*));
     test_case.fact_array[0] = create_fact(HasNoCyclesFact, NULL);
-    params3[0] = create_function(2);
-    params3[1] = create_function(1);
-    params3[2] = create_function(4);
+    params3[0] = create_constant_integer_function(2);
+    params3[1] = create_constant_integer_function(1);
+    params3[2] = create_constant_integer_function(4);
     test_case.fact_array[1] = create_fact(HasNoInducedCompletePartiteFact, params3);
-    params1[0] = create_function(4);
+    params1[0] = create_constant_integer_function(4);
     test_case.fact_array[2] = create_fact(HasNoInducedPathFact, params1);
-    params1[0] = create_function(8);
+    params1[0] = create_constant_integer_function(8);
     test_case.fact_array[3] = create_fact(MinVertexCountFact, params1);
     test_case.fact_array[4] = create_fact(IsConnectedFact, NULL);
     test_case.expected = true;
@@ -775,24 +775,24 @@ static void test_fact_tree_machine(void)
     test_case.fact_count = 10;
     test_case.fact_array = (Fact **)gtd_malloc(10 * sizeof(Fact*));
     test_case.fact_array[0] = create_fact(HasNoCyclesFact, NULL);
-    params3[0] = create_function(2);
-    params3[1] = create_function(1);
-    params3[2] = create_function(4);
+    params3[0] = create_constant_integer_function(2);
+    params3[1] = create_constant_integer_function(1);
+    params3[2] = create_constant_integer_function(4);
     test_case.fact_array[1] = create_fact(HasNoInducedCompletePartiteFact, params3);
-    params1[0] = create_function(4);
+    params1[0] = create_constant_integer_function(4);
     test_case.fact_array[2] = create_fact(HasNoInducedPathFact, params1);
-    params1[0] = create_function(8);
+    params1[0] = create_constant_integer_function(8);
     test_case.fact_array[3] = create_fact(MinVertexCountFact, params1);
     test_case.fact_array[4] = create_fact(IsConnectedFact, NULL);
-    params1[0] = create_function(8);
+    params1[0] = create_constant_integer_function(8);
     test_case.fact_array[5] = create_fact(HasNoInducedCycleFact, params1);
-    params1[0] = create_function(8);
+    params1[0] = create_constant_integer_function(8);
     test_case.fact_array[6] = create_fact(HasNoMinorCycleFact, params1);
-    params1[0] = create_function(8);
+    params1[0] = create_constant_integer_function(8);
     test_case.fact_array[7] = create_fact(HasNoCliqueFact, params1);
-    params1[0] = create_function(8);
+    params1[0] = create_constant_integer_function(8);
     test_case.fact_array[8] = create_fact(HasNoMinorCliqueFact, params1);
-    params1[0] = create_function(8);
+    params1[0] = create_constant_integer_function(8);
     test_case.fact_array[9] = create_fact(MaxVertexDegreeFact, params1);
     test_case.expected = true;
     run_fact_tree_machine_test_case(test_case);

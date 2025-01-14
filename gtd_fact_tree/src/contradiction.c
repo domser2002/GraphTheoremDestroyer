@@ -75,10 +75,29 @@ static bool contradiction_type_3_occurs(Function **params)
 {
     char *str1 = get_function_str(params[0]);
     char *str2 = get_function_str(params[1]);
-    GTD_LOG("Checking for contradiction type 2, minEdgeCount = %s, maxEdgeCount = %s", str1, str2);
+    GTD_LOG("Checking for contradiction type 3, minEdgeCount = %s, maxEdgeCount = %s", str1, str2);
     gtd_free(str1);
     gtd_free(str2);
     return compare_functions(params[0], params[1]) == 1;
+}
+
+/**
+ * \brief contradiction type 4 - contradiction between min edge count, max edge count and min vertex count
+ * \param params - array of 3 integers, min edge count, max edge count and min vertex count
+ * \return true if contradiction occurs, false otherwise
+ */
+static bool contradiction_type_4_occurs(Function **params)
+{
+    char *str1 = get_function_str(params[0]);
+    char *str2 = get_function_str(params[1]);
+    char *str3 = get_function_str(params[2]);
+    GTD_LOG("Checking for contradiction type 4, minEdgeCount = %s, maxEdgeCount = %s, maxVertexCount = %d", str1, str2, str3);
+    gtd_free(str1);
+    gtd_free(str2);
+    gtd_free(str3);
+    if(!is_constant(params[2]) || params[0]->variable != 'n' || params[1]->variable != 'n')
+        return false;
+    return is_greater_for_parameter(params[0], params[1], params[2]->coef[0]) == 1;
 }
 
 /**
@@ -95,7 +114,7 @@ static bool contradiction_type_5_occurs(Function **params) {
     gtd_free(str2);
     gtd_free(str3);
     Function *two;
-    two = create_function(2); 
+    two = create_constant_integer_function(2); 
     int8_t res1 = compare_functions(params[0], two);
     int8_t res2 = compare_functions(params[1], two);
     int8_t res3 = compare_functions(params[2], two);
@@ -114,7 +133,7 @@ static bool contradiction_type_6_occurs(Function **params)
     GTD_LOG("Checking for contradiction type 6, clique size = %s", str);
     gtd_free(str);
     Function *four;
-    four = create_function(4);
+    four = create_constant_integer_function(4);
     int8_t res = compare_functions(params[0],four);
     delete_function(four);
     return res == 1;
@@ -145,7 +164,7 @@ static bool contradiction_type_9_occurs(Function **params)
     gtd_free(str1);
     gtd_free(str2);
     Function *two;
-    two = create_function(2);
+    two = create_constant_integer_function(2);
     int8_t res = compare_functions(params[0], two);
     return res == 0 && mod_function(params[1], 2) == 1;
 }
@@ -186,6 +205,15 @@ const Contradiction knownContradictionsArray[KNOWN_CONTRADICTIONS_NUMBER] = {
     [2].type_to_param_idx[MinEdgeCountFact] = {0},
     [2].type_to_param_idx[MaxEdgeCountFact] = {1},
     // type 4
+    [3].types[MinEdgeCountFact] = true,
+    [3].types[MaxEdgeCountFact] = true,
+    [3].types[MinVertexCountFact] = true,
+    [3].occurs = &contradiction_type_4_occurs,
+    [3].n_facts = 3,
+    [3].n_params = 3,
+    [3].type_to_param_idx[MinEdgeCountFact] = {0},
+    [3].type_to_param_idx[MaxEdgeCountFact] = {1},
+    [3].type_to_param_idx[MinVertexCountFact] = {2},
     // valid only with functions, will be added later
     // type 5
     [4].types[IsPlanarFact] = true,
@@ -226,6 +254,11 @@ const Contradiction knownContradictionsArray[KNOWN_CONTRADICTIONS_NUMBER] = {
 bool contradict(Fact **factArray, uint32_t n_facts)
 {
     GTD_LOG("Checking if array of %d facts forms a known contradiction",n_facts);
+    GTD_LOG("Array is:");
+    for(uint32_t i=0; i<n_facts; i++)
+    {
+        GTD_LOG("%s", get_fact_str(factArray[i]));
+    }
     if (n_facts > MAX_CONTRADICTING_FACTS)
     {
         GTD_LOG("No contradiction - too many facts");

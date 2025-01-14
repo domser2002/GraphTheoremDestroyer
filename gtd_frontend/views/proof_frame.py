@@ -243,7 +243,7 @@ class ProofFrame(CTkFrame):
         is_success = self.proof.result.lower() == 'success'
         is_failure = self.proof.result.lower() == 'failure'
 
-        text = 'Success' if is_success else 'Failure' if is_failure else 'Pending'
+        text = 'Contradiction\nfound' if is_success else 'Contradicition\nnot found' if is_failure else 'Pending'
         text_color="#32CD32" if is_success else "#FF4500" if is_failure else 'gray'
 
         self.result_label.configure(text=text)

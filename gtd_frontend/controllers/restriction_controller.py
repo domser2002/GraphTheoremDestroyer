@@ -87,8 +87,12 @@ class RestrictionController:
                 # Wait for the backend response
                 data = self.sock.recv(1024).decode('utf-8')
                 print(f"Received result path: {data}")
-
-                response = Response(ResponseResult.SUCCESS, data)
+                success = ResponseResult.SUCCESS
+                with open(data, "r") as file:
+                    content = file.read()
+                    if content == "Contradiction not found":
+                        success = ResponseResult.FAILURE
+                response = Response(success, data)
                 return response
 
             except Exception as e:

@@ -8,7 +8,7 @@
 #include "fact.h"
 #include "function.h"
 #define MIN_CONTRADICTING_FACTS 2
-#define MAX_CONTRADICTING_FACTS 2
+#define MAX_CONTRADICTING_FACTS 3
 
 /**
  * \brief Function which checks if facts from factArray are in one of the predefined contradictions

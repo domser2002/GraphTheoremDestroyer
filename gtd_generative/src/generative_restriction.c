@@ -176,7 +176,7 @@ GenerativeRestriction *create_restriction_from_fact(Fact *fact, GenerativeProofM
             gtd_free(params->intParams);
             return NULL;
         }
-        params->intParams[i] = fact->params[i]->c;
+        params->intParams[i] = fact->params[i]->coef[0];
     }
     return create_restriction(fact->type, params);
 }

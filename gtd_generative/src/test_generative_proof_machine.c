@@ -43,7 +43,7 @@ void test_generative_proof_machine(void)
 
     */
     printf("Erdos gyarfas p11 free\n");
-    test_erdos_gyarfas_pk_free(11, -1, 1, 1); // change 5 to 6, 7, ...
+    test_erdos_gyarfas_pk_free(11, -1, 5, 1); // change 5 to 6, 7, ...
 
     // printf("Erdos gyarfas p12 free\n");
     // test_erdos_gyarfas_pk_free(12, 50, 5, 1);

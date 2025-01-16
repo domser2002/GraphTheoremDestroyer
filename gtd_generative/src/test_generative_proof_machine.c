@@ -28,7 +28,7 @@ void test_generative_proof_machine(void)
     test_erdos_gyarfas_case();
 
     printf("Erdos gyarfas p7 free\n");
-    test_erdos_gyarfas_pk_free(7, 15, 2, 1);
+    test_erdos_gyarfas_pk_free(7, -1, 2, 1);
 
     printf("Edros gyarfas p8 free\n");
     test_erdos_gyarfas_pk_free(8, 40, 5, 1);
@@ -41,12 +41,12 @@ void test_generative_proof_machine(void)
     printf("Erdos gyarfas p10 free\n");
     test_erdos_gyarfas_pk_free(10, 50, 5, 1);
 
-    printf("Erdos gyarfas p11 free\n");
-    test_erdos_gyarfas_pk_free(11, 50, 5, 1);
-
-    printf("Erdos gyarfas p12 free\n");
-    test_erdos_gyarfas_pk_free(12, 50, 5, 1);
     */
+    printf("Erdos gyarfas p11 free\n");
+    test_erdos_gyarfas_pk_free(11, -1, 1, 1); // change 5 to 6, 7, ...
+
+    // printf("Erdos gyarfas p12 free\n");
+    // test_erdos_gyarfas_pk_free(12, 50, 5, 1);
 }
 
 void test_machine_creation_and_deletion(void)

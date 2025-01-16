@@ -1,3 +1,7 @@
+/**
+ * \file fact_tree_machine.c
+ * \brief implementation of functions from fact_tree_machine.h
+ */
 #define IS_FACT_TREE_COMPONENT
 #include "fact_tree_machine.h"
 

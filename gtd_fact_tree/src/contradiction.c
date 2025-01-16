@@ -1,3 +1,7 @@
+/**
+ * \file contradiction.c
+ * \brief implementation of functions from contradiction.h
+ */
 #define IS_FACT_TREE_COMPONENT
 #include "contradiction.h"
 #define KNOWN_CONTRADICTIONS_NUMBER 9

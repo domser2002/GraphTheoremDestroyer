@@ -1,3 +1,7 @@
+/**
+ * \file log.c
+ * \brief implementation of functions from log.h
+ */
 #include "log.h"
 bool first_log = true;
 bool test_mode = false;

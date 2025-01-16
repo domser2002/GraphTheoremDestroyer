@@ -5,7 +5,9 @@
  */
 #ifndef FACT_TREE_MACHINE_H
 #define FACT_TREE_MACHINE_H
+/** \cond IS_FACT_TREE_COMPONENT */
 #ifdef IS_FACT_TREE_COMPONENT
+/** \endcond */
 #include "fact_tree.h"
 #include "common.h"
 #include "fact.h"

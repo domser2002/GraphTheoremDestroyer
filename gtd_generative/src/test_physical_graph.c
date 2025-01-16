@@ -1,3 +1,8 @@
+/**
+ * \file test_physical_graph.c
+ * \brief implementation of functions from test_physical_graph.h
+ */
+#define IS_GENERATIVE_MODULE_COMPONENT
 #include "test_physical_graph.h"
 #include "physical_graph.h"
 

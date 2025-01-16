@@ -1,3 +1,7 @@
+/**
+ * \file test_gtd_fact_tree.c
+ * \brief implementation of functions from test_gtd_fact_tree.h
+ */
 #define IS_FACT_TREE_COMPONENT
 #include "test_gtd_fact_tree.h"
 static uint8_t unit_test_counter = 1;

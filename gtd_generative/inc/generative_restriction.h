@@ -1,6 +1,8 @@
 #ifndef GENERATIVE_RESTRICTION_H
 #define GENERATIVE_RESTRICTION_H
+/** \cond IS_GENERATIVE_MODULE_COMPONENT */
 #ifdef IS_GENERATIVE_MODULE_COMPONENT
+/** \endcond */
 
 #include "common.h"
 #include "physical_graph.h"

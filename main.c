@@ -1,6 +1,6 @@
 /**
  * \file main.c
- * \brief main file of a Graph Theorem Destroyer (GTD) application
+ * \brief main file containing entry point of a Graph Theorem Destroyer (GTD) application
  * \details This file includes main function which is an entry point to GTD. This function handles
  * all necessary initialization at the beginning and cleaning/freeing memory at the end. It is
  * also responsible for gathering results of shared work of all modules and communicating with
@@ -94,6 +94,9 @@ char *create_restrictions_file(size_t *pathname_len)
     return pathname;
 }
 
+/**
+ * \brief function to set a path under which proof will be written
+ */
 void set_out_file_path(ModuleArgs *args, size_t *pathname_len)
 {
     char time_str[20];
@@ -116,6 +119,9 @@ void set_out_file_path(ModuleArgs *args, size_t *pathname_len)
     }
 }
 
+/**
+ * \brief entry point for GTD
+ */
 int main(int argc, char **argv)
 {
     GTD_UNUSED(argc);

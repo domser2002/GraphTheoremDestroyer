@@ -1,7 +1,10 @@
+/**
+ * \file proof_tree.c
+ * \brief implementation of functions from proof_tree.h
+ */
 #define IS_GENERATIVE_MODULE_COMPONENT
 #include <string.h>
 #include "proof_tree.h"
-#include "common.h"
 
 
 ProofNode *create_proof_node(void)

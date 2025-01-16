@@ -1,3 +1,7 @@
+/**
+ * \file generative_main.c
+ * \brief implementation of functions from generative_main.h
+ */
 #define IS_GENERATIVE_MODULE_COMPONENT
 #include "generative_main.h"
 #include "generative_proof_machine.h"

@@ -1,3 +1,7 @@
+/**
+ * \file module_args.c
+ * \brief implementation of functions from module_args.h
+ */
 #include "module_args.h"
 
 ModuleArgs *deep_copy_module_args(ModuleArgs *args)

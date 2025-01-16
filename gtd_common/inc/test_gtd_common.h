@@ -1,3 +1,7 @@
+/**
+ * \file test_gtd_common.h
+ * \brief header to run all tests for gtd_common
+ */
 #ifndef TEST_GTD_COMMON_H
 #define TEST_GTD_COMMON_H
 #define _GNU_SOURCE

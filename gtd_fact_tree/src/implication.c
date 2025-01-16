@@ -1,3 +1,7 @@
+/**
+ * \file implication.c
+ * \brief implementation of functions from implication.h
+ */
 #define IS_FACT_TREE_COMPONENT
 #include "implication.h"
 #define KNOWN_IMPLICATIONS_NUMBER 17

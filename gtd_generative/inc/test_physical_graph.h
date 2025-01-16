@@ -1,3 +1,7 @@
+/**
+ * \file test_physical_graph.h
+ * \brief header to run all tests for Graph
+ */
 #ifndef TEST_PHYSICAL_GRAPH_H
 #define TEST_PHYSICAL_GRAPH_H
 #include <assert.h>

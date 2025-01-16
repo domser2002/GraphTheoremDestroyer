@@ -1,3 +1,7 @@
+/**
+ * \file common.c
+ * \brief implementation of functions from common.h
+ */
 #include "common.h"
 
 void *gtd_malloc(size_t size)

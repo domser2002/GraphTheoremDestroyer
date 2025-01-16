@@ -1,3 +1,7 @@
+/**
+ * \file module.c
+ * \brief implementation of functions from module.h
+ */
 #include "module.h"
 
 module_main_loop modules[MODULES_COUNT] = {

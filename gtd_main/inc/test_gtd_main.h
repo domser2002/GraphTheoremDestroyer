@@ -1,3 +1,7 @@
+/**
+ * \file test_gtd_main.h
+ * \brief header to run all tests for gtd_main
+ */
 #ifndef TEST_GTD_MAIN_H
 #define TEST_GTD_MAIN_H
 #include <assert.h>

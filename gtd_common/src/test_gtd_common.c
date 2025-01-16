@@ -1,3 +1,7 @@
+/**
+ * \file test_gtd_common.c
+ * \brief implementation of functions from test_gtd_common.h
+ */
 #include "test_gtd_common.h"
 static uint8_t unit_test_counter = 0;
 static uint8_t integration_test_counter = 0;

@@ -1,6 +1,9 @@
+/**
+ * \file fact_tree.c
+ * \brief implementation of functions from fact_tree.h
+ */
 #define IS_FACT_TREE_COMPONENT
 #include "fact_tree.h"
-#include "common.h"
 #include <stdlib.h>
 
 FactTree *construct(uint32_t fact_count, Fact ***facts)

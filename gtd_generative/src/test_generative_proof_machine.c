@@ -1,3 +1,7 @@
+/**
+ * \file test_generative_proof_machine.c
+ * \brief implementation of functions from test_generative_proof_machine.h
+ */
 #define IS_GENERATIVE_MODULE_COMPONENT
 #include "test_generative_proof_machine.h"
 #include "generative_restriction.h"

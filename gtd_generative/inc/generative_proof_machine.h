@@ -1,10 +1,11 @@
 #ifndef GENERATIVE_PROOF_MACHINE_H
 #define GENERATIVE_PROOF_MACHINE_H
+/** \cond IS_GENERATIVE_MODULE_COMPONENT */
 #ifdef IS_GENERATIVE_MODULE_COMPONENT
-#include "common.h"
-#include "physical_graph.h"
+/** \endcond */
 #include "proof_tree.h"
-
+#include "physical_graph.h"
+#include "common.h"
 
 typedef struct GraphNode GraphNode;
 Graph *get_node_graph(GraphNode *node);
@@ -12,6 +13,7 @@ GraphNode *get_node_next(GraphNode *node);
 
 typedef struct GenerativeRestriction GenerativeRestriction;
 typedef struct GenerativeProofMachine GenerativeProofMachine;
+#include "generative_restriction.h"
 /**
  * \brief constructor for GenerativeProofMachine class
  * \param startGraph start graph

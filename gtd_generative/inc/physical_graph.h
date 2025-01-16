@@ -1,5 +1,8 @@
 #ifndef PHYSICAL_GRAPH_H 
 #define PHYSICAL_GRAPH_H
+/** \cond IS_GENERATIVE_MODULE_COMPONENT */
+#ifdef IS_GENERATIVE_MODULE_COMPONENT
+/** \endcond */
 #include <stdint.h>
 #include "common.h"
 #include <string.h>
@@ -83,5 +86,5 @@ int get_graph_hash(Graph *graph);
 int *get_graph_degree(Graph *graph);
 int set_graph_maximal(Graph *graph);
 int get_graph_is_maximal(Graph *graph);
-
+#endif
 #endif

@@ -1,8 +1,9 @@
+/**
+ * \file generative_proof_machine.c
+ * \brief implementation of functions from generative_proof_machine.h
+ */
 #define IS_GENERATIVE_MODULE_COMPONENT
 #include "generative_proof_machine.h"
-#include "physical_graph.h"
-#include "generative_restriction.h"
-#include "common.h"
 
 typedef struct GenerativeProofMachine
 {

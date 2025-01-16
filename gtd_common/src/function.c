@@ -1,3 +1,7 @@
+/**
+ * \file function.c
+ * \brief implementation of functions from function.h
+ */
 #include "function.h"
 
 Function *create_function_by_va_args(char variable, uint8_t coef_num, ...)

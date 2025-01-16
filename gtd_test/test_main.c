@@ -1,3 +1,7 @@
+/**
+ * \file test_main.c
+ * \brief main file containing entry point for GTD unit and integration tests
+ */
 #include <assert.h>
 #include <stdio.h>
 #include "test_gtd_common.h"
@@ -6,6 +10,9 @@
 #include "test_gtd_generative.h"
 #define TEST_MODE
 
+/**
+ * \brief entry point for GTD unit and integration tests
+ */
 int main(void) {
     test_mode = true;
     printf("\nTESTING GTD_COMMON\n");

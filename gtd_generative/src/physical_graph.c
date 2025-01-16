@@ -1,3 +1,8 @@
+/**
+ * \file physical_graph.c
+ * \brief implementation of functions from physical_graph.h
+ */
+#define IS_GENERATIVE_MODULE_COMPONENT
 #include "physical_graph.h"
 #define HASH_EXP 5
 

@@ -1,6 +1,9 @@
+/**
+ * \file test_generative_proof_machine.h
+ * \brief header to run all tests for GenerativeProofMachine
+ */
 #ifndef TEST_GENERATIVE_PROOF_MACHINE_H
 #define TEST_GENERATIVE_PROOF_MACHINE_H
-#define IS_GENERATIVE_MODULE_COMPONENT
 void test_generative_proof_machine(void);
 void run_generative_proof_machine_tests(void);
 void test_machine_creation_and_deletion(void);

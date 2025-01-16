@@ -4,7 +4,9 @@
  */
 #ifndef CONTRADICTION_H
 #define CONTRADICTION_H
+/** \cond IS_FACT_TREE_COMPONENT */
 #ifdef IS_FACT_TREE_COMPONENT
+/** \endcond */
 #include "fact.h"
 #include "function.h"
 #define MIN_CONTRADICTING_FACTS 2

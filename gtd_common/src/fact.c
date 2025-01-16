@@ -1,3 +1,7 @@
+/**
+ * \file fact.c
+ * \brief implementation of functions from fact.h
+ */
 #include "fact.h"
 
 Fact *create_fact(FactType type, Function **params)

@@ -1,8 +1,11 @@
 #ifndef PROOF_TREE_H
 #define PROOF_TREE_H
+/** \cond IS_GENERATIVE_MODULE_COMPONENT */
 #ifdef IS_GENERATIVE_MODULE_COMPONENT
+/** \endcond */
 #include <string.h>
 #include "common.h"
+#include "proof_tree.h"
 typedef struct ProofNode ProofNode;
 
 typedef struct ProofTree

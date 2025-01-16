@@ -1,3 +1,7 @@
+/**
+ * \file generative_restriction.c
+ * \brief implementation of functions from generative_restriction.h
+ */
 #define IS_GENERATIVE_MODULE_COMPONENT
 #include "physical_graph.h"
 #include "generative_restriction.h"

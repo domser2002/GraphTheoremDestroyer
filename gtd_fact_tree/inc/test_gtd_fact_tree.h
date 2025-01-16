@@ -1,3 +1,7 @@
+/**
+ * \file test_gtd_fact_tree.h
+ * \brief header to run all tests for gtd_fact_tree
+ */
 #ifndef TEST_FACT_H
 #define TEST_FACT_H
 #define IS_FACT_TREE_COMPONENT

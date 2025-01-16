@@ -5,10 +5,13 @@
  */
 #ifndef FACT_TREE_H
 #define FACT_TREE_H
+/** \cond IS_FACT_TREE_COMPONENT */
 #ifdef IS_FACT_TREE_COMPONENT
+/** \endcond */
 #include <stdint.h>
 #include <stdbool.h>
 #include "fact.h"
+#include "common.h"
 
 typedef struct FactTree
 {

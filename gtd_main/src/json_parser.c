@@ -1,3 +1,7 @@
+/**
+ * \file json_parser.c
+ * \brief implementation of functions from json_parser.h
+ */
 #include "json_parser.h"
 
 ModuleArgs *get_module_args_from_json(const char *pathname)

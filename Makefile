@@ -5,7 +5,7 @@ CFLAGS = -std=c99 -fstrict-aliasing -fstack-protector -ftrack-macro-expansion=0 
          -Wstrict-aliasing -Wstrict-prototypes -Wno-override-init \
          -Werror -Wno-error=cast-function-type -Wno-format-truncation \
          -Wno-error=format-overflow= -D_POSIX_C_SOURCE=20190101L \
-         -ggdb3 -DMALLOC_CHECK_=3 -Og -pthread
+         -ggdb3 -DMALLOC_CHECK_=3 -Ofast -pthread
 LFLAGS = -lm -pthread
 
 # Paths

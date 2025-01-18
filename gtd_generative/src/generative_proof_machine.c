@@ -39,6 +39,16 @@ int destroy_generative_proof_machine(GenerativeProofMachine *machine)
     return 1;
 }
 
+uint8_t destroy_machine_graph_and_restrictions(GenerativeProofMachine *machine)
+{
+    destroy_graph(machine->graph);
+    for(int i=0;i<machine->numRestrictions;i++)
+    {
+        delete_restriction_object(machine->restrictions[i]);
+    }
+    return 1;
+}
+
 uint8_t execute_generative_proof_machine(GenerativeProofMachine *machine)
 {
     int i = 0;
@@ -59,16 +69,17 @@ uint8_t execute_generative_proof_machine(GenerativeProofMachine *machine)
 
         if (result->contradictionFound)
         {
-            // TODO: Implement proper memory cleanup
+            gtd_free(result);
             return 1;
         }
 
         if (result->modified)
         {
-            // TODO: Implement proper memory cleanup
+            gtd_free(result);
             i = 0;
             continue;
         }
+        gtd_free(result);
         ++i;
     }
     return 0;

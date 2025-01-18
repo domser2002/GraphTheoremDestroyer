@@ -29,6 +29,14 @@ GenerativeProofMachine *create_proof_machine(Graph *startGraph);
 int destroy_generative_proof_machine(GenerativeProofMachine *machine);
 
 /**
+ * \brief function to free machine graph and restrictions, which will not be used after checking cases
+ * \note it is ugly, but works
+ * \param machine pointer to the GenerativeProofMachine to partially destroy
+ * \returns 1 on success, 0 on failure
+ */
+uint8_t destroy_machine_graph_and_restrictions(GenerativeProofMachine *machine);
+
+/**
  * \brief function for executing generative proof machine
  * \param machine pointer to the GenerativeProofMachine to execute
  * \returns 1 if contradictionw was found, 0 otherwise

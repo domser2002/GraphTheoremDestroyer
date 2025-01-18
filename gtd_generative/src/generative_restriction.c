@@ -663,11 +663,13 @@ RestrictionResult *edge_check_condition(Graph *graph, RestrictionParameters *par
             if(contrConn)
             {
                 load_machine(originMachine, notConnMachine);
+                destroy_machine_graph_and_restrictions(connMachine);
             }
 
             if(contrNotConn)
             {
                 load_machine(originMachine, connMachine);
+                destroy_machine_graph_and_restrictions(notConnMachine);
             }
 
             if(contrConn || contrNotConn)

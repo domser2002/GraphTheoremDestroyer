@@ -1,6 +1,4 @@
 #include "physical_graph.h"
-#define HASH_EXP 5
-
 
 struct Graph
 {
@@ -8,8 +6,6 @@ struct Graph
     int vertices;
     char **adjacency_matrix;
     int *degree;
-    // hash is sum of degree^HASH_EXP (not sum^HASH_EXP)
-    int hash;
 
     // do we know for sure that from this graph
     // we can not generate any other graphs
@@ -17,12 +13,9 @@ struct Graph
     int is_maximal;
 };
 
-static int int_pow(int base, int exp);
-
 Graph *create_graph(int max_vertices, int vertices)
 {
     Graph *newGraph = (Graph *)gtd_malloc(sizeof(Graph));
-    newGraph->hash = 0;
     newGraph->is_maximal = 0;
     newGraph->max_vertices = max_vertices;
     newGraph->vertices = vertices;
@@ -76,11 +69,6 @@ char **get_graph_adjacency_matrix(Graph *graph)
     return graph->adjacency_matrix;
 }
 
-int get_graph_hash(Graph *graph)
-{
-    return graph->hash / 2;
-}
-
 int set_graph_maximal(Graph *graph)
 {
     graph->is_maximal = 1;
@@ -100,17 +88,11 @@ int set_edge_connected(Graph *graph, int from, int to)
         return -1;
     }
 
-    // update hash
     if(graph->adjacency_matrix[from][to] != CONNECTED_SYMBOL)
     {
-        int from_degree = graph->degree[from];
-        int to_degree = graph->degree[to];
-        graph->hash += int_pow(from_degree + 1, HASH_EXP) + int_pow(to_degree + 1, HASH_EXP);
-        graph->hash -= int_pow(from_degree, HASH_EXP) + int_pow(to_degree, HASH_EXP);
         graph->degree[from]++;
         graph->degree[to]++;
     }
-
     graph->adjacency_matrix[from][to] = CONNECTED_SYMBOL;
     graph->adjacency_matrix[to][from] = CONNECTED_SYMBOL;
 
@@ -125,17 +107,10 @@ int set_edge_not_connected(Graph *graph, int from, int to)
         return -1;
     }
 
-    if(graph->adjacency_matrix[from][to] == 1)
+    if(graph->adjacency_matrix[from][to] == CONNECTED_SYMBOL)
     {
-        int from_degree = graph->degree[from];
-        int to_degree = graph->degree[to];
-        graph->hash += int_pow(from_degree - 1, HASH_EXP) + int_pow(to_degree - 1, HASH_EXP);
-        graph->hash -= int_pow(from_degree, HASH_EXP) + int_pow(to_degree, HASH_EXP);
-        if(graph->adjacency_matrix[from][to] == CONNECTED_SYMBOL)
-        {
-            graph->degree[from]--;
-            graph->degree[to]--;
-        }
+        graph->degree[from]--;
+        graph->degree[to]--;
     }
 
     graph->adjacency_matrix[from][to] = NOT_CONNECTED_SYMBOL;
@@ -183,7 +158,6 @@ Graph *copy_graph(Graph *graph)
     if(graph == NULL)
         return NULL;
     Graph *newGraph = create_graph(graph->max_vertices, graph->vertices);
-    newGraph->hash = graph->hash;
     int n = graph->vertices;
     for(int r = 0; r < n; ++r)
     {
@@ -213,14 +187,4 @@ char **create_matrix(int rows, int cols)
     }
 
     return matrix;
-}
-
-static int int_pow(int base, int exp)
-{
-    int res = 1;
-    for(int i = 0; i < exp; ++i)
-    {
-        res *= base;
-    }
-    return res;
 }

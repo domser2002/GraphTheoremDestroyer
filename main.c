@@ -124,9 +124,16 @@ void set_out_file_path(ModuleArgs *args, size_t *pathname_len)
  */
 int main(int argc, char **argv)
 {
-    GTD_UNUSED(argc);
-    GTD_UNUSED(argv);
-    GTD_LOG("GraphTheoremDestroyer initiated. Starting application");
+    log_level = DEPLOYMENT_LOGS;
+    if(argc == 2 && strcmp(argv[1], "debug") == 0)
+    {
+        log_level = DEBUG_LOGS;
+    }
+    else if(argc == 2 && strcmp(argv[1], "no") == 0)
+    {
+        log_level = NO_LOGS;
+    }
+    GTD_LOG_DEPLOYMENT("GraphTheoremDestroyer initiated. Starting application");
     int server_fd, new_socket;
     struct sockaddr_in address;
     int opt = 1;
@@ -164,7 +171,7 @@ int main(int argc, char **argv)
         exit(EXIT_FAILURE);
     }
 
-    GTD_LOG("Frontend connected");
+    GTD_LOG_DEPLOYMENT("Frontend connected");
     size_t pathname_len;    
     char *pathname = create_restrictions_file(&pathname_len);
     send(new_socket, pathname, pathname_len, 0);
@@ -179,13 +186,15 @@ int main(int argc, char **argv)
         set_out_file_path(module_args, &out_file_pathname_len);
         run_modules(module_args);
         send(new_socket, module_args->out_file_path, out_file_pathname_len, 0);
+        GTD_LOG_DEPLOYMENT("Sent proof details to frontend: %s", module_args->out_file_path);
         free_module_args(module_args);
     }
 
     close(new_socket);
-    GTD_LOG("Frontend disconnected");
+    GTD_LOG_DEPLOYMENT("Frontend disconnected");
 
     close(server_fd);
-    GTD_LOG("Terminating application");
+    GTD_LOG_DEPLOYMENT("Terminating application");
+    cleanup();
     return EXIT_SUCCESS;
 }

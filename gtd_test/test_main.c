@@ -14,7 +14,7 @@
  * \brief entry point for GTD unit and integration tests
  */
 int main(void) {
-    test_mode = true;
+    log_level = NO_LOGS;
     printf("\nTESTING GTD_COMMON\n");
     gtd_common_unit_tests();
     gtd_common_integration_tests();

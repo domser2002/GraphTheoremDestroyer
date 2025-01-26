@@ -37,29 +37,34 @@ ModuleArgs *get_module_args_from_json(const char *pathname)
             const char *param_name = param_names[j - loop_start];
             if(functional[j - loop_start])
             {
-                int32_t val = -1;
-                JSON_Array *coeficients_json = json_object_dotget_array(functional_params, param_name);
-                size_t number_of_coefficients = json_array_get_count(coeficients_json);
-                if(number_of_coefficients > 1)
+                JSON_Object *current_function = json_object_dotget_object(functional_params, param_name);
+                const char* var_str = json_object_dotget_string(current_function, "var");
+                if(strlen(var_str) != 1)
                 {
-                    GTD_LOG("Only constant functions are supported");
+                    GTD_LOG_DEPLOYMENT("Wrong length of variable name");
                     exit(EXIT_FAILURE);
                 }
+                char var = var_str[0];
+                JSON_Array *coeficients_json = json_object_dotget_array(current_function, "function");
+                size_t number_of_coefficients = json_array_get_count(coeficients_json);
+                int32_t max_degree = 0;
+                for(size_t k=0; k<number_of_coefficients; k++)
+                {
+                    JSON_Array *coeficient_json = json_array_get_array(coeficients_json, k);
+                    int32_t degree = (int32_t)json_array_get_number(coeficient_json, 2);
+                    if(degree > max_degree)
+                        max_degree = degree;
+                }
+                double *coeficients = (double*)gtd_calloc(max_degree + 1, sizeof(double));
                 for(size_t k=0; k<number_of_coefficients; k++)
                 {
                     JSON_Array *coeficient_json = json_array_get_array(coeficients_json, k);
                     int32_t nominator = (int32_t)json_array_get_number(coeficient_json, 0);
                     int32_t denominator = (int32_t)json_array_get_number(coeficient_json, 1);
                     int32_t degree = (int32_t)json_array_get_number(coeficient_json, 2);
-                    if(degree > 1)
-                    {
-                        GTD_LOG("Only constant functions are supported");
-                        exit(EXIT_FAILURE);
-                    }
-                    val = nominator/denominator;
+                    coeficients[degree] = (double)nominator/denominator;
                 }
-                if(val != -1)
-                    params[j] = create_constant_integer_function(val);
+                params[j] = create_function_by_array(var, max_degree, coeficients);
             }
             if(!functional[j - loop_start])
             {

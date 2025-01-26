@@ -24,13 +24,16 @@
         "id": 3,
         "name": "Min vertex count",
         "functions": {
-            "min vertex count": [
+            "min vertex count": {
+                "var": "x",
+                "function": [
                 [
                     8,
                     1,
-                    1
+                    0
                 ]
             ]
+            }
         }
     },
     {

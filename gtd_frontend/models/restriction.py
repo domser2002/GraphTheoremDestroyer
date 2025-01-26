@@ -1,3 +1,5 @@
+from sympy import symbols
+
 class RestrictionSchema:
 
     def __init__(self, id, name, int_params: list[str], functions: list[str]):
@@ -47,7 +49,9 @@ class Restriction:
             result['functions'] = {}
             for key in self.functions:
                 val = self.functions[key]
-                result['functions'][key] = val
+                val_var = str(val['var'])
+                val_poly = val['function']
+                result['functions'][key] = {'var': val_var, 'function': val_poly}
         return result
     
     @staticmethod
@@ -60,6 +64,10 @@ class Restriction:
             int_params_values = dictionary['int_params_values']
         if 'functions' in dictionary:
             functions = dictionary['functions']
+            for key in functions:
+                val_sym = symbols(functions[key]['var'])
+                val_func = functions[key]['function']
+                functions[key] = (val_sym, val_func)
         
         params = RestrictionParameters(id, name, int_params_values, functions)
         restriction = Restriction(params)

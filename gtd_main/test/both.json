@@ -24,13 +24,16 @@
         "id": 3,
         "name": "Min vertex degree",
         "functions": {
-            "min degree": [
+            "min degree": {
+                "var": "x",
+                "function": [
                 [
                     3,
                     1,
-                    1
+                    0
                 ]
             ]
+            }
         }
     },
     {
@@ -72,13 +75,16 @@
         "id": 3,
         "name": "Min vertex count",
         "functions": {
-            "min vertex count": [
+            "min vertex count": {
+                "var": "x",
+                "function": [
                 [
                     8,
                     1,
-                    1
+                    0
                 ]
             ]
+            }
         }
     },
     {

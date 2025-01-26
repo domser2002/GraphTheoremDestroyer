@@ -10,7 +10,18 @@ def render_polynomial(expression, canvas, fig, input_field, is_destroyed_callbac
 
     try:
         x = symbols('x')
-        poly = Poly(sympify(expression), x)
+        n = symbols('n')
+        m = symbols('m')
+        if sympify(expression).is_Number:
+            poly = Poly(sympify(expression), x)
+            used_symbols = {x}
+        else:
+            poly = Poly(sympify(expression))
+            free_symbols = poly.free_symbols
+            used_symbols = free_symbols & {x, n, m}
+
+        if len(used_symbols) != 1:
+            raise ValueError("Invalid variable, should be x, n or m")
         
         if not all(coef.is_rational for coef in poly.all_coeffs()):
             raise ValueError("Not a rational polynomial")
@@ -78,10 +89,21 @@ class FunctionInputFrame(CTkFrame):
     def get_value(self):
         x = symbols('x')
         try:
-            poly = Poly(self.expression, x)
+            # poly = Poly(self.expression, x)
+            x = symbols('x')
+            n = symbols('n')
+            m = symbols('m')
+            if sympify(self.expression).is_Number:
+                poly = Poly(sympify(self.expression), x)
+                used_symbols = {x}
+            else:
+                poly = Poly(sympify(self.expression))
+                free_symbols = poly.free_symbols
+                used_symbols = free_symbols & {x, n, m}
+
             terms = poly.terms()
             result = [(coef.p, coef.q, deg[0]) for deg, coef in terms]
-            return result
+            return used_symbols.pop(), result
         except:
             return None
     

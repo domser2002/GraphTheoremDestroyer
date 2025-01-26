@@ -111,6 +111,12 @@ class RestrictionController:
             data['int_params_values'] = restr.int_params_values
         if restr.functions is not None and len(restr.functions) > 0:
             data['functions'] = restr.functions
+            print(data['functions'])
+            for key in data['functions']:
+                val = data['functions'][key]
+                val_var = str(val[0])
+                val_poly = val[1]
+                data['functions'][key] = {'var': val_var, 'function': val_poly}
         return data
 
     def close_connection(self):

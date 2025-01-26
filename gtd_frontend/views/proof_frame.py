@@ -187,11 +187,13 @@ class ProofFrame(CTkFrame):
             )
             key_label.grid(row=0, column=0, padx=5, pady=0, sticky='w')
 
-            x = symbols('x')
+            # x = symbols('x')
+            print(val)
             terms = []
             if val != None:
-                for n, d, p in val:
-                    terms.append(Rational(n, d) * x**p)
+                symbol = val[0]
+                for n, d, p in val[1]:
+                    terms.append(Rational(n, d) * symbol**p)
             
             poly = Add(*terms)
             latex_expr = latex(sympify(poly))

@@ -29,7 +29,10 @@ class ProofListView(CTkScrollableFrame):
             self.proof_views.insert(0, proof_frame)
             proof_frame.grid(row=0, column=0, sticky="ew", pady=10)
             for index, frame in enumerate(self.proof_views[1:], start=1):
-                frame.grid_configure(row=index)
+                try:
+                    frame.grid_configure(row=index)
+                except:
+                    continue
 
     def update_proof_result(self, proof: Proof):
         for proof_view in self.proof_views:

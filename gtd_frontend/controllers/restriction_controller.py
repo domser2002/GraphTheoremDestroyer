@@ -16,7 +16,7 @@ class RestrictionController:
     def __init__(self, proof_controller: ProofController):
         self.restrictions: list[Restriction] = []
         self.proof_controller: ProofController = proof_controller
-        self.server_address = ('localhost', 8080)  # Assuming localhost and PORT 8080
+        self.server_address = ('localhost', 8711)  # Assuming localhost and PORT 8080
         self.sock = None
         self.init_controller()
 

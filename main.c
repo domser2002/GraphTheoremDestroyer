@@ -14,7 +14,7 @@
 #include <arpa/inet.h>
 #include "json_parser.h"
 #include "module.h"
-#define PORT 8080
+#define PORT 8711
 #define BUFFER_SIZE 1024
 
 /**

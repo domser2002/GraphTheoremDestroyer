@@ -79,6 +79,12 @@ class RestrictionView(CTkFrame):
         combo_box.set(self.restriction_params.restriction_name)
 
     def display_int_input_fields(self):
+
+        def is_digit_or_empty(P):
+            return len(P) == 0 or P.isdigit()
+        
+        val_command = (self.right_frame.register(is_digit_or_empty), '%P')
+
         for int_field_label in self.chosen_schema.int_params:
             label = CTkLabel(self.right_frame, text=f'{int_field_label}:')
             # label.pack_propagate(False)
@@ -88,7 +94,11 @@ class RestrictionView(CTkFrame):
             else:
                 int_var = tk.StringVar(value=str(INT_ENTRY_FIELD_DEFAULT))
                 self.restriction_params.int_params_values[int_field_label] = int_var
-            entry = CTkEntry(self.right_frame, width=50, textvariable=int_var)
+            entry = CTkEntry(self.right_frame,
+                              width=50, 
+                              textvariable=int_var,
+                              validate='key',
+                              validatecommand=val_command)
             entry.pack(side='left', padx=10)
             
     
